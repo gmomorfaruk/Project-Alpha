@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>My Investments - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item active">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item active">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="content">
+            <div class="page-header">
+                <h1 data-en="My Investments" data-bn="আমার বিনিয়োগ">My Investments</h1>
+                <p data-en="Track and manage your investments" data-bn="আপনার বিনিয়োগ ট্র্যাক এবং পরিচালনা করুন">Track and manage your investments</p>
+            </div>
+
+            <!-- Investment Stats -->
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-icon investment">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Total Invested" data-bn="মোট বিনিয়োগ">Total Invested</span>
+                        <span class="stat-value" id="totalInvested">৳0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon profit">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Total Profit" data-bn="মোট লাভ">Total Profit</span>
+                        <span class="stat-value" id="totalProfit">৳0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(23, 133, 130, 0.1); color: #178582;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Active Investments" data-bn="সক্রিয় বিনিয়োগ">Active Investments</span>
+                        <span class="stat-value" id="activeCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs" style="margin-bottom: 20px;">
+                <button class="filter-tab active" data-filter="all" onclick="filterInvestments('all')">All</button>
+                <button class="filter-tab" data-filter="active" onclick="filterInvestments('active')">Active</button>
+                <button class="filter-tab" data-filter="self-sell" onclick="filterInvestments('self-sell')">Self-Sell</button>
+                <button class="filter-tab" data-filter="auto-sell" onclick="filterInvestments('auto-sell')">Auto-Sell</button>
+                <button class="filter-tab" data-filter="completed" onclick="filterInvestments('completed')">Completed</button>
+            </div>
+
+            <!-- Investments List -->
+            <div class="investments-list" id="investmentsList">
+                <div class="empty-state">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3 data-en="No investments yet" data-bn="এখনও কোন বিনিয়োগ নেই">No investments yet</h3>
+                    <p data-en="Start investing to see your portfolio here" data-bn="আপনার পোর্টফোলিও এখানে দেখতে বিনিয়োগ শুরু করুন">Start investing to see your portfolio here</p>
+                    <a href="products.html" class="btn btn-primary" data-en="Browse Products" data-bn="পণ্য ব্রাউজ করুন">Browse Products</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Investment Details Modal -->
+    <div class="modal-overlay" id="investmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Investment Details" data-bn="বিনিয়োগের বিবরণ">Investment Details</h3>
+                <button class="modal-close" onclick="Modal.close('investmentModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="investmentDetails">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        // Sample investments data
+        let investments = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'User';
+            
+            // Load investments
+            investments = Storage.get('investments') || [];
+            
+            // Calculate stats
+            const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
+            const totalProfit = investments.reduce((sum, inv) => sum + (inv.profit || 0), 0);
+            const activeCount = investments.filter(inv => inv.status === 'active').length;
+
+            document.getElementById('totalInvested').textContent = formatCurrency(totalInvested);
+            document.getElementById('totalProfit').textContent = formatCurrency(totalProfit);
+            document.getElementById('activeCount').textContent = activeCount;
+
+            renderInvestments(investments);
+        });
+
+        function renderInvestments(investmentList) {
+            const container = document.getElementById('investmentsList');
+
+            if (investmentList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3 data-en="No investments found" data-bn="কোন বিনিয়োগ পাওয়া যায়নি">No investments found</h3>
+                        <p data-en="Start investing to see your portfolio here" data-bn="আপনার পোর্টফোলিও এখানে দেখতে বিনিয়োগ শুরু করুন">Start investing to see your portfolio here</p>
+                        <a href="products.html" class="btn btn-primary" data-en="Browse Products" data-bn="পণ্য ব্রাউজ করুন">Browse Products</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = investmentList.map(inv => `
+                <div class="investment-item" onclick="showInvestmentDetails('${inv.id}')">
+                    <div class="investment-icon">
+                        <i class="fas fa-${inv.productIcon || 'box'}"></i>
+                    </div>
+                    <div class="investment-details">
+                        <div class="investment-name">${inv.productName}</div>
+                        <div class="investment-meta">
+                            ${inv.units} units • ${inv.sellMode === 'self' ? 'Self-Sell' : 'Auto-Sell'} • 
+                            <span class="badge badge-${inv.status === 'active' ? 'primary' : inv.status === 'completed' ? 'success' : 'warning'}">${inv.status}</span>
+                        </div>
+                    </div>
+                    <div class="investment-stats">
+                        <div class="investment-amount">${formatCurrency(inv.amount)}</div>
+                        <div class="investment-profit">+${formatCurrency(inv.expectedProfit)} expected</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterInvestments(filter) {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === filter);
+            });
+
+            let filtered = investments;
+
+            if (filter === 'active') {
+                filtered = investments.filter(inv => inv.status === 'active');
+            } else if (filter === 'self-sell') {
+                filtered = investments.filter(inv => inv.sellMode === 'self');
+            } else if (filter === 'auto-sell') {
+                filtered = investments.filter(inv => inv.sellMode === 'auto');
+            } else if (filter === 'completed') {
+                filtered = investments.filter(inv => inv.status === 'completed');
+            }
+
+            renderInvestments(filtered);
+        }
+
+        function showInvestmentDetails(id) {
+            const investment = investments.find(inv => inv.id === id);
+            if (!investment) return;
+
+            const daysRemaining = Math.max(0, Math.ceil((new Date(investment.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
+            const progress = Math.min(100, ((investment.duration - daysRemaining) / investment.duration) * 100);
+
+            document.getElementById('investmentDetails').innerHTML = `
+                <div class="product-summary">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div class="investment-icon" style="width: 60px; height: 60px; font-size: 28px;">
+                            <i class="fas fa-${investment.productIcon || 'box'}"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 5px;">${investment.productName}</h4>
+                            <span class="badge badge-${investment.status === 'active' ? 'primary' : 'success'}">${investment.status}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Invested Amount</span>
+                        <strong>${formatCurrency(investment.amount)}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Units</span>
+                        <strong>${investment.units}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Sell Mode</span>
+                        <strong>${investment.sellMode === 'self' ? 'Self-Sell' : 'Auto-Sell'}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Profit Rate</span>
+                        <strong style="color: var(--success-color);">+${investment.profitRate}%</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Expected Profit</span>
+                        <strong style="color: var(--success-color);">${formatCurrency(investment.expectedProfit)}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Duration</span>
+                        <strong>${investment.duration} days</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Days Remaining</span>
+                        <strong>${daysRemaining} days</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Start Date</span>
+                        <strong>${formatDate(investment.startDate)}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>End Date</span>
+                        <strong>${formatDate(investment.endDate)}</strong>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 14px; color: var(--text-secondary);">Progress</span>
+                        <span style="font-size: 14px; font-weight: 600;">${Math.round(progress)}%</span>
+                    </div>
+                    <div style="background: var(--bg-secondary); border-radius: 10px; height: 10px; overflow: hidden;">
+                        <div style="background: var(--primary-gradient); height: 100%; width: ${progress}%; border-radius: 10px;"></div>
+                    </div>
+                </div>
+
+                ${investment.sellMode === 'self' && investment.status === 'active' ? `
+                    <a href="sell-proofs.html?investment=${investment.id}" class="btn btn-primary btn-block">
+                        <i class="fas fa-upload"></i>
+                        Submit Sell Proof
+                    </a>
+                ` : ''}
+            `;
+
+            Modal.open('investmentModal');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

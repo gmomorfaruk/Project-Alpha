@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Sell Proofs - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item active">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item active">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="content">
+            <div class="page-header">
+                <h1 data-en="Sell Proofs" data-bn="বিক্রয় প্রমাণ">Sell Proofs</h1>
+                <p data-en="Submit proofs for your self-sell investments" data-bn="আপনার সেলফ-সেল বিনিয়োগের জন্য প্রমাণ জমা দিন">Submit proofs for your self-sell investments</p>
+            </div>
+
+            <!-- Sell Bonus Info Banner -->
+            <div class="sell-bonus-info" id="sellBonusInfo" style="display: none; background: linear-gradient(135deg, rgba(191, 161, 129, 0.1), rgba(23, 133, 130, 0.1)); border: 1px solid rgba(191, 161, 129, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="width: 50px; height: 50px; background: rgba(191, 161, 129, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fas fa-gift" style="font-size: 22px; color: #BFA181;"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 5px;">🎁 Earn Bonus Points for Every Sale!</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin: 0;">
+                            Get <strong id="bonusBasePoints" style="color: #BFA181;">500</strong> bonus points 
+                            <span id="bonusPercentText">+ <strong style="color: #BFA181;">5%</strong> of product value</span> 
+                            when your sell proof is approved!
+                        </p>
+                    </div>
+                    <div style="background: #BFA181; color: #0A1828; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-coins" style="margin-right: 6px;"></i>
+                        Max: <span id="bonusMaxPoints">5000</span> pts
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit New Proof -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 30px; border: 1px solid var(--border-color); margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-upload" style="margin-right: 10px; color: var(--primary-color);"></i>Submit Sell Proof</h3>
+                
+                <form id="proofForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Select Investment</label>
+                            <select id="investmentSelect" required>
+                                <option value="">-- Select Self-Sell Investment --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Units Sold</label>
+                            <input type="number" id="unitsSold" min="1" placeholder="Enter number of units sold" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Buyer Name</label>
+                        <input type="text" id="buyerName" placeholder="Enter buyer's name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Proof Image</label>
+                        <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s;" id="uploadArea" onclick="document.getElementById('proofImage').click()">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                            <p style="color: var(--text-secondary);">Click to upload or drag and drop</p>
+                            <p style="font-size: 12px; color: var(--text-muted);">PNG, JPG up to 5MB</p>
+                            <input type="file" id="proofImage" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        </div>
+                        <div id="imagePreview" style="display: none; margin-top: 15px; position: relative;">
+                            <img id="previewImg" style="max-width: 200px; border-radius: 8px;">
+                            <button type="button" onclick="removeImage()" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; background: var(--danger-color); color: white; border-radius: 50%; border: none; cursor: pointer;">×</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Notes (Optional)</label>
+                        <textarea id="proofNotes" rows="3" placeholder="Any additional information about the sale"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Proof
+                    </button>
+                </form>
+            </div>
+
+            <!-- Submitted Proofs -->
+            <div class="section">
+                <h2 class="section-title">Submitted Proofs</h2>
+                <div class="filter-tabs" style="margin-bottom: 20px;">
+                    <button class="filter-tab active" data-filter="all" onclick="filterProofs('all')">All</button>
+                    <button class="filter-tab" data-filter="pending" onclick="filterProofs('pending')">Pending</button>
+                    <button class="filter-tab" data-filter="approved" onclick="filterProofs('approved')">Approved</button>
+                    <button class="filter-tab" data-filter="rejected" onclick="filterProofs('rejected')">Rejected</button>
+                </div>
+                <div class="investments-list" id="proofsList">
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No proofs submitted yet</h3>
+                        <p>Submit a sell proof for your self-sell investments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let proofs = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'User';
+            
+            loadSellBonusInfo();
+            loadSelfSellInvestments();
+            loadProofs();
+        });
+        
+        function loadSellBonusInfo() {
+            const settings = Storage.get('workSettings') || {};
+            const bonusSection = document.getElementById('sellBonusInfo');
+            
+            if (settings.sellBonusEnabled !== false) {
+                bonusSection.style.display = 'block';
+                
+                const basePoints = settings.sellBonusPoints || 500;
+                const percent = settings.sellBonusPercent || 5;
+                const maxPoints = settings.sellBonusMax || 5000;
+                
+                document.getElementById('bonusBasePoints').textContent = basePoints;
+                document.getElementById('bonusMaxPoints').textContent = maxPoints > 0 ? maxPoints : '∞';
+                
+                const percentText = document.getElementById('bonusPercentText');
+                if (percent > 0) {
+                    percentText.innerHTML = `+ <strong style="color: #BFA181;">${percent}%</strong> of product value`;
+                } else {
+                    percentText.style.display = 'none';
+                }
+            }
+        }
+        
+        function calculateSellBonus(productValue, unitsSold) {
+            const settings = Storage.get('workSettings') || {};
+            if (settings.sellBonusEnabled === false) return 0;
+            
+            const basePoints = settings.sellBonusPoints || 500;
+            const percent = settings.sellBonusPercent || 5;
+            const maxPoints = settings.sellBonusMax || 0;
+            const minUnits = settings.sellBonusMinUnits || 1;
+            
+            if (unitsSold < minUnits) return 0;
+            
+            let bonus = basePoints;
+            if (percent > 0) {
+                bonus += Math.floor((productValue * percent) / 100);
+            }
+            
+            if (maxPoints > 0 && bonus > maxPoints) {
+                bonus = maxPoints;
+            }
+            
+            return bonus;
+        }
+
+        function loadSelfSellInvestments() {
+            const investments = Storage.get('investments') || [];
+            const selfSellInvestments = investments.filter(inv => inv.sellMode === 'self' && inv.status === 'active');
+            
+            const select = document.getElementById('investmentSelect');
+            select.innerHTML = '<option value="">-- Select Self-Sell Investment --</option>' + 
+                selfSellInvestments.map(inv => `
+                    <option value="${inv.id}">${inv.productName} - ${inv.units} units</option>
+                `).join('');
+        }
+
+        function loadProofs() {
+            proofs = Storage.get('sellProofs') || [];
+            renderProofs(proofs);
+        }
+
+        function renderProofs(proofList) {
+            const container = document.getElementById('proofsList');
+
+            if (proofList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No proofs found</h3>
+                        <p>Submit a sell proof for your self-sell investments</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = proofList.map(proof => {
+                const bonusDisplay = proof.bonusPoints ? `
+                    <div style="font-size: 12px; color: #BFA181; margin-top: 3px;">
+                        <i class="fas fa-gift"></i> ${proof.status === 'approved' ? 'Bonus Earned:' : 'Potential Bonus:'} ${proof.bonusPoints} pts
+                    </div>
+                ` : '';
+                
+                return `
+                <div class="investment-item">
+                    <div class="investment-icon" style="background: ${proof.status === 'approved' ? 'rgba(16, 185, 129, 0.1)' : proof.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(191, 161, 129, 0.15)'}; color: ${proof.status === 'approved' ? '#10b981' : proof.status === 'rejected' ? '#ef4444' : '#BFA181'};">
+                        <i class="fas fa-${proof.status === 'approved' ? 'check' : proof.status === 'rejected' ? 'times' : 'clock'}"></i>
+                    </div>
+                    <div class="investment-details">
+                        <div class="investment-name">${proof.productName}</div>
+                        <div class="investment-meta">
+                            ${proof.unitsSold} units • Buyer: ${proof.buyerName} • ${formatDate(proof.submittedAt)}
+                        </div>
+                        ${bonusDisplay}
+                    </div>
+                    <div class="investment-stats">
+                        <span class="badge badge-${proof.status === 'approved' ? 'success' : proof.status === 'rejected' ? 'danger' : 'warning'}">${proof.status.charAt(0).toUpperCase() + proof.status.slice(1)}</span>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function filterProofs(filter) {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === filter);
+            });
+
+            const filtered = filter === 'all' ? proofs : proofs.filter(p => p.status === filter);
+            renderProofs(filtered);
+        }
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('uploadArea').style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('proofImage').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+        }
+
+        document.getElementById('proofForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const investmentId = document.getElementById('investmentSelect').value;
+            const unitsSold = parseInt(document.getElementById('unitsSold').value);
+            const buyerName = document.getElementById('buyerName').value;
+            const notes = document.getElementById('proofNotes').value;
+            const imageInput = document.getElementById('proofImage');
+
+            if (!investmentId) {
+                showToast('Please select an investment', 'error');
+                return;
+            }
+
+            const investments = Storage.get('investments') || [];
+            const investment = investments.find(inv => inv.id === investmentId);
+
+            if (!investment) {
+                showToast('Investment not found', 'error');
+                return;
+            }
+
+            if (unitsSold > investment.units) {
+                showToast('Units sold cannot exceed investment units', 'error');
+                return;
+            }
+            
+            // Calculate potential bonus points
+            const productValue = investment.price * unitsSold;
+            const bonusPoints = calculateSellBonus(productValue, unitsSold);
+
+            const proof = {
+                id: generateId(),
+                investmentId: investmentId,
+                productName: investment.productName,
+                productValue: productValue,
+                unitsSold: unitsSold,
+                buyerName: buyerName,
+                notes: notes,
+                imageUrl: imageInput.files[0] ? document.getElementById('previewImg').src : null,
+                status: 'pending',
+                bonusPoints: bonusPoints,
+                submittedAt: new Date().toISOString()
+            };
+
+            // Save proof
+            proofs.push(proof);
+            Storage.set('sellProofs', proofs);
+
+            showToast(`Sell proof submitted! Potential bonus: ${bonusPoints} points`, 'success');
+            this.reset();
+            removeImage();
+            loadProofs();
+        });
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

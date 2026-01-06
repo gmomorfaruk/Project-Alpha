@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Transactions - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('transactions'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Transaction Management</h1>
+                <p>Approve or reject deposit/withdrawal and membership requests</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="transaction-tabs" style="display: flex; gap: 10px; margin-bottom: 25px;">
+                <button class="tab-btn active" id="tabTransactions" onclick="switchTab('transactions')">
+                    <i class="fas fa-exchange-alt"></i> Transactions
+                    <span class="tab-badge" id="pendingTransBadge">0</span>
+                </button>
+                <button class="tab-btn" id="tabMembership" onclick="switchTab('membership')">
+                    <i class="fas fa-crown"></i> Membership Requests
+                    <span class="tab-badge" id="pendingMemberBadge">0</span>
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row" id="transactionStats">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="pendingCount">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalDeposits">৳0</h3>
+                        <p>Total Deposits</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalWithdrawals">৳0</h3>
+                        <p>Total Withdrawals</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalTransactions">0</h3>
+                        <p>Total Transactions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Section -->
+            <div class="tab-content active" id="transactionsContent">
+                <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search by email or transaction ID..." oninput="searchTransactions()">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="filterType" onchange="filterTransactions()">
+                                <option value="all">All Types</option>
+                                <option value="deposit">Deposits</option>
+                                <option value="withdrawal">Withdrawals</option>
+                            </select>
+                            <select id="filterStatus" onchange="filterTransactions()">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <button class="btn btn-outline" onclick="exportTransactions()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                    <th>Account</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 40px;">
+                                        <i class="fas fa-exchange-alt" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                        <p style="color: var(--text-muted);">No transactions found</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membership Requests Section -->
+            <div class="tab-content" id="membershipContent" style="display: none;">
+                <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="membershipSearchInput" placeholder="Search by user or TrxID..." oninput="searchMembershipRequests()">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="membershipFilterStatus" onchange="filterMembershipRequests()">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>User</th>
+                                    <th>Membership</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>TrxID</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="membershipTable">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 40px;">
+                                        <i class="fas fa-crown" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                        <p style="color: var(--text-muted);">No membership requests found</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Transaction Details Modal -->
+    <div class="form-modal" id="detailsModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3 id="modalTitle">Transaction Details</h3>
+                <button class="form-modal-close" onclick="closeModal('detailsModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="transactionDetails">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="form-modal-footer" id="modalActions">
+                <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover { border-color: var(--primary-color); }
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        .tab-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .tab-btn:not(.active) .tab-badge {
+            background: #ef4444;
+            color: white;
+        }
+        .membership-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/app-config.js"></script>
+    <script src="../js/financial-tracker.js"></script>
+    <script>
+        let transactions = [];
+        let membershipRequests = [];
+        let currentTab = 'transactions';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadAllData();
+
+            // Check for filter param
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            const tab = urlParams.get('tab');
+            
+            if (tab === 'membership') {
+                switchTab('membership');
+            }
+            
+            if (filter) {
+                document.getElementById('filterStatus').value = filter;
+                filterTransactions();
+            }
+        });
+
+        function loadAllData() {
+            loadTransactions();
+            loadMembershipRequests();
+            updateBadges();
+        }
+
+        function loadTransactions() {
+            transactions = Storage.get('transactions') || [];
+            updateStats();
+            renderTransactions(transactions);
+        }
+
+        function loadMembershipRequests() {
+            membershipRequests = Storage.get('membershipRequests') || [];
+            renderMembershipRequests(membershipRequests);
+        }
+
+        function updateBadges() {
+            const pendingTrans = (Storage.get('transactions') || []).filter(t => t.status === 'pending');
+            const pendingMember = (Storage.get('membershipRequests') || []).filter(r => r.status === 'pending');
+            
+            document.getElementById('pendingTransBadge').textContent = pendingTrans.length;
+            document.getElementById('pendingMemberBadge').textContent = pendingMember.length;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tab === 'transactions' ? 'tabTransactions' : 'tabMembership').classList.add('active');
+            
+            // Update content
+            document.getElementById('transactionsContent').style.display = tab === 'transactions' ? 'block' : 'none';
+            document.getElementById('membershipContent').style.display = tab === 'membership' ? 'block' : 'none';
+        }
+
+        function updateStats() {
+            const pending = transactions.filter(t => t.status === 'pending');
+            document.getElementById('pendingCount').textContent = pending.length;
+
+            const deposits = transactions.filter(t => t.type === 'deposit' && t.status === 'approved');
+            const totalDeposits = deposits.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('totalDeposits').textContent = formatCurrency(totalDeposits);
+
+            const withdrawals = transactions.filter(t => t.type === 'withdrawal' && t.status === 'approved');
+            const totalWithdrawals = withdrawals.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('totalWithdrawals').textContent = formatCurrency(totalWithdrawals);
+
+            document.getElementById('totalTransactions').textContent = transactions.length;
+        }
+
+        function renderTransactions(transactionList) {
+            const tbody = document.getElementById('transactionsTable');
+            
+            if (transactionList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exchange-alt" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No transactions found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = transactionList.map(t => `
+                <tr>
+                    <td><code style="font-size: 11px;">${t.id.slice(0, 8)}...</code></td>
+                    <td>${t.userEmail}</td>
+                    <td>
+                        <span class="badge badge-${t.type === 'deposit' ? 'success' : 'danger'}">
+                            <i class="fas fa-arrow-${t.type === 'deposit' ? 'down' : 'up'}"></i> ${t.type}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="color: ${t.method === 'bkash' ? '#e2136e' : '#f5821f'};">
+                            ${t.method === 'bkash' ? 'bKash' : 'Nagad'}
+                        </span>
+                    </td>
+                    <td><strong>${formatCurrency(t.amount)}</strong></td>
+                    <td>${t.accountNumber || '-'}</td>
+                    <td>
+                        <span class="badge badge-${t.status === 'approved' ? 'success' : t.status === 'rejected' ? 'danger' : 'warning'}">
+                            ${t.status}
+                        </span>
+                    </td>
+                    <td>${formatDate(t.createdAt)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn-view" onclick="viewTransaction('${t.id}')" title="View"><i class="fas fa-eye"></i></button>
+                            ${t.status === 'pending' ? `
+                                <button class="action-btn-approve" onclick="approveTransaction('${t.id}')" title="Approve"><i class="fas fa-check"></i></button>
+                                <button class="action-btn-reject" onclick="rejectTransaction('${t.id}')" title="Reject"><i class="fas fa-times"></i></button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchTransactions() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = transactions.filter(t => 
+                t.id.toLowerCase().includes(query) ||
+                t.userEmail.toLowerCase().includes(query)
+            );
+            renderTransactions(filtered);
+        }
+
+        function filterTransactions() {
+            const type = document.getElementById('filterType').value;
+            const status = document.getElementById('filterStatus').value;
+            
+            let filtered = transactions;
+            
+            if (type !== 'all') {
+                filtered = filtered.filter(t => t.type === type);
+            }
+            
+            if (status !== 'all') {
+                filtered = filtered.filter(t => t.status === status);
+            }
+            
+            renderTransactions(filtered);
+        }
+
+        function viewTransaction(id) {
+            const t = transactions.find(t => t.id === id);
+            if (!t) return;
+
+            document.getElementById('transactionDetails').innerHTML = `
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Transaction ID</span>
+                        <strong style="font-family: monospace;">${t.id}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>User</span>
+                        <strong>${t.userEmail}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Type</span>
+                        <span class="badge badge-${t.type === 'deposit' ? 'success' : 'danger'}">${t.type}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Method</span>
+                        <strong>${t.method === 'bkash' ? 'bKash' : 'Nagad'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Amount</span>
+                        <strong style="font-size: 18px;">${formatCurrency(t.amount)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Account Number</span>
+                        <strong>${t.accountNumber || '-'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Transaction ID (User)</span>
+                        <strong>${t.transactionId || '-'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Status</span>
+                        <span class="badge badge-${t.status === 'approved' ? 'success' : t.status === 'rejected' ? 'danger' : 'warning'}">${t.status}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span>Date</span>
+                        <strong>${formatDate(t.createdAt)}</strong>
+                    </div>
+                </div>
+            `;
+
+            const actionsDiv = document.getElementById('modalActions');
+            if (t.status === 'pending') {
+                actionsDiv.innerHTML = `
+                    <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+                    <button class="btn btn-danger" onclick="rejectTransaction('${t.id}'); closeModal('detailsModal');">Reject</button>
+                    <button class="btn btn-success" onclick="approveTransaction('${t.id}'); closeModal('detailsModal');">Approve</button>
+                `;
+            } else {
+                actionsDiv.innerHTML = `<button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>`;
+            }
+
+            document.getElementById('detailsModal').classList.add('active');
+        }
+
+        function approveTransaction(id) {
+            const t = transactions.find(t => t.id === id);
+            if (!t) return;
+
+            // Update transaction status
+            t.status = 'approved';
+            t.processedAt = new Date().toISOString();
+
+            // Update user balance if deposit
+            if (t.type === 'deposit') {
+                const users = Storage.get('users') || [];
+                const userIndex = users.findIndex(u => u.email === t.userEmail);
+                if (userIndex !== -1) {
+                    users[userIndex].balance = (users[userIndex].balance || 0) + t.amount;
+                    Storage.set('users', users);
+                }
+                
+                // Record deposit in financial tracker
+                FinancialTracker.recordDeposit(t.userEmail, t.amount, t.method || 'manual');
+            }
+            
+            // Record withdrawal in financial tracker
+            if (t.type === 'withdrawal') {
+                FinancialTracker.recordWithdrawal(t.userEmail, t.amount, t.method || 'manual');
+            }
+
+            Storage.set('transactions', transactions);
+            showToast('Transaction approved successfully', 'success');
+            loadAllData();
+        }
+
+        function rejectTransaction(id) {
+            const t = transactions.find(t => t.id === id);
+            if (!t) return;
+
+            // If withdrawal, refund the amount
+            if (t.type === 'withdrawal') {
+                const users = Storage.get('users') || [];
+                const userIndex = users.findIndex(u => u.email === t.userEmail);
+                if (userIndex !== -1) {
+                    users[userIndex].balance = (users[userIndex].balance || 0) + t.amount;
+                    Storage.set('users', users);
+                }
+            }
+
+            t.status = 'rejected';
+            t.processedAt = new Date().toISOString();
+
+            Storage.set('transactions', transactions);
+            showToast('Transaction rejected', 'success');
+            loadAllData();
+        }
+
+        function exportTransactions() {
+            exportToCSV(transactions.map(t => ({
+                ID: t.id,
+                User: t.userEmail,
+                Type: t.type,
+                Method: t.method,
+                Amount: t.amount,
+                Account: t.accountNumber || '',
+                Status: t.status,
+                Date: t.createdAt
+            })), 'transactions');
+        }
+
+        // ===== MEMBERSHIP REQUESTS FUNCTIONS =====
+        
+        function renderMembershipRequests(requestList) {
+            const tbody = document.getElementById('membershipTable');
+            
+            if (requestList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-crown" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No membership requests found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = requestList.map(r => {
+                const membership = AppConfig.membershipLevels[r.membershipId] || {};
+                return `
+                <tr>
+                    <td><code style="font-size: 11px;">${r.id}</code></td>
+                    <td>
+                        <div>
+                            <strong>${r.userName || 'Unknown'}</strong>
+                            <br><small style="color: var(--text-muted);">${r.userId}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="membership-badge" style="background: ${membership.color}20; color: ${membership.color};">
+                            <i class="fas ${membership.icon || 'fa-crown'}"></i>
+                            ${r.membershipName}
+                        </span>
+                    </td>
+                    <td><strong>${formatCurrency(r.amount)}</strong></td>
+                    <td>
+                        <span style="color: ${r.paymentMethod === 'bkash' ? '#e2136e' : '#f5821f'};">
+                            ${r.paymentMethodName}
+                        </span>
+                    </td>
+                    <td>
+                        <code style="font-size: 11px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px;">
+                            ${r.transactionId}
+                        </code>
+                    </td>
+                    <td>
+                        <span class="badge badge-${r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning'}">
+                            ${r.status}
+                        </span>
+                    </td>
+                    <td>${formatDate(r.createdAt)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn-view" onclick="viewMembershipRequest('${r.id}')" title="View"><i class="fas fa-eye"></i></button>
+                            ${r.status === 'pending' ? `
+                                <button class="action-btn-approve" onclick="approveMembershipRequest('${r.id}')" title="Approve"><i class="fas fa-check"></i></button>
+                                <button class="action-btn-reject" onclick="rejectMembershipRequest('${r.id}')" title="Reject"><i class="fas fa-times"></i></button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function searchMembershipRequests() {
+            const query = document.getElementById('membershipSearchInput').value.toLowerCase();
+            const filtered = membershipRequests.filter(r => 
+                r.id.toLowerCase().includes(query) ||
+                r.userId.toLowerCase().includes(query) ||
+                r.userName.toLowerCase().includes(query) ||
+                r.transactionId.toLowerCase().includes(query)
+            );
+            renderMembershipRequests(filtered);
+        }
+
+        function filterMembershipRequests() {
+            const status = document.getElementById('membershipFilterStatus').value;
+            let filtered = membershipRequests;
+            
+            if (status !== 'all') {
+                filtered = filtered.filter(r => r.status === status);
+            }
+            
+            renderMembershipRequests(filtered);
+        }
+
+        function viewMembershipRequest(id) {
+            const r = membershipRequests.find(r => r.id === id);
+            if (!r) return;
+
+            const membership = AppConfig.membershipLevels[r.membershipId] || {};
+            
+            document.getElementById('modalTitle').textContent = 'Membership Request Details';
+            document.getElementById('transactionDetails').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: ${membership.color}; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; color: white; font-size: 1.5rem;">
+                        <i class="fas ${membership.icon || 'fa-crown'}"></i>
+                    </div>
+                    <h3>${r.membershipName}</h3>
+                    <p style="color: var(--text-muted);">${membership.earningsMultiplier}x earnings multiplier</p>
+                </div>
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Request ID</span>
+                        <strong style="font-family: monospace;">${r.id}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>User</span>
+                        <strong>${r.userName}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Email</span>
+                        <strong>${r.userId}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Amount</span>
+                        <strong style="font-size: 18px; color: #10b981;">${formatCurrency(r.amount)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Payment Method</span>
+                        <strong style="color: ${r.paymentMethod === 'bkash' ? '#e2136e' : '#f5821f'};">${r.paymentMethodName}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Transaction ID</span>
+                        <strong style="font-family: monospace; background: var(--bg-primary); padding: 4px 8px; border-radius: 4px;">${r.transactionId}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Sender Number</span>
+                        <strong>${r.senderNumber}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Status</span>
+                        <span class="badge badge-${r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning'}">${r.status}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span>Submitted</span>
+                        <strong>${formatDate(r.createdAt)}</strong>
+                    </div>
+                    ${r.note ? `
+                    <div style="margin-top: 15px; padding: 15px; background: var(--bg-primary); border-radius: 8px;">
+                        <strong>User Note:</strong>
+                        <p style="margin-top: 5px; color: var(--text-secondary);">${r.note}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+            const actionsDiv = document.getElementById('modalActions');
+            if (r.status === 'pending') {
+                actionsDiv.innerHTML = `
+                    <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+                    <button class="btn btn-danger" onclick="rejectMembershipRequest('${r.id}'); closeModal('detailsModal');">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                    <button class="btn btn-success" onclick="approveMembershipRequest('${r.id}'); closeModal('detailsModal');">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                `;
+            } else {
+                actionsDiv.innerHTML = `<button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>`;
+            }
+
+            document.getElementById('detailsModal').classList.add('active');
+        }
+
+        function approveMembershipRequest(id) {
+            const r = membershipRequests.find(r => r.id === id);
+            if (!r) return;
+
+            // Update request status
+            r.status = 'approved';
+            r.processedAt = new Date().toISOString();
+            r.processedBy = Storage.get('currentUser')?.email || 'admin';
+            
+            // Get the task limit from request or from levels
+            let taskLimit = r.taskLimit;
+            if (!taskLimit) {
+                const levels = Storage.get('membershipLevels') || [];
+                const level = levels.find(l => l.id === r.membershipId);
+                taskLimit = level?.taskLimit || 5;
+            }
+
+            // Update user's membership level
+            const users = Storage.get('users') || [];
+            const userIndex = users.findIndex(u => u.email === r.userId);
+            
+            if (userIndex !== -1) {
+                users[userIndex].membershipLevel = r.membershipId;
+                users[userIndex].membershipName = r.membershipName;
+                users[userIndex].membershipTaskLimit = taskLimit;
+                users[userIndex].membershipDate = new Date().toISOString();
+                users[userIndex].membershipRequestId = r.id;
+                Storage.set('users', users);
+                
+                // Also update currentUser if same user is logged in
+                const currentUser = Storage.get('currentUser');
+                if (currentUser && currentUser.email === r.userId) {
+                    currentUser.membershipLevel = r.membershipId;
+                    currentUser.membershipName = r.membershipName;
+                    currentUser.membershipTaskLimit = taskLimit;
+                    currentUser.membershipDate = new Date().toISOString();
+                    Storage.set('currentUser', currentUser);
+                }
+                
+                // Create notification for the user
+                const notifications = Storage.get('membershipNotifications') || [];
+                notifications.push({
+                    id: 'MN' + Date.now(),
+                    userId: r.userId,
+                    membershipId: r.membershipId,
+                    membershipName: r.membershipName,
+                    taskLimit: taskLimit,
+                    createdAt: new Date().toISOString(),
+                    shown: false
+                });
+                Storage.set('membershipNotifications', notifications);
+            }
+
+            Storage.set('membershipRequests', membershipRequests);
+            
+            // Record membership purchase in financial tracker
+            if (r.amount && r.amount > 0) {
+                FinancialTracker.recordMembershipPurchase(r.userId, r.membershipName, r.amount);
+            }
+            
+            // Log activity
+            logAdminActivity('membership_approved', `Approved ${r.membershipName} for ${r.userName} (${r.userId})`);
+            
+            showToast(`Membership approved! ${r.userName} is now a ${r.membershipName}`, 'success');
+            loadAllData();
+        }
+
+        function rejectMembershipRequest(id) {
+            const r = membershipRequests.find(r => r.id === id);
+            if (!r) return;
+
+            r.status = 'rejected';
+            r.processedAt = new Date().toISOString();
+            r.processedBy = Storage.get('currentUser')?.email || 'admin';
+
+            Storage.set('membershipRequests', membershipRequests);
+            
+            // Log activity
+            logAdminActivity('membership_rejected', `Rejected ${r.membershipName} request from ${r.userName} (${r.userId})`);
+            
+            showToast('Membership request rejected', 'success');
+            loadAllData();
+        }
+
+        function logAdminActivity(action, description) {
+            const activities = Storage.get('adminActivities') || [];
+            const currentUser = Storage.get('currentUser');
+            activities.unshift({
+                id: Date.now(),
+                action: action,
+                description: description,
+                admin: currentUser?.email || 'admin',
+                timestamp: new Date().toISOString()
+            });
+            if (activities.length > 500) activities.length = 500;
+            Storage.set('adminActivities', activities);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Membership Settings - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .settings-page {
+            padding: 20px;
+        }
+
+        .settings-header {
+            margin-bottom: 30px;
+        }
+
+        .settings-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .settings-tab {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-tab:hover {
+            background: var(--bg-card);
+        }
+
+        .settings-tab.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .settings-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .settings-card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-card-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-card-header .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .settings-card-header .badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .settings-card-header .badge.inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .settings-card-body {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Membership Levels Grid */
+        .membership-levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .level-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .level-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .level-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .level-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .level-delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .level-delete-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .level-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .level-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .level-form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        .level-form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .level-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--primary-gradient);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info h4 {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .toggle-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Membership Cards */
+        .membership-settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .membership-edit-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .membership-edit-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .membership-edit-header i {
+            font-size: 1.5rem;
+        }
+
+        .membership-edit-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .membership-edit-body {
+            padding: 20px;
+        }
+
+        .membership-edit-body .form-group {
+            margin-bottom: 15px;
+        }
+
+        .inline-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* Withdrawal Settings */
+        .time-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .time-inputs input {
+            flex: 1;
+        }
+
+        .time-inputs span {
+            color: var(--text-secondary);
+        }
+
+        .days-checkboxes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .day-checkbox {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .day-checkbox:hover {
+            border-color: var(--primary-color);
+        }
+
+        .day-checkbox.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Payment Methods */
+        .payment-method-settings {
+            display: grid;
+            gap: 15px;
+        }
+
+        .payment-method-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        .payment-method-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .payment-method-info {
+            flex: 1;
+        }
+
+        .payment-method-info h4 {
+            font-size: 1rem;
+        }
+
+        .payment-method-inputs {
+            display: flex;
+            gap: 10px;
+            flex: 2;
+        }
+
+        .payment-method-inputs input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-card);
+        }
+
+        /* Task Settings */
+        .task-category-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .task-category-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .task-category-info {
+            flex: 1;
+        }
+
+        .task-category-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .task-category-controls input {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-card);
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-buttons .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+        }
+
+        .action-buttons .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .settings-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+
+            .inline-form {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-method-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .payment-method-inputs {
+                width: 100%;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('membership-settings'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content settings-page">
+            <div class="settings-header">
+                <h1><i class="fas fa-crown"></i> Membership Settings</h1>
+                <p>Configure membership levels, pricing, and benefits</p>
+            </div>
+
+            <!-- Settings Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" onclick="showTab('membership')">
+                    <i class="fas fa-crown"></i> Membership Levels
+                </button>
+                <button class="settings-tab" onclick="showTab('payment')">
+                    <i class="fas fa-wallet"></i> Payment Accounts
+                </button>
+                <button class="settings-tab" onclick="showTab('features')">
+                    <i class="fas fa-check-circle"></i> Features
+                </button>
+                <button class="settings-tab" onclick="showTab('referral')">
+                    <i class="fas fa-user-friends"></i> Referral Program
+                </button>
+            </div>
+
+            <!-- Membership Levels Section -->
+            <div class="settings-section active" id="membership-section">
+                <!-- Add Level Button -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0;"><i class="fas fa-layer-group"></i> Membership Levels</h3>
+                    <button class="btn btn-primary" onclick="addNewLevel()">
+                        <i class="fas fa-plus"></i> Add New Level
+                    </button>
+                </div>
+                
+                <!-- Levels Grid -->
+                <div class="membership-levels-grid" id="levelsGrid">
+                    <!-- Generated by JavaScript -->
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="saveMembershipLevels()">
+                        <i class="fas fa-save"></i> Save All Levels
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Accounts Section -->
+            <div class="settings-section" id="payment-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-mobile-alt" style="color: #E2136E;"></i> bKash Account</h3>
+                        <span class="badge active" id="bkashStatusBadge">Active</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>bKash Number</label>
+                                <input type="text" id="bkashNumber" placeholder="01XXXXXXXXX">
+                                <p class="form-help">Your bKash number for receiving payments</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Type</label>
+                                <select id="bkashType">
+                                    <option value="Personal">Personal</option>
+                                    <option value="Merchant">Merchant</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="toggle-row" style="border: none; padding-top: 0;">
+                            <div class="toggle-info">
+                                <h4>Enable bKash</h4>
+                                <p>Allow users to pay via bKash</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="bkashEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-mobile-alt" style="color: #F6921E;"></i> Nagad Account</h3>
+                        <span class="badge active" id="nagadStatusBadge">Active</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nagad Number</label>
+                                <input type="text" id="nagadNumber" placeholder="01XXXXXXXXX">
+                                <p class="form-help">Your Nagad number for receiving payments</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Type</label>
+                                <select id="nagadType">
+                                    <option value="Personal">Personal</option>
+                                    <option value="Merchant">Merchant</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="toggle-row" style="border: none; padding-top: 0;">
+                            <div class="toggle-info">
+                                <h4>Enable Nagad</h4>
+                                <p>Allow users to pay via Nagad</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="nagadEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-mobile-alt" style="color: #8C3494;"></i> Rocket Account</h3>
+                        <span class="badge inactive" id="rocketStatusBadge">Inactive</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Rocket Number</label>
+                                <input type="text" id="rocketNumber" placeholder="01XXXXXXXXX">
+                                <p class="form-help">Your Rocket number for receiving payments</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Type</label>
+                                <select id="rocketType">
+                                    <option value="Personal">Personal</option>
+                                    <option value="Merchant">Merchant</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="toggle-row" style="border: none; padding-top: 0;">
+                            <div class="toggle-info">
+                                <h4>Enable Rocket</h4>
+                                <p>Allow users to pay via Rocket</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="rocketEnabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="savePaymentAccounts()" style="margin-top: 20px;">
+                    <i class="fas fa-save"></i> Save Payment Settings
+                </button>
+            </div>
+
+            <!-- Features Section -->
+            <div class="settings-section" id="features-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-toggle-on"></i> Feature Toggles</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h4>Membership System</h4>
+                                <p>Enable or disable the entire membership system</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="membershipEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h4>Membership Upgrades</h4>
+                                <p>Allow users to purchase and upgrade memberships</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="upgradesEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h4>Free Membership</h4>
+                                <p>Allow users to use the platform with free membership</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="freeMembershipEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h4>Membership Benefits Display</h4>
+                                <p>Show membership benefits comparison on purchase page</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="benefitsDisplay" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Section -->
+            <div class="settings-section" id="referral-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-user-friends"></i> Referral Settings</h3>
+                        <span class="badge active">Active</span>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h4>Enable Referral Program</h4>
+                                <p>Allow users to earn by referring others</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="referralEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-grid" style="margin-top: 20px;">
+                            <div class="form-group">
+                                <label>Referrer Bonus (৳)</label>
+                                <input type="number" id="referrerBonus" value="50">
+                                <p class="form-help">Amount given to referrer when someone signs up</p>
+                            </div>
+                            <div class="form-group">
+                                <label>New User Bonus (৳)</label>
+                                <input type="number" id="newUserBonus" value="25">
+                                <p class="form-help">Amount given to new user who uses referral code</p>
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 20px 0 15px;">Multi-Level Referral</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Level 1 Commission (%)</label>
+                                <input type="number" id="level1Commission" value="10">
+                                <p class="form-help">Direct referral earnings percentage</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Level 2 Commission (%)</label>
+                                <input type="number" id="level2Commission" value="5">
+                                <p class="form-help">Second level referral percentage</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Level 3 Commission (%)</label>
+                                <input type="number" id="level3Commission" value="2">
+                                <p class="form-help">Third level referral percentage</p>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="saveReferralSettings()">
+                                <i class="fas fa-save"></i> Save Referral Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Authentication check
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            
+            renderMembershipCards();
+            loadMembershipLevels();
+            loadReferralSettings();
+            loadPaymentAccounts();
+            initializeSidebar();
+        });
+
+        // Show tab
+        function showTab(tab) {
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            
+            event.target.closest('.settings-tab').classList.add('active');
+            document.getElementById(`${tab}-section`).classList.add('active');
+        }
+        
+        // Get default membership levels
+        function getDefaultLevels() {
+            return [
+                { id: 'level1', name: 'Level 1', price: 1000, taskLimit: 5, enabled: true },
+                { id: 'level2', name: 'Level 2', price: 2000, taskLimit: 8, enabled: true },
+                { id: 'level3', name: 'Level 3', price: 3000, taskLimit: 12, enabled: true },
+                { id: 'level4', name: 'Level 4', price: 4000, taskLimit: 15, enabled: true },
+                { id: 'level5', name: 'Level 5', price: 5000, taskLimit: 20, enabled: true }
+            ];
+        }
+        
+        // Load membership levels from storage
+        function loadMembershipLevels() {
+            let levels = Storage.get('membershipLevels');
+            if (!levels || levels.length === 0) {
+                levels = getDefaultLevels();
+                Storage.set('membershipLevels', levels);
+            }
+            renderLevelsGrid(levels);
+        }
+        
+        // Render levels grid
+        function renderLevelsGrid(levels) {
+            const grid = document.getElementById('levelsGrid');
+            grid.innerHTML = '';
+            
+            levels.forEach((level, index) => {
+                const card = document.createElement('div');
+                card.className = 'level-card';
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <div class="level-card-header">
+                        <span class="level-badge">${level.name}</span>
+                        <button class="level-delete-btn" onclick="deleteLevel(${index})" title="Delete Level">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="level-form-group">
+                        <label>Level Name</label>
+                        <input type="text" class="level-name" value="${level.name}" placeholder="e.g., Level 1">
+                    </div>
+                    <div class="level-form-row">
+                        <div class="level-form-group">
+                            <label>Price (৳)</label>
+                            <input type="number" class="level-price" value="${level.price}" min="0" placeholder="1000">
+                        </div>
+                        <div class="level-form-group">
+                            <label>Task Limit</label>
+                            <input type="number" class="level-taskLimit" value="${level.taskLimit}" min="1" placeholder="5">
+                        </div>
+                    </div>
+                    <div class="toggle-row" style="border: none; padding-top: 10px;">
+                        <div class="toggle-info">
+                            <h4 style="font-size: 0.9rem;">Enable Level</h4>
+                            <p style="font-size: 0.8rem;">Show this level to users</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="level-enabled" ${level.enabled !== false ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        // Add new level
+        function addNewLevel() {
+            const levels = Storage.get('membershipLevels') || getDefaultLevels();
+            const newLevelNum = levels.length + 1;
+            const lastLevel = levels[levels.length - 1];
+            
+            levels.push({
+                id: 'level' + newLevelNum,
+                name: 'Level ' + newLevelNum,
+                price: lastLevel ? lastLevel.price + 1000 : 1000,
+                taskLimit: lastLevel ? lastLevel.taskLimit + 3 : 5,
+                enabled: true
+            });
+            
+            Storage.set('membershipLevels', levels);
+            renderLevelsGrid(levels);
+            showToast('New level added!', 'success');
+        }
+        
+        // Delete level
+        function deleteLevel(index) {
+            const levels = Storage.get('membershipLevels') || [];
+            if (levels.length <= 1) {
+                showToast('You must have at least one level', 'error');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete "${levels[index].name}"?`)) {
+                levels.splice(index, 1);
+                Storage.set('membershipLevels', levels);
+                renderLevelsGrid(levels);
+                showToast('Level deleted', 'success');
+            }
+        }
+        
+        // Save all membership levels
+        function saveMembershipLevels() {
+            const cards = document.querySelectorAll('.level-card');
+            const levels = [];
+            
+            cards.forEach((card, index) => {
+                const name = card.querySelector('.level-name').value.trim();
+                const price = parseInt(card.querySelector('.level-price').value) || 0;
+                const taskLimit = parseInt(card.querySelector('.level-taskLimit').value) || 5;
+                const enabled = card.querySelector('.level-enabled').checked;
+                
+                if (name) {
+                    levels.push({
+                        id: 'level' + (index + 1),
+                        name: name,
+                        price: price,
+                        taskLimit: taskLimit,
+                        enabled: enabled
+                    });
+                }
+            });
+            
+            if (levels.length === 0) {
+                showToast('At least one level is required', 'error');
+                return;
+            }
+            
+            Storage.set('membershipLevels', levels);
+            renderLevelsGrid(levels);
+            showToast('Membership levels saved successfully!', 'success');
+            
+            if (typeof db !== 'undefined') {
+                db.log('Updated membership levels', levels);
+            }
+        }
+
+        // Render membership cards (old function - keep for compatibility)
+        function renderMembershipCards() {
+            // This is now handled by loadMembershipLevels
+        }
+
+        // Load referral settings
+        function loadReferralSettings() {
+            document.getElementById('referralEnabled').checked = AppConfig.referral.enabled;
+            document.getElementById('referrerBonus').value = AppConfig.referral.bonusAmount;
+            document.getElementById('newUserBonus').value = AppConfig.referral.newUserBonus;
+            document.getElementById('level1Commission').value = AppConfig.referral.levels.level1.percentage;
+            document.getElementById('level2Commission').value = AppConfig.referral.levels.level2.percentage;
+            document.getElementById('level3Commission').value = AppConfig.referral.levels.level3.percentage;
+        }
+
+        // Save referral settings
+        function saveReferralSettings() {
+            const settings = {
+                enabled: document.getElementById('referralEnabled').checked,
+                bonusAmount: parseInt(document.getElementById('referrerBonus').value),
+                newUserBonus: parseInt(document.getElementById('newUserBonus').value),
+                levels: {
+                    level1: { percentage: parseInt(document.getElementById('level1Commission').value), label: 'Direct Referral' },
+                    level2: { percentage: parseInt(document.getElementById('level2Commission').value), label: 'Second Level' },
+                    level3: { percentage: parseInt(document.getElementById('level3Commission').value), label: 'Third Level' }
+                }
+            };
+
+            Object.assign(AppConfig.referral, settings);
+            configManager.saveConfig();
+            showToast('Referral settings saved successfully!', 'success');
+            
+            if (window.db) {
+                db.log('Updated referral settings', settings);
+            }
+        }
+
+        // Load payment accounts from config or storage
+        function loadPaymentAccounts() {
+            const savedAccounts = Storage.get('paymentAccounts') || AppConfig.paymentAccounts;
+            
+            if (savedAccounts.bkash) {
+                document.getElementById('bkashNumber').value = savedAccounts.bkash.number || '';
+                document.getElementById('bkashType').value = savedAccounts.bkash.type || 'Personal';
+                document.getElementById('bkashEnabled').checked = savedAccounts.bkash.enabled !== false;
+                updateStatusBadge('bkash', savedAccounts.bkash.enabled !== false);
+            }
+            
+            if (savedAccounts.nagad) {
+                document.getElementById('nagadNumber').value = savedAccounts.nagad.number || '';
+                document.getElementById('nagadType').value = savedAccounts.nagad.type || 'Personal';
+                document.getElementById('nagadEnabled').checked = savedAccounts.nagad.enabled !== false;
+                updateStatusBadge('nagad', savedAccounts.nagad.enabled !== false);
+            }
+            
+            if (savedAccounts.rocket) {
+                document.getElementById('rocketNumber').value = savedAccounts.rocket.number || '';
+                document.getElementById('rocketType').value = savedAccounts.rocket.type || 'Personal';
+                document.getElementById('rocketEnabled').checked = savedAccounts.rocket.enabled === true;
+                updateStatusBadge('rocket', savedAccounts.rocket.enabled === true);
+            }
+        }
+
+        // Update status badge
+        function updateStatusBadge(method, isEnabled) {
+            const badge = document.getElementById(`${method}StatusBadge`);
+            if (badge) {
+                badge.textContent = isEnabled ? 'Active' : 'Inactive';
+                badge.className = `badge ${isEnabled ? 'active' : 'inactive'}`;
+            }
+        }
+
+        // Save payment accounts
+        function savePaymentAccounts() {
+            const paymentAccounts = {
+                bkash: {
+                    enabled: document.getElementById('bkashEnabled').checked,
+                    name: 'bKash',
+                    number: document.getElementById('bkashNumber').value.trim(),
+                    type: document.getElementById('bkashType').value,
+                    icon: 'fa-mobile-alt',
+                    color: '#E2136E',
+                    instructions: 'Send money to this bKash number using the "Send Money" option.'
+                },
+                nagad: {
+                    enabled: document.getElementById('nagadEnabled').checked,
+                    name: 'Nagad',
+                    number: document.getElementById('nagadNumber').value.trim(),
+                    type: document.getElementById('nagadType').value,
+                    icon: 'fa-mobile-alt',
+                    color: '#F6921E',
+                    instructions: 'Send money to this Nagad number using the "Send Money" option.'
+                },
+                rocket: {
+                    enabled: document.getElementById('rocketEnabled').checked,
+                    name: 'Rocket',
+                    number: document.getElementById('rocketNumber').value.trim(),
+                    type: document.getElementById('rocketType').value,
+                    icon: 'fa-mobile-alt',
+                    color: '#8C3494',
+                    instructions: 'Send money to this Rocket number using the "Send Money" option.'
+                }
+            };
+
+            // Validate numbers
+            const enabledMethods = Object.entries(paymentAccounts).filter(([_, account]) => account.enabled);
+            for (const [method, account] of enabledMethods) {
+                if (!account.number || !/^01[0-9]{9}$/.test(account.number)) {
+                    showToast(`Please enter a valid 11-digit ${account.name} number`, 'error');
+                    return;
+                }
+            }
+
+            Storage.set('paymentAccounts', paymentAccounts);
+            
+            // Update status badges
+            updateStatusBadge('bkash', paymentAccounts.bkash.enabled);
+            updateStatusBadge('nagad', paymentAccounts.nagad.enabled);
+            updateStatusBadge('rocket', paymentAccounts.rocket.enabled);
+
+            showToast('Payment accounts saved successfully!', 'success');
+            
+            // Log activity
+            if (typeof db !== 'undefined') {
+                db.log('Updated payment accounts');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                padding: 15px 25px; border-radius: 10px;
+                color: white; font-weight: 500; z-index: 10000;
+                display: flex; align-items: center; gap: 10px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            `;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Sidebar
+        function initializeSidebar() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
+            if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>

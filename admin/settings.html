@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Settings - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('settings'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Platform Settings</h1>
+                <p>Configure your platform settings</p>
+            </div>
+
+            <!-- General Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-globe" style="color: var(--primary-color); margin-right: 10px;"></i>General Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Platform Name</h4>
+                        <p>The name displayed across the platform</p>
+                    </div>
+                    <input type="text" id="platformName" value="Project Alpha" style="width: 200px;">
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Default Language</h4>
+                        <p>Default language for new users</p>
+                    </div>
+                    <select id="defaultLanguage">
+                        <option value="en">English</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Maintenance Mode</h4>
+                        <p>Temporarily disable the platform for maintenance</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="maintenanceMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Financial Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-coins" style="color: var(--primary-color); margin-right: 10px;"></i>Financial Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Minimum Deposit</h4>
+                        <p>Minimum amount users can deposit</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span>৳</span>
+                        <input type="number" id="minDeposit" value="500" min="0" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Minimum Withdrawal</h4>
+                        <p>Minimum amount users can withdraw</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span>৳</span>
+                        <input type="number" id="minWithdrawal" value="1000" min="0" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Maximum Withdrawal (Daily)</h4>
+                        <p>Maximum withdrawal amount per day</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span>৳</span>
+                        <input type="number" id="maxWithdrawal" value="50000" min="0" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Withdrawal Fee (%)</h4>
+                        <p>Fee charged on withdrawals</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="number" id="withdrawalFee" value="0" min="0" max="100" step="0.1" style="width: 80px;">
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-user-friends" style="color: var(--primary-color); margin-right: 10px;"></i>Referral Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Referral Commission Rate</h4>
+                        <p>Commission percentage for successful referrals</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="number" id="referralRate" value="5" min="0" max="100" style="width: 80px;">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Referral Bonus</h4>
+                        <p>Fixed bonus for each successful referral</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span>৳</span>
+                        <input type="number" id="referralBonus" value="50" min="0" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Enable Referral Program</h4>
+                        <p>Allow users to earn through referrals</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="referralEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Payment Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-credit-card" style="color: var(--primary-color); margin-right: 10px;"></i>Payment Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>bKash Merchant Number</h4>
+                        <p>Your bKash merchant/agent number</p>
+                    </div>
+                    <input type="tel" id="bkashNumber" placeholder="01XXXXXXXXX" style="width: 200px;">
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Nagad Merchant Number</h4>
+                        <p>Your Nagad merchant/agent number</p>
+                    </div>
+                    <input type="tel" id="nagadNumber" placeholder="01XXXXXXXXX" style="width: 200px;">
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Enable bKash</h4>
+                        <p>Accept payments via bKash</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="bkashEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Enable Nagad</h4>
+                        <p>Accept payments via Nagad</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="nagadEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-bell" style="color: var(--primary-color); margin-right: 10px;"></i>Notification Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Email Notifications</h4>
+                        <p>Send email notifications for important events</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>SMS Notifications</h4>
+                        <p>Send SMS notifications to users</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="smsNotifications">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Admin Email</h4>
+                        <p>Email for receiving admin notifications</p>
+                    </div>
+                    <input type="email" id="adminEmail" placeholder="admin@example.com" style="width: 250px;">
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section">
+                <h3><i class="fas fa-shield-alt" style="color: var(--primary-color); margin-right: 10px;"></i>Security Settings</h3>
+                
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Require Phone Verification</h4>
+                        <p>Users must verify phone number to invest</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="phoneVerification">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Auto-approve Deposits Under</h4>
+                        <p>Automatically approve deposits below this amount</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span>৳</span>
+                        <input type="number" id="autoApproveLimit" value="0" min="0" style="width: 120px;">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info">
+                        <h4>Two-Factor Authentication</h4>
+                        <p>Require 2FA for admin login</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="twoFactorAuth">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                <button class="btn btn-outline" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> Reset to Default
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        const defaultSettings = {
+            platformName: 'Project Alpha',
+            defaultLanguage: 'en',
+            maintenanceMode: false,
+            minDeposit: 500,
+            minWithdrawal: 1000,
+            maxWithdrawal: 50000,
+            withdrawalFee: 0,
+            referralRate: 5,
+            referralBonus: 50,
+            referralEnabled: true,
+            bkashNumber: '',
+            nagadNumber: '',
+            bkashEnabled: true,
+            nagadEnabled: true,
+            emailNotifications: true,
+            smsNotifications: false,
+            adminEmail: '',
+            phoneVerification: false,
+            autoApproveLimit: 0,
+            twoFactorAuth: false
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadSettings();
+        });
+
+        function loadSettings() {
+            const settings = Storage.get('settings') || defaultSettings;
+
+            // General
+            document.getElementById('platformName').value = settings.platformName || defaultSettings.platformName;
+            document.getElementById('defaultLanguage').value = settings.defaultLanguage || defaultSettings.defaultLanguage;
+            document.getElementById('maintenanceMode').checked = settings.maintenanceMode || false;
+
+            // Financial
+            document.getElementById('minDeposit').value = settings.minDeposit || defaultSettings.minDeposit;
+            document.getElementById('minWithdrawal').value = settings.minWithdrawal || defaultSettings.minWithdrawal;
+            document.getElementById('maxWithdrawal').value = settings.maxWithdrawal || defaultSettings.maxWithdrawal;
+            document.getElementById('withdrawalFee').value = settings.withdrawalFee || defaultSettings.withdrawalFee;
+
+            // Referral
+            document.getElementById('referralRate').value = settings.referralRate || defaultSettings.referralRate;
+            document.getElementById('referralBonus').value = settings.referralBonus || defaultSettings.referralBonus;
+            document.getElementById('referralEnabled').checked = settings.referralEnabled !== false;
+
+            // Payment
+            document.getElementById('bkashNumber').value = settings.bkashNumber || '';
+            document.getElementById('nagadNumber').value = settings.nagadNumber || '';
+            document.getElementById('bkashEnabled').checked = settings.bkashEnabled !== false;
+            document.getElementById('nagadEnabled').checked = settings.nagadEnabled !== false;
+
+            // Notifications
+            document.getElementById('emailNotifications').checked = settings.emailNotifications !== false;
+            document.getElementById('smsNotifications').checked = settings.smsNotifications || false;
+            document.getElementById('adminEmail').value = settings.adminEmail || '';
+
+            // Security
+            document.getElementById('phoneVerification').checked = settings.phoneVerification || false;
+            document.getElementById('autoApproveLimit').value = settings.autoApproveLimit || 0;
+            document.getElementById('twoFactorAuth').checked = settings.twoFactorAuth || false;
+        }
+
+        function saveSettings() {
+            const settings = {
+                // General
+                platformName: document.getElementById('platformName').value,
+                defaultLanguage: document.getElementById('defaultLanguage').value,
+                maintenanceMode: document.getElementById('maintenanceMode').checked,
+
+                // Financial
+                minDeposit: parseInt(document.getElementById('minDeposit').value) || 500,
+                minWithdrawal: parseInt(document.getElementById('minWithdrawal').value) || 1000,
+                maxWithdrawal: parseInt(document.getElementById('maxWithdrawal').value) || 50000,
+                withdrawalFee: parseFloat(document.getElementById('withdrawalFee').value) || 0,
+
+                // Referral
+                referralRate: parseFloat(document.getElementById('referralRate').value) || 5,
+                referralBonus: parseInt(document.getElementById('referralBonus').value) || 50,
+                referralEnabled: document.getElementById('referralEnabled').checked,
+
+                // Payment
+                bkashNumber: document.getElementById('bkashNumber').value,
+                nagadNumber: document.getElementById('nagadNumber').value,
+                bkashEnabled: document.getElementById('bkashEnabled').checked,
+                nagadEnabled: document.getElementById('nagadEnabled').checked,
+
+                // Notifications
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                smsNotifications: document.getElementById('smsNotifications').checked,
+                adminEmail: document.getElementById('adminEmail').value,
+
+                // Security
+                phoneVerification: document.getElementById('phoneVerification').checked,
+                autoApproveLimit: parseInt(document.getElementById('autoApproveLimit').value) || 0,
+                twoFactorAuth: document.getElementById('twoFactorAuth').checked,
+
+                // Meta
+                updatedAt: new Date().toISOString()
+            };
+
+            Storage.set('settings', settings);
+            showToast('Settings saved successfully!', 'success');
+        }
+
+        function resetSettings() {
+            if (!confirm('Reset all settings to default values?')) return;
+            
+            Storage.set('settings', defaultSettings);
+            loadSettings();
+            showToast('Settings reset to default', 'success');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

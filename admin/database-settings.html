@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Database Settings - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .settings-page { padding: 20px; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        
+        .db-status-card {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .db-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .db-status-header h3 { font-size: 1.3rem; }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.connected { background: rgba(16, 185, 129, 0.3); }
+        .status-badge.disconnected { background: rgba(239, 68, 68, 0.3); }
+        .status-badge.demo { background: rgba(251, 191, 36, 0.3); }
+        
+        .db-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .db-stat {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .db-stat-value { font-size: 1.5rem; font-weight: 700; }
+        .db-stat-label { font-size: 0.8rem; opacity: 0.9; }
+        
+        .settings-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+        
+        .settings-card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .settings-card-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-card-body { padding: 20px; }
+        
+        .db-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .db-option {
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .db-option:hover { border-color: var(--primary-color); }
+        .db-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+        
+        .db-option-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .db-option h4 { font-size: 1rem; margin-bottom: 5px; }
+        .db-option span { font-size: 0.8rem; color: var(--text-secondary); }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .btn:hover { transform: scale(1.02); }
+        
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .connection-form { display: none; }
+        .connection-form.active { display: block; }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .test-result.success { display: block; background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .test-result.error { display: block; background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .migration-log {
+            background: #1a1a2e;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider { background: #10b981; }
+        input:checked + .toggle-slider:before { transform: translateX(24px); }
+        
+        .feature-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('database-settings'));</script>
+
+    <main class="admin-main-content">
+        <div class="content settings-page">
+            <div class="page-header">
+                <h1><i class="fas fa-database"></i> Database Configuration</h1>
+                <p>Configure and manage database connections for your platform</p>
+            </div>
+
+            <!-- Current Connection Status -->
+            <div class="db-status-card">
+                <div class="db-status-header">
+                    <h3><i class="fas fa-plug"></i> Current Connection</h3>
+                    <span class="status-badge demo" id="connectionStatus">Demo Mode</span>
+                </div>
+                <div class="db-stats">
+                    <div class="db-stat">
+                        <div class="db-stat-value" id="totalUsers">--</div>
+                        <div class="db-stat-label">Users</div>
+                    </div>
+                    <div class="db-stat">
+                        <div class="db-stat-value" id="totalTasks">--</div>
+                        <div class="db-stat-label">Tasks</div>
+                    </div>
+                    <div class="db-stat">
+                        <div class="db-stat-value" id="totalTransactions">--</div>
+                        <div class="db-stat-label">Transactions</div>
+                    </div>
+                    <div class="db-stat">
+                        <div class="db-stat-value" id="dbSize">--</div>
+                        <div class="db-stat-label">Size (KB)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Type Selection -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3><i class="fas fa-server"></i> Choose Database Type</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="db-options">
+                        <div class="db-option" data-db="localStorage" onclick="selectDatabase('localStorage')">
+                            <div class="db-option-icon">💾</div>
+                            <h4>Local Storage</h4>
+                            <span>Browser-based storage (Demo)</span>
+                        </div>
+                        <div class="db-option" data-db="postgresql" onclick="selectDatabase('postgresql')">
+                            <div class="db-option-icon">🐘</div>
+                            <h4>PostgreSQL</h4>
+                            <span>Enterprise SQL database</span>
+                        </div>
+                        <div class="db-option" data-db="mysql" onclick="selectDatabase('mysql')">
+                            <div class="db-option-icon">🐬</div>
+                            <h4>MySQL</h4>
+                            <span>Popular SQL database</span>
+                        </div>
+                        <div class="db-option" data-db="mongodb" onclick="selectDatabase('mongodb')">
+                            <div class="db-option-icon">🍃</div>
+                            <h4>MongoDB</h4>
+                            <span>NoSQL document database</span>
+                        </div>
+                        <div class="db-option" data-db="firebase" onclick="selectDatabase('firebase')">
+                            <div class="db-option-icon">🔥</div>
+                            <h4>Firebase</h4>
+                            <span>Google cloud database</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PostgreSQL Connection -->
+            <div class="settings-card connection-form" id="form-postgresql">
+                <div class="settings-card-header">
+                    <h3>🐘 PostgreSQL Configuration</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Host</label>
+                            <input type="text" class="form-control" id="pg-host" placeholder="localhost" value="localhost">
+                        </div>
+                        <div class="form-group">
+                            <label>Port</label>
+                            <input type="number" class="form-control" id="pg-port" placeholder="5432" value="5432">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Database Name</label>
+                            <input type="text" class="form-control" id="pg-database" placeholder="project_alpha">
+                        </div>
+                        <div class="form-group">
+                            <label>SSL Mode</label>
+                            <select class="form-control" id="pg-ssl">
+                                <option value="disable">Disable</option>
+                                <option value="require">Require</option>
+                                <option value="verify-full">Verify Full</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="pg-user" placeholder="postgres">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" id="pg-password" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Connection String (Optional)</label>
+                        <input type="text" class="form-control" id="pg-connection-string" placeholder="postgresql://user:password@host:port/database">
+                        <span class="help-text">If provided, this will override other settings</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="testConnection('postgresql')">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary" onclick="saveConnection('postgresql')">
+                            <i class="fas fa-save"></i> Save & Connect
+                        </button>
+                    </div>
+                    <div class="test-result" id="result-postgresql"></div>
+                </div>
+            </div>
+
+            <!-- MySQL Connection -->
+            <div class="settings-card connection-form" id="form-mysql">
+                <div class="settings-card-header">
+                    <h3>🐬 MySQL Configuration</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Host</label>
+                            <input type="text" class="form-control" id="mysql-host" placeholder="localhost" value="localhost">
+                        </div>
+                        <div class="form-group">
+                            <label>Port</label>
+                            <input type="number" class="form-control" id="mysql-port" placeholder="3306" value="3306">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Database Name</label>
+                            <input type="text" class="form-control" id="mysql-database" placeholder="project_alpha">
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="mysql-user" placeholder="root">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" id="mysql-password" placeholder="••••••••">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="testConnection('mysql')">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary" onclick="saveConnection('mysql')">
+                            <i class="fas fa-save"></i> Save & Connect
+                        </button>
+                    </div>
+                    <div class="test-result" id="result-mysql"></div>
+                </div>
+            </div>
+
+            <!-- MongoDB Connection -->
+            <div class="settings-card connection-form" id="form-mongodb">
+                <div class="settings-card-header">
+                    <h3>🍃 MongoDB Configuration</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-group">
+                        <label>Connection URI</label>
+                        <input type="text" class="form-control" id="mongo-uri" placeholder="mongodb://localhost:27017/project_alpha">
+                        <span class="help-text">For MongoDB Atlas, use the connection string from your dashboard</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Database Name</label>
+                        <input type="text" class="form-control" id="mongo-database" placeholder="project_alpha">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="testConnection('mongodb')">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary" onclick="saveConnection('mongodb')">
+                            <i class="fas fa-save"></i> Save & Connect
+                        </button>
+                    </div>
+                    <div class="test-result" id="result-mongodb"></div>
+                </div>
+            </div>
+
+            <!-- Firebase Connection -->
+            <div class="settings-card connection-form" id="form-firebase">
+                <div class="settings-card-header">
+                    <h3>🔥 Firebase Configuration</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>API Key</label>
+                            <input type="text" class="form-control" id="firebase-apiKey" placeholder="AIzaSy...">
+                        </div>
+                        <div class="form-group">
+                            <label>Auth Domain</label>
+                            <input type="text" class="form-control" id="firebase-authDomain" placeholder="your-app.firebaseapp.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Project ID</label>
+                            <input type="text" class="form-control" id="firebase-projectId" placeholder="your-project-id">
+                        </div>
+                        <div class="form-group">
+                            <label>Storage Bucket</label>
+                            <input type="text" class="form-control" id="firebase-storageBucket" placeholder="your-app.appspot.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Messaging Sender ID</label>
+                            <input type="text" class="form-control" id="firebase-messagingSenderId" placeholder="123456789">
+                        </div>
+                        <div class="form-group">
+                            <label>App ID</label>
+                            <input type="text" class="form-control" id="firebase-appId" placeholder="1:123456789:web:abc123">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="testConnection('firebase')">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary" onclick="saveConnection('firebase')">
+                            <i class="fas fa-save"></i> Save & Connect
+                        </button>
+                    </div>
+                    <div class="test-result" id="result-firebase"></div>
+                </div>
+            </div>
+
+            <!-- Data Migration -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3><i class="fas fa-exchange-alt"></i> Data Migration</h3>
+                </div>
+                <div class="settings-card-body">
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">
+                        Transfer your data between different database systems. Make sure to backup before migrating.
+                    </p>
+                    <div class="btn-group" style="margin-bottom: 20px;">
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export Data (JSON)
+                        </button>
+                        <button class="btn btn-secondary" onclick="importData()">
+                            <i class="fas fa-upload"></i> Import Data
+                        </button>
+                        <button class="btn btn-danger" onclick="confirmClearData()">
+                            <i class="fas fa-trash"></i> Clear All Data
+                        </button>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport()">
+                    <div class="migration-log" id="migrationLog" style="display: none;">
+                        <div id="logContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup Settings -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3><i class="fas fa-history"></i> Backup & Restore</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="feature-toggle">
+                        <div>
+                            <strong>Auto Backup</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">Automatically backup data every day</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoBackup" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="feature-toggle">
+                        <div>
+                            <strong>Backup Retention</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">Keep backups for 30 days</p>
+                        </div>
+                        <select class="form-control" style="width: auto;">
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="90">90 days</option>
+                        </select>
+                    </div>
+                    <div class="btn-group" style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="createBackup()">
+                            <i class="fas fa-save"></i> Create Backup Now
+                        </button>
+                        <button class="btn btn-secondary" onclick="showBackups()">
+                            <i class="fas fa-list"></i> View Backups
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        let selectedDB = 'localStorage';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Authentication check
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            
+            loadCurrentConfig();
+            updateStats();
+            initializeSidebar();
+        });
+
+        function loadCurrentConfig() {
+            selectedDB = AppConfig.database.type || 'localStorage';
+            highlightSelectedDB();
+            showConnectionForm();
+        }
+
+        function selectDatabase(dbType) {
+            selectedDB = dbType;
+            highlightSelectedDB();
+            showConnectionForm();
+        }
+
+        function highlightSelectedDB() {
+            document.querySelectorAll('.db-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.db === selectedDB);
+            });
+        }
+
+        function showConnectionForm() {
+            document.querySelectorAll('.connection-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            const form = document.getElementById(`form-${selectedDB}`);
+            if (form) form.classList.add('active');
+        }
+
+        function updateStats() {
+            const users = JSON.parse(localStorage.getItem('projectAlpha_users') || '[]');
+            const tasks = JSON.parse(localStorage.getItem('projectAlpha_tasks') || '[]');
+            const transactions = JSON.parse(localStorage.getItem('projectAlpha_transactions') || '[]');
+            
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('totalTransactions').textContent = transactions.length;
+            
+            // Estimate localStorage size
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (key.startsWith('projectAlpha')) {
+                    totalSize += localStorage[key].length;
+                }
+            }
+            document.getElementById('dbSize').textContent = (totalSize / 1024).toFixed(1);
+            
+            // Update status
+            const statusBadge = document.getElementById('connectionStatus');
+            if (selectedDB === 'localStorage') {
+                statusBadge.textContent = 'Demo Mode';
+                statusBadge.className = 'status-badge demo';
+            }
+        }
+
+        function testConnection(dbType) {
+            const resultDiv = document.getElementById(`result-${dbType}`);
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection...';
+            resultDiv.style.display = 'block';
+
+            // Simulate connection test (in real app, this would be an API call)
+            setTimeout(() => {
+                // Demo: Always show success for localStorage, random for others
+                if (dbType === 'localStorage' || Math.random() > 0.3) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> Connection successful! Database is ready.';
+                    showToast('Connection test passed!', 'success');
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Connection failed. Please check your credentials.';
+                    showToast('Connection failed', 'error');
+                }
+            }, 1500);
+        }
+
+        function saveConnection(dbType) {
+            let config = {};
+            
+            switch(dbType) {
+                case 'postgresql':
+                    config = {
+                        host: document.getElementById('pg-host').value,
+                        port: document.getElementById('pg-port').value,
+                        database: document.getElementById('pg-database').value,
+                        user: document.getElementById('pg-user').value,
+                        password: document.getElementById('pg-password').value,
+                        ssl: document.getElementById('pg-ssl').value,
+                        connectionString: document.getElementById('pg-connection-string').value
+                    };
+                    break;
+                case 'mysql':
+                    config = {
+                        host: document.getElementById('mysql-host').value,
+                        port: document.getElementById('mysql-port').value,
+                        database: document.getElementById('mysql-database').value,
+                        user: document.getElementById('mysql-user').value,
+                        password: document.getElementById('mysql-password').value
+                    };
+                    break;
+                case 'mongodb':
+                    config = {
+                        uri: document.getElementById('mongo-uri').value,
+                        database: document.getElementById('mongo-database').value
+                    };
+                    break;
+                case 'firebase':
+                    config = {
+                        apiKey: document.getElementById('firebase-apiKey').value,
+                        authDomain: document.getElementById('firebase-authDomain').value,
+                        projectId: document.getElementById('firebase-projectId').value,
+                        storageBucket: document.getElementById('firebase-storageBucket').value,
+                        messagingSenderId: document.getElementById('firebase-messagingSenderId').value,
+                        appId: document.getElementById('firebase-appId').value
+                    };
+                    break;
+            }
+
+            // Save to config
+            AppConfig.database.type = dbType;
+            AppConfig.database[dbType] = config;
+            configManager.saveConfig();
+
+            // Log action
+            log(`Database configuration saved for ${dbType}`);
+            
+            showToast(`${dbType} configuration saved successfully!`, 'success');
+            
+            // Update status badge
+            const statusBadge = document.getElementById('connectionStatus');
+            if (dbType === 'localStorage') {
+                statusBadge.textContent = 'Demo Mode';
+                statusBadge.className = 'status-badge demo';
+            } else {
+                statusBadge.textContent = 'Connected';
+                statusBadge.className = 'status-badge connected';
+            }
+        }
+
+        function exportData() {
+            const data = {
+                users: JSON.parse(localStorage.getItem('projectAlpha_users') || '[]'),
+                tasks: JSON.parse(localStorage.getItem('projectAlpha_tasks') || '[]'),
+                transactions: JSON.parse(localStorage.getItem('projectAlpha_transactions') || '[]'),
+                logs: JSON.parse(localStorage.getItem('projectAlpha_logs') || '[]'),
+                config: AppConfig,
+                exportDate: new Date().toISOString(),
+                version: '1.0.0'
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `project_alpha_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            log('Data exported successfully');
+            showToast('Data exported successfully!', 'success');
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImport() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate structure
+                    if (!data.version) {
+                        throw new Error('Invalid backup file format');
+                    }
+
+                    // Show log
+                    const logDiv = document.getElementById('migrationLog');
+                    const logContent = document.getElementById('logContent');
+                    logDiv.style.display = 'block';
+                    logContent.innerHTML = '';
+                    
+                    appendLog('Starting import...');
+                    
+                    // Import users
+                    if (data.users) {
+                        localStorage.setItem('projectAlpha_users', JSON.stringify(data.users));
+                        appendLog(`✓ Imported ${data.users.length} users`);
+                    }
+                    
+                    // Import tasks
+                    if (data.tasks) {
+                        localStorage.setItem('projectAlpha_tasks', JSON.stringify(data.tasks));
+                        appendLog(`✓ Imported ${data.tasks.length} tasks`);
+                    }
+                    
+                    // Import transactions
+                    if (data.transactions) {
+                        localStorage.setItem('projectAlpha_transactions', JSON.stringify(data.transactions));
+                        appendLog(`✓ Imported ${data.transactions.length} transactions`);
+                    }
+                    
+                    appendLog('Import completed successfully!');
+                    updateStats();
+                    showToast('Data imported successfully!', 'success');
+                    
+                } catch (error) {
+                    showToast('Import failed: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function appendLog(message) {
+            const logContent = document.getElementById('logContent');
+            logContent.innerHTML += `${new Date().toLocaleTimeString()} - ${message}<br>`;
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function confirmClearData() {
+            if (confirm('⚠️ WARNING: This will permanently delete ALL data. Are you sure?')) {
+                if (confirm('This action cannot be undone. Type YES to confirm.')) {
+                    // Clear all project data
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('projectAlpha')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    
+                    updateStats();
+                    showToast('All data cleared', 'warning');
+                    log('All data cleared by admin');
+                }
+            }
+        }
+
+        function createBackup() {
+            const backups = JSON.parse(localStorage.getItem('projectAlpha_backups') || '[]');
+            const backup = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                users: JSON.parse(localStorage.getItem('projectAlpha_users') || '[]'),
+                tasks: JSON.parse(localStorage.getItem('projectAlpha_tasks') || '[]'),
+                transactions: JSON.parse(localStorage.getItem('projectAlpha_transactions') || '[]')
+            };
+            
+            backups.push(backup);
+            localStorage.setItem('projectAlpha_backups', JSON.stringify(backups));
+            
+            log('Backup created');
+            showToast('Backup created successfully!', 'success');
+        }
+
+        function showBackups() {
+            const backups = JSON.parse(localStorage.getItem('projectAlpha_backups') || '[]');
+            if (backups.length === 0) {
+                showToast('No backups found', 'info');
+                return;
+            }
+            
+            let message = 'Available backups:\n\n';
+            backups.forEach((b, i) => {
+                message += `${i + 1}. ${new Date(b.date).toLocaleString()}\n`;
+                message += `   Users: ${b.users.length}, Tasks: ${b.tasks.length}\n\n`;
+            });
+            
+            alert(message);
+        }
+
+        function log(message, data = null) {
+            const logs = JSON.parse(localStorage.getItem('projectAlpha_logs') || '[]');
+            logs.push({
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                action: message,
+                data: data,
+                adminAction: true
+            });
+            localStorage.setItem('projectAlpha_logs', JSON.stringify(logs));
+        }
+
+        function showToast(message, type = 'info') {
+            const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                padding: 15px 25px; border-radius: 10px;
+                color: white; font-weight: 500; z-index: 10000;
+                display: flex; align-items: center; gap: 10px;
+                background: ${colors[type]};
+            `;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation' : 'info'}-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function initializeSidebar() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
+            if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>

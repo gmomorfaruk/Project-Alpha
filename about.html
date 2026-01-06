@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>About Us - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .about-hero {
+            padding: 140px 0 80px;
+            background: var(--bg-gradient);
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-section {
+            padding: 80px 0;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .about-content p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .about-image {
+            background: var(--primary-light);
+            border-radius: 20px;
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-image i {
+            font-size: 150px;
+            color: var(--primary-color);
+        }
+
+        .mission-vision {
+            background: var(--bg-secondary);
+        }
+
+        .mv-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .mv-card {
+            background: var(--bg-primary);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .mv-card .icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .mv-card .icon i {
+            font-size: 36px;
+            color: var(--primary-color);
+        }
+
+        .mv-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .mv-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .team-section {
+            padding: 80px 0;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .team-card {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .team-avatar i {
+            font-size: 40px;
+            color: var(--primary-color);
+        }
+
+        .team-card h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .team-card span {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .stats-section {
+            padding: 80px 0;
+            background: var(--primary-gradient);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-item h3 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .contact-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .contact-card {
+            background: var(--bg-primary);
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-card .icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .contact-card .icon i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .contact-card h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+        }
+
+        .contact-card a {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                order: -1;
+            }
+
+            .mv-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item h3 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span>Loading...</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html" class="active">About</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="lang-toggle" id="langToggle" title="Toggle Language">
+                    <span>EN</span>
+                </button>
+                <button class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <h1 data-en="About Project Alpha" data-bn="প্রজেক্ট আলফা সম্পর্কে">About Project Alpha</h1>
+            <p data-en="We're on a mission to make investing accessible and profitable for everyone in Bangladesh." data-bn="আমরা বাংলাদেশের সবার জন্য বিনিয়োগকে সহজলভ্য এবং লাভজনক করার মিশনে আছি।">We're on a mission to make investing accessible and profitable for everyone in Bangladesh.</p>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <h2 data-en="Who We Are" data-bn="আমরা কারা">Who We Are</h2>
+                    <p data-en="Project Alpha is a leading investment platform in Bangladesh that connects investors with profitable opportunities. Founded in 2024, we've grown to serve thousands of satisfied investors across the country." data-bn="প্রজেক্ট আলফা বাংলাদেশের একটি শীর্ষস্থানীয় বিনিয়োগ প্ল্যাটফর্ম যা বিনিয়োগকারীদের লাভজনক সুযোগের সাথে সংযুক্ত করে। ২০২৪ সালে প্রতিষ্ঠিত, আমরা সারা দেশে হাজার হাজার সন্তুষ্ট বিনিয়োগকারীদের সেবা দিতে বড় হয়েছি।">Project Alpha is a leading investment platform in Bangladesh that connects investors with profitable opportunities. Founded in 2024, we've grown to serve thousands of satisfied investors across the country.</p>
+                    <p data-en="Our platform offers a unique combination of auto-sell and self-sell options, giving our investors flexibility in how they manage their investments and maximize their returns." data-bn="আমাদের প্ল্যাটফর্ম অটো-সেল এবং সেলফ-সেলের একটি অনন্য সমন্বয় প্রদান করে, যা আমাদের বিনিয়োগকারীদের তাদের বিনিয়োগ পরিচালনা এবং রিটার্ন সর্বাধিক করার ক্ষেত্রে নমনীয়তা দেয়।">Our platform offers a unique combination of auto-sell and self-sell options, giving our investors flexibility in how they manage their investments and maximize their returns.</p>
+                    <p data-en="We believe in transparency, security, and putting our investors first. That's why we've built a platform that's easy to use, secure, and designed to help you grow your wealth." data-bn="আমরা স্বচ্ছতা, নিরাপত্তা এবং আমাদের বিনিয়োগকারীদের প্রথমে রাখায় বিশ্বাস করি। এই কারণেই আমরা একটি প্ল্যাটফর্ম তৈরি করেছি যা ব্যবহার করা সহজ, নিরাপদ এবং আপনার সম্পদ বৃদ্ধিতে সহায়তা করার জন্য ডিজাইন করা হয়েছে।">We believe in transparency, security, and putting our investors first. That's why we've built a platform that's easy to use, secure, and designed to help you grow your wealth.</p>
+                </div>
+                <div class="about-image">
+                    <i class="fas fa-building"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="about-section mission-vision">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Our Mission & Vision" data-bn="আমাদের মিশন ও ভিশন">Our Mission & Vision</h2>
+            </div>
+            <div class="mv-grid">
+                <div class="mv-card">
+                    <div class="icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 data-en="Our Mission" data-bn="আমাদের মিশন">Our Mission</h3>
+                    <p data-en="To democratize investing by providing a secure, transparent, and user-friendly platform that enables everyone to build wealth through smart investments." data-bn="একটি নিরাপদ, স্বচ্ছ এবং ব্যবহারকারী-বান্ধব প্ল্যাটফর্ম প্রদান করে বিনিয়োগকে গণতন্ত্রায়িত করা যা সবাইকে স্মার্ট বিনিয়োগের মাধ্যমে সম্পদ গড়ে তুলতে সক্ষম করে।">To democratize investing by providing a secure, transparent, and user-friendly platform that enables everyone to build wealth through smart investments.</p>
+                </div>
+                <div class="mv-card">
+                    <div class="icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 data-en="Our Vision" data-bn="আমাদের ভিশন">Our Vision</h3>
+                    <p data-en="To become Bangladesh's most trusted investment platform, empowering millions of people to achieve financial freedom and security through innovative investment solutions." data-bn="বাংলাদেশের সবচেয়ে বিশ্বস্ত বিনিয়োগ প্ল্যাটফর্ম হয়ে ওঠা, উদ্ভাবনী বিনিয়োগ সমাধানের মাধ্যমে লক্ষ লক্ষ মানুষকে আর্থিক স্বাধীনতা এবং নিরাপত্তা অর্জন করতে ক্ষমতায়ন করা।">To become Bangladesh's most trusted investment platform, empowering millions of people to achieve financial freedom and security through innovative investment solutions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>10,000+</h3>
+                    <p data-en="Active Investors" data-bn="সক্রিয় বিনিয়োগকারী">Active Investors</p>
+                </div>
+                <div class="stat-item">
+                    <h3>৳50M+</h3>
+                    <p data-en="Total Invested" data-bn="মোট বিনিয়োগ">Total Invested</p>
+                </div>
+                <div class="stat-item">
+                    <h3>৳8M+</h3>
+                    <p data-en="Profits Distributed" data-bn="বিতরিত মুনাফা">Profits Distributed</p>
+                </div>
+                <div class="stat-item">
+                    <h3>99%</h3>
+                    <p data-en="Customer Satisfaction" data-bn="গ্রাহক সন্তুষ্টি">Customer Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Our Leadership Team" data-bn="আমাদের নেতৃত্ব দল">Our Leadership Team</h2>
+                <p data-en="Meet the experts behind Project Alpha" data-bn="প্রজেক্ট আলফার পেছনের বিশেষজ্ঞদের সাথে পরিচিত হন">Meet the experts behind Project Alpha</p>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>Mohammad Rahman</h4>
+                    <span>CEO & Founder</span>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>Fatima Akter</h4>
+                    <span>Chief Operations Officer</span>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>Karim Hossain</h4>
+                    <span>Chief Technology Officer</span>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>Nusrat Jahan</h4>
+                    <span>Head of Customer Success</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Get In Touch" data-bn="যোগাযোগ করুন">Get In Touch</h2>
+                <p data-en="Have questions? We'd love to hear from you." data-bn="প্রশ্ন আছে? আমরা আপনার কাছ থেকে শুনতে চাই।">Have questions? We'd love to hear from you.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4 data-en="Email Us" data-bn="ইমেইল করুন">Email Us</h4>
+                    <p><a href="mailto:support@projectalpha.com">support@projectalpha.com</a></p>
+                </div>
+                <div class="contact-card">
+                    <div class="icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4 data-en="Call Us" data-bn="কল করুন">Call Us</h4>
+                    <p><a href="tel:+8801XXXXXXXXX">+880 1XXX-XXXXXX</a></p>
+                </div>
+                <div class="contact-card">
+                    <div class="icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4 data-en="Visit Us" data-bn="আমাদের দেখুন">Visit Us</h4>
+                    <p>Dhaka, Bangladesh</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <p>&copy; 2025 Project Alpha. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app-config.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Chat Widget -->
+    <script src="js/chat-widget.js"></script>
+</body>
+</html>

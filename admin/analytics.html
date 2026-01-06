@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#635bff">
+    <title>Financial Analytics - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .finance-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .finance-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+        .finance-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .finance-card.income { border-left: 4px solid #10b981; }
+        .finance-card.expense { border-left: 4px solid #ef4444; }
+        .finance-card.balance { border-left: 4px solid #635bff; }
+        .finance-card.investment { border-left: 4px solid #f59e0b; }
+        .finance-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .finance-card-header i {
+            font-size: 20px;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .finance-card.income .finance-card-header i { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .finance-card.expense .finance-card-header i { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .finance-card.balance .finance-card-header i { background: rgba(99, 91, 255, 0.1); color: #635bff; }
+        .finance-card.investment .finance-card-header i { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .finance-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .finance-card-label {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .section-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-body {
+            padding: 24px;
+        }
+        
+        .investment-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .investment-form .form-group {
+            flex: 1;
+        }
+        .investment-form .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+        .investment-form input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .investment-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .daily-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .daily-table th, .daily-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .daily-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .daily-table tr:hover {
+            background: var(--bg-secondary);
+        }
+        .daily-table .income { color: #10b981; }
+        .daily-table .expense { color: #ef4444; }
+        .daily-table .profit { color: #635bff; font-weight: 600; }
+        .daily-table .loss { color: #ef4444; font-weight: 600; }
+        
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        .breakdown-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .breakdown-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+        }
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        .breakdown-item.total {
+            font-weight: 600;
+            padding-top: 14px;
+            margin-top: 4px;
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .investment-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .investment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .investment-item:last-child { border-bottom: none; }
+        .investment-item-info {
+            flex: 1;
+        }
+        .investment-item-amount {
+            font-weight: 600;
+            color: #f59e0b;
+        }
+        .investment-item-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .investment-item-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .date-filter select, .date-filter input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 1200px) {
+            .finance-grid { grid-template-columns: repeat(2, 1fr); }
+            .breakdown-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .finance-grid { grid-template-columns: 1fr; }
+            .investment-form { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('analytics'));</script>
+
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-line" style="color: var(--primary-color); margin-right: 10px;"></i>Financial Analytics</h1>
+                <p>Track all income, expenses, and profit/loss calculations</p>
+            </div>
+
+            <!-- Overall Summary Cards -->
+            <div class="finance-grid">
+                <div class="finance-card investment">
+                    <div class="finance-card-header">
+                        <span class="finance-card-label">Admin Investment</span>
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="finance-card-value" id="totalInvestment">৳0</div>
+                    <small style="color: var(--text-muted);">Total capital invested</small>
+                </div>
+                <div class="finance-card income">
+                    <div class="finance-card-header">
+                        <span class="finance-card-label">Total Income</span>
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="finance-card-value" id="totalIncome">৳0</div>
+                    <small style="color: var(--text-muted);">Memberships + Products + Deposits</small>
+                </div>
+                <div class="finance-card expense">
+                    <div class="finance-card-header">
+                        <span class="finance-card-label">Total Expense</span>
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="finance-card-value" id="totalExpense">৳0</div>
+                    <small style="color: var(--text-muted);">User Earnings + Withdrawals</small>
+                </div>
+                <div class="finance-card balance">
+                    <div class="finance-card-header">
+                        <span class="finance-card-label">Current Balance</span>
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="finance-card-value" id="currentBalance">৳0</div>
+                    <small style="color: var(--text-muted);">Investment + Profit/Loss</small>
+                </div>
+            </div>
+
+            <!-- Add Investment Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-plus-circle" style="color: #f59e0b;"></i> Add Admin Investment</h3>
+                </div>
+                <div class="section-body">
+                    <form class="investment-form" onsubmit="addInvestment(event)">
+                        <div class="form-group">
+                            <label>Amount (৳)</label>
+                            <input type="number" id="investmentAmount" placeholder="Enter amount" required min="1">
+                        </div>
+                        <div class="form-group" style="flex: 2;">
+                            <label>Description (Optional)</label>
+                            <input type="text" id="investmentDescription" placeholder="e.g., Initial capital, Monthly funding">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Investment
+                        </button>
+                    </form>
+                    
+                    <div style="margin-top: 24px;">
+                        <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Investment History</h4>
+                        <div class="investment-list" id="investmentList">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income & Expense Breakdown -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-pie" style="color: var(--primary-color);"></i> Income & Expense Breakdown</h3>
+                    <div class="date-filter">
+                        <select id="breakdownRange" onchange="loadBreakdown()">
+                            <option value="today">Today</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="breakdown-grid">
+                        <!-- Income Breakdown -->
+                        <div class="breakdown-card" style="border-left: 4px solid #10b981;">
+                            <h4><i class="fas fa-arrow-trend-up" style="color: #10b981;"></i> Income Sources</h4>
+                            <div class="breakdown-item">
+                                <span>Membership Purchases</span>
+                                <span class="income" id="breakdownMembership">৳0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Product Sales</span>
+                                <span class="income" id="breakdownProducts">৳0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>User Deposits</span>
+                                <span class="income" id="breakdownDeposits">৳0</span>
+                            </div>
+                            <div class="breakdown-item total">
+                                <span>Total Income</span>
+                                <span class="income" id="breakdownTotalIncome">৳0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Expense Breakdown -->
+                        <div class="breakdown-card" style="border-left: 4px solid #ef4444;">
+                            <h4><i class="fas fa-arrow-trend-down" style="color: #ef4444;"></i> Expense Categories</h4>
+                            <div class="breakdown-item">
+                                <span>User Task Earnings</span>
+                                <span class="expense" id="breakdownEarnings">৳0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Withdrawals Paid</span>
+                                <span class="expense" id="breakdownWithdrawals">৳0</span>
+                            </div>
+                            <div class="breakdown-item total">
+                                <span>Total Expense</span>
+                                <span class="expense" id="breakdownTotalExpense">৳0</span>
+                            </div>
+                            <div class="breakdown-item" style="margin-top: 10px; padding-top: 14px; border-top: 2px dashed var(--border-color);">
+                                <span style="font-weight: 600;">Net Profit/Loss</span>
+                                <span id="breakdownNetProfit" style="font-weight: 700;">৳0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Summary Table -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-alt" style="color: var(--primary-color);"></i> Daily Summary</h3>
+                    <div class="date-filter">
+                        <select id="dailyRange" onchange="loadDailySummary()">
+                            <option value="7" selected>Last 7 Days</option>
+                            <option value="14">Last 14 Days</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-body" style="padding: 0; overflow-x: auto;">
+                    <table class="daily-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Investment</th>
+                                <th>Memberships</th>
+                                <th>Products</th>
+                                <th>Deposits</th>
+                                <th>Total Income</th>
+                                <th>User Earnings</th>
+                                <th>Withdrawals</th>
+                                <th>Total Expense</th>
+                                <th>Net Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/financial-tracker.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            loadOverallTotals();
+            loadInvestmentList();
+            loadBreakdown();
+            loadDailySummary();
+        });
+        
+        function formatCurrency(amount) {
+            return '৳' + parseFloat(amount || 0).toLocaleString('en-IN');
+        }
+        
+        function loadOverallTotals() {
+            const totals = FinancialTracker.getOverallTotals();
+            
+            document.getElementById('totalInvestment').textContent = formatCurrency(totals.adminInvestments);
+            document.getElementById('totalIncome').textContent = formatCurrency(totals.totalIncome);
+            document.getElementById('totalExpense').textContent = formatCurrency(totals.totalExpense);
+            document.getElementById('currentBalance').textContent = formatCurrency(totals.currentBalance);
+            
+            // Color balance based on profit/loss
+            const balanceEl = document.getElementById('currentBalance');
+            if (totals.currentBalance >= totals.adminInvestments) {
+                balanceEl.style.color = '#10b981';
+            } else {
+                balanceEl.style.color = '#ef4444';
+            }
+        }
+        
+        function addInvestment(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('investmentAmount').value);
+            const description = document.getElementById('investmentDescription').value;
+            
+            if (amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            FinancialTracker.addAdminInvestment(amount, description);
+            
+            document.getElementById('investmentAmount').value = '';
+            document.getElementById('investmentDescription').value = '';
+            
+            loadOverallTotals();
+            loadInvestmentList();
+            loadBreakdown();
+            loadDailySummary();
+            
+            showToast('Investment added successfully!', 'success');
+        }
+        
+        function loadInvestmentList() {
+            const investments = FinancialTracker.getAdminInvestments().reverse();
+            const container = document.getElementById('investmentList');
+            
+            if (investments.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <i class="fas fa-coins" style="font-size: 32px; margin-bottom: 10px; opacity: 0.3;"></i>
+                        <p>No investments added yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = investments.map(inv => `
+                <div class="investment-item">
+                    <div class="investment-item-info">
+                        <div class="investment-item-amount">${formatCurrency(inv.amount)}</div>
+                        <div class="investment-item-date">
+                            ${new Date(inv.date).toLocaleDateString()} 
+                            ${inv.description ? '• ' + inv.description : ''}
+                        </div>
+                    </div>
+                    <button class="investment-item-delete" onclick="deleteInvestment(${inv.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function deleteInvestment(id) {
+            if (!confirm('Are you sure you want to delete this investment?')) return;
+            
+            let investments = FinancialTracker.getAdminInvestments();
+            investments = investments.filter(inv => inv.id !== id);
+            localStorage.setItem('adminInvestments', JSON.stringify(investments));
+            
+            FinancialTracker.updateDailySummary();
+            loadOverallTotals();
+            loadInvestmentList();
+            loadBreakdown();
+            loadDailySummary();
+            
+            showToast('Investment deleted', 'success');
+        }
+        
+        function loadBreakdown() {
+            const range = document.getElementById('breakdownRange').value;
+            let data;
+            
+            if (range === 'today') {
+                data = FinancialTracker.getDailySummary();
+            } else if (range === 'all') {
+                data = FinancialTracker.getOverallTotals();
+            } else {
+                data = FinancialTracker.getLastNDaysSummary(parseInt(range));
+            }
+            
+            document.getElementById('breakdownMembership').textContent = formatCurrency(data.membershipIncome);
+            document.getElementById('breakdownProducts').textContent = formatCurrency(data.productIncome);
+            document.getElementById('breakdownDeposits').textContent = formatCurrency(data.depositIncome);
+            document.getElementById('breakdownTotalIncome').textContent = formatCurrency(data.totalIncome);
+            document.getElementById('breakdownEarnings').textContent = formatCurrency(data.userEarnings);
+            document.getElementById('breakdownWithdrawals').textContent = formatCurrency(data.withdrawals);
+            document.getElementById('breakdownTotalExpense').textContent = formatCurrency(data.totalExpense);
+            
+            const netProfit = (data.totalIncome || 0) - (data.totalExpense || 0);
+            const netProfitEl = document.getElementById('breakdownNetProfit');
+            netProfitEl.textContent = formatCurrency(netProfit);
+            netProfitEl.className = netProfit >= 0 ? 'profit' : 'loss';
+        }
+        
+        function loadDailySummary() {
+            const days = parseInt(document.getElementById('dailyRange').value);
+            const container = document.getElementById('dailyTableBody');
+            const summaries = FinancialTracker.getAllDailySummaries();
+            
+            let rows = [];
+            const today = new Date();
+            
+            for (let i = 0; i < days; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateKey = FinancialTracker.getDateKey(date);
+                const day = summaries[dateKey] || {};
+                
+                const netProfit = (day.totalIncome || 0) - (day.totalExpense || 0);
+                
+                rows.push(`
+                    <tr>
+                        <td><strong>${dateKey}</strong></td>
+                        <td style="color: #f59e0b;">${formatCurrency(day.adminInvestment || 0)}</td>
+                        <td class="income">${formatCurrency(day.membershipIncome || 0)}</td>
+                        <td class="income">${formatCurrency(day.productIncome || 0)}</td>
+                        <td class="income">${formatCurrency(day.depositIncome || 0)}</td>
+                        <td class="income"><strong>${formatCurrency(day.totalIncome || 0)}</strong></td>
+                        <td class="expense">${formatCurrency(day.userEarnings || 0)}</td>
+                        <td class="expense">${formatCurrency(day.withdrawals || 0)}</td>
+                        <td class="expense"><strong>${formatCurrency(day.totalExpense || 0)}</strong></td>
+                        <td class="${netProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(netProfit)}</td>
+                    </tr>
+                `);
+            }
+            
+            if (rows.length === 0 || Object.keys(summaries).length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No data available yet. Add investments or record transactions to see daily summary.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                container.innerHTML = rows.join('');
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; padding: 14px 24px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'}; color: white;
+                border-radius: 10px; font-weight: 500; z-index: 9999;
+                display: flex; align-items: center; gap: 10px;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

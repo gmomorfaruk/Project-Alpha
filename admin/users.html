@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>User Management - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('users'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-users" style="color: var(--primary-color); margin-right: 10px;"></i>User Management</h1>
+                <p>Manage all registered users</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalUsers">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="activeUsers">0</h3>
+                        <p>Active Users</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="newToday">0</h3>
+                        <p>New Today</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalBalance">৳0</h3>
+                        <p>Total Balance</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search users..." oninput="searchUsers()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterStatus" onchange="filterUsers()">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="moderator">Moderators</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="exportUsers()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddUserModal()">
+                            <i class="fas fa-user-plus"></i> Add User
+                        </button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Balance</th>
+                                <th>Referrals</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-users" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No users found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- View User Modal -->
+    <div class="form-modal" id="viewModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3>User Details</h3>
+                <button class="form-modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="userDetails">
+                <!-- User details will be loaded here -->
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Balance Modal -->
+    <div class="form-modal" id="balanceModal">
+        <div class="form-modal-content" style="max-width: 400px;">
+            <div class="form-modal-header">
+                <h3>Edit User Balance</h3>
+                <button class="form-modal-close" onclick="closeModal('balanceModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="balanceForm">
+                    <input type="hidden" id="balanceUserId">
+                    <div class="form-group">
+                        <label>Current Balance</label>
+                        <input type="text" id="currentBalance" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>New Balance</label>
+                        <input type="number" id="newBalance" placeholder="Enter new balance" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <textarea id="balanceReason" rows="2" placeholder="Reason for balance change" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('balanceModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateBalance()">Update Balance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="form-modal" id="addUserModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-user-plus" style="margin-right: 10px;"></i>Add New User</h3>
+                <button class="form-modal-close" onclick="closeModal('addUserModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="newUserName" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="newUserEmail" placeholder="Enter email address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="newUserPhone" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="newUserPassword" placeholder="Enter password" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Role *</label>
+                            <select id="newUserRole" required>
+                                <option value="user">User</option>
+                                <option value="moderator">Moderator</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Initial Balance</label>
+                            <input type="number" id="newUserBalance" placeholder="0" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Referral Code (Optional)</label>
+                        <input type="text" id="newUserReferral" placeholder="Enter referrer's code">
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('addUserModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addNewUser()"><i class="fas fa-user-plus"></i> Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div class="form-modal" id="deleteModal">
+        <div class="form-modal-content" style="max-width: 400px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+                <h3><i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>Delete User</h3>
+                <button class="form-modal-close" onclick="closeModal('deleteModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" style="text-align: center; padding: 30px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i class="fas fa-trash-alt" style="font-size: 32px; color: #ef4444;"></i>
+                </div>
+                <h3 style="margin-bottom: 10px;">Are you sure?</h3>
+                <p style="color: var(--text-muted);">This action cannot be undone. All data associated with <strong id="deleteUserName"></strong> will be permanently removed.</p>
+                <input type="hidden" id="deleteUserEmail">
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDeleteUser()" style="background: #ef4444; border-color: #ef4444;"><i class="fas fa-trash-alt"></i> Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="form-modal" id="editUserModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-user-edit" style="margin-right: 10px;"></i>Edit User</h3>
+                <button class="form-modal-close" onclick="closeModal('editUserModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserEmail">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="editUserName" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="editUserPhone" placeholder="Enter phone number">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Role *</label>
+                            <select id="editUserRole" required>
+                                <option value="user">User</option>
+                                <option value="moderator">Moderator</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="editUserStatus" required>
+                                <option value="active">Active</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>bKash Number</label>
+                        <input type="tel" id="editUserBkash" placeholder="bKash number">
+                    </div>
+                    <div class="form-group">
+                        <label>Nagad Number</label>
+                        <input type="tel" id="editUserNagad" placeholder="Nagad number">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password (leave blank to keep current)</label>
+                        <input type="password" id="editUserPassword" placeholder="Enter new password">
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('editUserModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveUserEdit()"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Notification Modal -->
+    <div class="form-modal" id="notifyModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-bell" style="margin-right: 10px;"></i>Send Notification</h3>
+                <button class="form-modal-close" onclick="closeModal('notifyModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="notifyForm">
+                    <input type="hidden" id="notifyUserEmail">
+                    <div class="form-group">
+                        <label>To</label>
+                        <input type="text" id="notifyUserName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Notification Type</label>
+                        <select id="notifyType">
+                            <option value="info">ℹ️ Information</option>
+                            <option value="success">✅ Success</option>
+                            <option value="warning">⚠️ Warning</option>
+                            <option value="alert">🚨 Alert</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" id="notifyTitle" placeholder="Notification title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Message *</label>
+                        <textarea id="notifyMessage" rows="4" placeholder="Write your message here..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('notifyModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="sendNotification()"><i class="fas fa-paper-plane"></i> Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let users = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Admin Users Page Loading ===');
+            
+            // Debug: Check raw localStorage
+            const rawUsers = localStorage.getItem('projectAlpha_users');
+            console.log('Raw localStorage projectAlpha_users:', rawUsers);
+            
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Force initialize default users
+            console.log('Calling initializeAppData...');
+            initializeAppData();
+            
+            // Debug: Check after initialization
+            const afterInit = localStorage.getItem('projectAlpha_users');
+            console.log('After init projectAlpha_users:', afterInit);
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadUsers();
+        });
+
+        function loadUsers() {
+            // Force initialize again to be safe
+            initializeAppData();
+            
+            // Get all users excluding admins for display
+            const allUsers = Storage.get('users') || [];
+            console.log('All users from storage:', allUsers.length, allUsers);
+            
+            users = allUsers.filter(u => u.role !== 'admin');
+            console.log('Filtered users (non-admin):', users.length);
+            
+            updateStats();
+            renderUsers(users);
+        }
+
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = users.length;
+            
+            const activeUsers = users.filter(u => u.status !== 'blocked');
+            document.getElementById('activeUsers').textContent = activeUsers.length;
+            
+            const today = new Date().toDateString();
+            const newToday = users.filter(u => new Date(u.createdAt).toDateString() === today);
+            document.getElementById('newToday').textContent = newToday.length;
+            
+            const totalBalance = users.reduce((sum, u) => sum + (u.balance || 0), 0);
+            document.getElementById('totalBalance').textContent = formatCurrency(totalBalance);
+        }
+
+        function renderUsers(userList) {
+            const tbody = document.getElementById('usersTable');
+            
+            if (userList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-users" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No users found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const referrals = Storage.get('referrals') || [];
+
+            tbody.innerHTML = userList.map(user => {
+                const userReferrals = referrals.filter(r => r.referrerId === user.email);
+                const roleClass = user.role === 'moderator' ? 'badge-warning' : 'badge-secondary';
+                const roleName = user.role === 'moderator' ? 'Moderator' : 'User';
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="user-avatar-table">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
+                                <span>${user.name || 'Unknown'}</span>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.phone || '-'}</td>
+                        <td><span class="badge ${roleClass}">${roleName}</span></td>
+                        <td><strong>${formatCurrency(user.balance || 0)}</strong></td>
+                        <td>${userReferrals.length}</td>
+                        <td><span class="badge badge-${user.status === 'blocked' ? 'danger' : 'success'}">${user.status || 'Active'}</span></td>
+                        <td>${formatDate(user.createdAt)}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn-view" onclick="viewUser('${user.email}')" title="View"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn-edit" onclick="openEditUserModal('${user.email}')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn-edit" onclick="editBalance('${user.email}')" title="Edit Balance" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="fas fa-wallet"></i></button>
+                                <button class="action-btn-view" onclick="openNotifyModal('${user.email}')" title="Send Notification" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fas fa-bell"></i></button>
+                                <button class="action-btn-${user.status === 'blocked' ? 'approve' : 'reject'}" onclick="toggleBlock('${user.email}')" title="${user.status === 'blocked' ? 'Unblock' : 'Block'}">
+                                    <i class="fas fa-${user.status === 'blocked' ? 'unlock' : 'ban'}"></i>
+                                </button>
+                                <button class="action-btn-reject" onclick="openDeleteModal('${user.email}')" title="Delete User"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function searchUsers() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = users.filter(u => 
+                (u.name && u.name.toLowerCase().includes(query)) ||
+                u.email.toLowerCase().includes(query) ||
+                (u.phone && u.phone.includes(query))
+            );
+            renderUsers(filtered);
+        }
+
+        function filterUsers() {
+            const status = document.getElementById('filterStatus').value;
+            let filtered = users;
+            
+            if (status === 'moderator') {
+                filtered = users.filter(u => u.role === 'moderator');
+            } else if (status !== 'all') {
+                filtered = users.filter(u => (u.status || 'active') === status);
+            }
+            
+            renderUsers(filtered);
+        }
+
+        function viewUser(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+
+            const investments = Storage.get('investments') || [];
+            const userInvestments = investments.filter(i => i.userId === email);
+            const totalInvested = userInvestments.reduce((sum, i) => sum + i.totalAmount, 0);
+
+            const referrals = Storage.get('referrals') || [];
+            const userReferrals = referrals.filter(r => r.referrerId === email);
+
+            const roleDisplay = user.role === 'moderator' ? '🛡️ Moderator' : '👤 User';
+
+            document.getElementById('userDetails').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin: 0 auto 15px;">
+                        ${user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <h3>${user.name || 'Unknown'}</h3>
+                    <p style="color: var(--text-muted);">${user.email}</p>
+                    <span class="badge badge-${user.role === 'moderator' ? 'warning' : 'secondary'}" style="margin-top: 5px;">${roleDisplay}</span>
+                </div>
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Phone</span>
+                        <strong>${user.phone || '-'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Balance</span>
+                        <strong>${formatCurrency(user.balance || 0)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Total Invested</span>
+                        <strong>${formatCurrency(totalInvested)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Referrals</span>
+                        <strong>${userReferrals.length}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>bKash</span>
+                        <strong>${user.bkashNumber || '-'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Nagad</span>
+                        <strong>${user.nagadNumber || '-'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Status</span>
+                        <span class="badge badge-${user.status === 'blocked' ? 'danger' : 'success'}">${user.status || 'Active'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Joined</span>
+                        <strong>${formatDate(user.createdAt)}</strong>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function editBalance(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+
+            document.getElementById('balanceUserId').value = email;
+            document.getElementById('currentBalance').value = formatCurrency(user.balance || 0);
+            document.getElementById('newBalance').value = user.balance || 0;
+            document.getElementById('balanceReason').value = '';
+
+            document.getElementById('balanceModal').classList.add('active');
+        }
+
+        function updateBalance() {
+            const email = document.getElementById('balanceUserId').value;
+            const newBalance = parseFloat(document.getElementById('newBalance').value);
+            const reason = document.getElementById('balanceReason').value;
+
+            if (isNaN(newBalance) || newBalance < 0) {
+                showToast('Please enter a valid balance', 'error');
+                return;
+            }
+
+            if (!reason) {
+                showToast('Please enter a reason', 'error');
+                return;
+            }
+
+            const allUsers = Storage.get('users') || [];
+            const userIndex = allUsers.findIndex(u => u.email === email);
+            
+            if (userIndex !== -1) {
+                const oldBalance = allUsers[userIndex].balance || 0;
+                allUsers[userIndex].balance = newBalance;
+                Storage.set('users', allUsers);
+                
+                // Log activity
+                logAdminActivity('balance_update', `Updated balance for ${email} from ${formatCurrency(oldBalance)} to ${formatCurrency(newBalance)}. Reason: ${reason}`);
+                
+                showToast('Balance updated successfully', 'success');
+                closeModal('balanceModal');
+                loadUsers();
+            }
+        }
+
+        function toggleBlock(email) {
+            const allUsers = Storage.get('users') || [];
+            const userIndex = allUsers.findIndex(u => u.email === email);
+            
+            if (userIndex !== -1) {
+                const currentStatus = allUsers[userIndex].status || 'active';
+                allUsers[userIndex].status = currentStatus === 'blocked' ? 'active' : 'blocked';
+                Storage.set('users', allUsers);
+                
+                logAdminActivity('user_status', `${allUsers[userIndex].status === 'blocked' ? 'Blocked' : 'Unblocked'} user: ${email}`);
+                
+                showToast(`User ${allUsers[userIndex].status === 'blocked' ? 'blocked' : 'unblocked'}`, 'success');
+                loadUsers();
+            }
+        }
+
+        // Add User Functions
+        function openAddUserModal() {
+            document.getElementById('addUserForm').reset();
+            document.getElementById('newUserBalance').value = 0;
+            document.getElementById('addUserModal').classList.add('active');
+        }
+
+        function addNewUser() {
+            const name = document.getElementById('newUserName').value.trim();
+            const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('newUserPhone').value.trim();
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+            const balance = parseFloat(document.getElementById('newUserBalance').value) || 0;
+            const referralCode = document.getElementById('newUserReferral').value.trim();
+
+            if (!name || !email || !password) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            // Check if email already exists
+            const allUsers = Storage.get('users') || [];
+            if (allUsers.find(u => u.email === email)) {
+                showToast('Email already exists', 'error');
+                return;
+            }
+
+            const newUser = {
+                name: name,
+                email: email,
+                phone: phone,
+                password: password,
+                role: role,
+                balance: balance,
+                status: 'active',
+                referralCode: generateReferralCode(email),
+                createdAt: new Date().toISOString(),
+                createdBy: 'admin'
+            };
+
+            allUsers.push(newUser);
+            Storage.set('users', allUsers);
+
+            // Handle referral if provided
+            if (referralCode) {
+                const referrer = allUsers.find(u => u.referralCode === referralCode);
+                if (referrer) {
+                    const referrals = Storage.get('referrals') || [];
+                    referrals.push({
+                        referrerId: referrer.email,
+                        referredEmail: email,
+                        referredName: name,
+                        status: 'completed',
+                        commission: 0,
+                        date: new Date().toISOString()
+                    });
+                    Storage.set('referrals', referrals);
+                }
+            }
+
+            logAdminActivity('user_added', `Added new user: ${name} (${email}) with role: ${role}`);
+            
+            showToast('User added successfully', 'success');
+            closeModal('addUserModal');
+            loadUsers();
+        }
+
+        function generateReferralCode(email) {
+            return email.split('@')[0].toUpperCase().slice(0, 4) + Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+
+        // Edit User Functions
+        function openEditUserModal(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserName').value = user.name || '';
+            document.getElementById('editUserPhone').value = user.phone || '';
+            document.getElementById('editUserRole').value = user.role || 'user';
+            document.getElementById('editUserStatus').value = user.status || 'active';
+            document.getElementById('editUserBkash').value = user.bkashNumber || '';
+            document.getElementById('editUserNagad').value = user.nagadNumber || '';
+            document.getElementById('editUserPassword').value = '';
+
+            document.getElementById('editUserModal').classList.add('active');
+        }
+
+        function saveUserEdit() {
+            const email = document.getElementById('editUserEmail').value;
+            const allUsers = Storage.get('users') || [];
+            const userIndex = allUsers.findIndex(u => u.email === email);
+
+            if (userIndex === -1) {
+                showToast('User not found', 'error');
+                return;
+            }
+
+            allUsers[userIndex].name = document.getElementById('editUserName').value.trim();
+            allUsers[userIndex].phone = document.getElementById('editUserPhone').value.trim();
+            allUsers[userIndex].role = document.getElementById('editUserRole').value;
+            allUsers[userIndex].status = document.getElementById('editUserStatus').value;
+            allUsers[userIndex].bkashNumber = document.getElementById('editUserBkash').value.trim();
+            allUsers[userIndex].nagadNumber = document.getElementById('editUserNagad').value.trim();
+
+            const newPassword = document.getElementById('editUserPassword').value;
+            if (newPassword) {
+                allUsers[userIndex].password = newPassword;
+            }
+
+            Storage.set('users', allUsers);
+            logAdminActivity('user_edited', `Edited user: ${email}`);
+            
+            showToast('User updated successfully', 'success');
+            closeModal('editUserModal');
+            loadUsers();
+        }
+
+        // Delete User Functions
+        function openDeleteModal(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+
+            document.getElementById('deleteUserEmail').value = email;
+            document.getElementById('deleteUserName').textContent = user.name || email;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function confirmDeleteUser() {
+            const email = document.getElementById('deleteUserEmail').value;
+            let allUsers = Storage.get('users') || [];
+            const user = allUsers.find(u => u.email === email);
+            
+            if (!user) {
+                showToast('User not found', 'error');
+                return;
+            }
+
+            // Remove user
+            allUsers = allUsers.filter(u => u.email !== email);
+            Storage.set('users', allUsers);
+
+            // Also remove related data
+            let investments = Storage.get('investments') || [];
+            investments = investments.filter(i => i.userId !== email);
+            Storage.set('investments', investments);
+
+            let transactions = Storage.get('transactions') || [];
+            transactions = transactions.filter(t => t.userId !== email);
+            Storage.set('transactions', transactions);
+
+            logAdminActivity('user_deleted', `Deleted user: ${user.name} (${email})`);
+            
+            showToast('User deleted successfully', 'success');
+            closeModal('deleteModal');
+            loadUsers();
+        }
+
+        // Notification Functions
+        function openNotifyModal(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+
+            document.getElementById('notifyUserEmail').value = email;
+            document.getElementById('notifyUserName').value = user.name || email;
+            document.getElementById('notifyType').value = 'info';
+            document.getElementById('notifyTitle').value = '';
+            document.getElementById('notifyMessage').value = '';
+            document.getElementById('notifyModal').classList.add('active');
+        }
+
+        function sendNotification() {
+            const email = document.getElementById('notifyUserEmail').value;
+            const type = document.getElementById('notifyType').value;
+            const title = document.getElementById('notifyTitle').value.trim();
+            const message = document.getElementById('notifyMessage').value.trim();
+
+            if (!title || !message) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+
+            const notifications = Storage.get('notifications') || [];
+            notifications.push({
+                id: Date.now(),
+                userId: email,
+                type: type,
+                title: title,
+                message: message,
+                read: false,
+                date: new Date().toISOString()
+            });
+            Storage.set('notifications', notifications);
+
+            logAdminActivity('notification_sent', `Sent notification to ${email}: ${title}`);
+            
+            showToast('Notification sent successfully', 'success');
+            closeModal('notifyModal');
+        }
+
+        // Admin Activity Logging
+        function logAdminActivity(action, description) {
+            const activities = Storage.get('adminActivities') || [];
+            const currentUser = Storage.get('currentUser');
+            activities.unshift({
+                id: Date.now(),
+                action: action,
+                description: description,
+                admin: currentUser?.email || 'admin',
+                timestamp: new Date().toISOString()
+            });
+            // Keep only last 500 activities
+            if (activities.length > 500) activities.length = 500;
+            Storage.set('adminActivities', activities);
+        }
+
+        function exportUsers() {
+            exportToCSV(users.map(u => ({
+                Name: u.name || 'Unknown',
+                Email: u.email,
+                Phone: u.phone || '',
+                Role: u.role || 'user',
+                Balance: u.balance || 0,
+                Status: u.status || 'active',
+                Joined: u.createdAt
+            })), 'users');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

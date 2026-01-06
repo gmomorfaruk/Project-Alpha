@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Task Management - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('tasks'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-tasks" style="color: var(--primary-color); margin-right: 10px;"></i>Task Management</h1>
+                <p>Create and manage work tasks for users</p>
+            </div>
+
+            <!-- Task Categories -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="youtubeTasks">0</h3>
+                        <p>YouTube Tasks</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fab fa-facebook"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="socialTasks">0</h3>
+                        <p>Social Tasks</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="surveyTasks">0</h3>
+                        <p>Survey Tasks</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalPointsAwarded">0</h3>
+                        <p>Total Points Awarded</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Categories Tabs -->
+            <div class="tabs-container" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('youtube')">
+                        <i class="fab fa-youtube"></i> YouTube Tasks
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('social')">
+                        <i class="fas fa-share-alt"></i> Social Media
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('survey')">
+                        <i class="fas fa-clipboard-list"></i> Surveys
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('custom')">
+                        <i class="fas fa-puzzle-piece"></i> Custom Tasks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tasks Table -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search tasks..." oninput="searchTasks()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterStatus" onchange="filterTasks()">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <select id="filterVisibility" onchange="filterTasks()">
+                            <option value="all">All Visibility</option>
+                            <option value="everyone">Everyone</option>
+                            <option value="users">Users Only</option>
+                            <option value="premium">Premium Users</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="openBulkTaskModal()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none;">
+                            <i class="fas fa-layer-group"></i> Bulk Create
+                        </button>
+                        <button class="btn btn-primary" onclick="openTaskModal()">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Category</th>
+                                <th>Points</th>
+                                <th>Daily Limit</th>
+                                <th>Completions</th>
+                                <th>Visibility</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTable">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-tasks" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No tasks found. Create your first task!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Modal -->
+    <div class="form-modal" id="taskModal">
+        <div class="form-modal-content" style="max-width: 600px;">
+            <div class="form-modal-header">
+                <h3 id="modalTitle"><i class="fas fa-plus" style="margin-right: 10px;"></i>Add New Task</h3>
+                <button class="form-modal-close" onclick="closeModal('taskModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    
+                    <div class="form-group">
+                        <label>Task Title *</label>
+                        <input type="text" id="taskTitle" placeholder="e.g., Subscribe to YouTube Channel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="taskDescription" rows="3" placeholder="Describe what the user needs to do..."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="taskCategory" required onchange="updateCategoryFields()">
+                                <option value="youtube">🎬 YouTube</option>
+                                <option value="social">📱 Social Media</option>
+                                <option value="survey">📋 Survey</option>
+                                <option value="custom">🧩 Custom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Task Type</label>
+                            <select id="taskType">
+                                <option value="subscribe">Subscribe</option>
+                                <option value="like">Like</option>
+                                <option value="watch">Watch Video</option>
+                                <option value="comment">Comment</option>
+                                <option value="follow">Follow</option>
+                                <option value="share">Share</option>
+                                <option value="survey">Complete Survey</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="urlGroup">
+                        <label>Task URL *</label>
+                        <input type="url" id="taskUrl" placeholder="https://youtube.com/channel/...">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Points Reward *</label>
+                            <input type="number" id="taskPoints" placeholder="10" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Daily Limit</label>
+                            <input type="number" id="taskDailyLimit" placeholder="0 = Unlimited" min="0" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Limit</label>
+                            <input type="number" id="taskTotalLimit" placeholder="0 = Unlimited" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Visibility *</label>
+                            <select id="taskVisibility" required>
+                                <option value="everyone">👥 Everyone</option>
+                                <option value="users">👤 Regular Users Only</option>
+                                <option value="premium">⭐ Premium Users Only</option>
+                                <option value="new">🆕 New Users Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Verification</label>
+                            <select id="taskVerification">
+                                <option value="auto">🤖 Auto Approve</option>
+                                <option value="manual">👁️ Manual Review</option>
+                                <option value="screenshot">📸 Screenshot Required</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Proof Instructions</label>
+                        <textarea id="taskProofInstructions" rows="2" placeholder="What proof should user provide? (optional)"></textarea>
+                    </div>
+
+                    <div class="form-group" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="taskActive" checked>
+                            <span>✓ Active</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="taskFeatured">
+                            <span>⭐ Featured</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="taskVerified">
+                            <span>✔️ Verified Source</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('taskModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTask()"><i class="fas fa-save"></i> Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="form-modal" id="deleteModal">
+        <div class="form-modal-content" style="max-width: 400px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+                <h3><i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>Delete Task</h3>
+                <button class="form-modal-close" onclick="closeModal('deleteModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" style="text-align: center; padding: 30px;">
+                <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+                <input type="hidden" id="deleteTaskId">
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()" style="background: #ef4444; border-color: #ef4444;"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Create Tasks Modal -->
+    <div class="form-modal" id="bulkTaskModal">
+        <div class="form-modal-content" style="max-width: 700px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <h3 style="color: white;"><i class="fas fa-layer-group" style="margin-right: 10px;"></i>Bulk Create Tasks</h3>
+                <button class="form-modal-close" onclick="closeModal('bulkTaskModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <div class="bulk-info" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <p style="color: #0369a1; margin: 0;"><i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        Paste a channel/page link and select task types. Multiple tasks will be created for the same link!
+                    </p>
+                </div>
+                
+                <form id="bulkTaskForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-link" style="margin-right: 8px; color: var(--primary-color);"></i>Channel/Page URL *</label>
+                        <input type="url" id="bulkUrl" placeholder="https://youtube.com/@channelname or https://facebook.com/pagename" required>
+                        <small style="color: var(--text-muted); margin-top: 5px; display: block;">Paste your YouTube channel, Facebook page, Instagram, Twitter, or Telegram link</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-tag" style="margin-right: 8px; color: var(--primary-color);"></i>Channel/Page Name *</label>
+                        <input type="text" id="bulkChannelName" placeholder="e.g., Tech Reviews, My Gaming Channel" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Platform *</label>
+                            <select id="bulkPlatform" required onchange="updateBulkTaskTypes()">
+                                <option value="youtube">🎬 YouTube</option>
+                                <option value="facebook">📘 Facebook</option>
+                                <option value="instagram">📸 Instagram</option>
+                                <option value="twitter">🐦 Twitter/X</option>
+                                <option value="telegram">✈️ Telegram</option>
+                                <option value="tiktok">🎵 TikTok</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Visibility</label>
+                            <select id="bulkVisibility">
+                                <option value="everyone">👥 Everyone</option>
+                                <option value="users">👤 Regular Users Only</option>
+                                <option value="premium">⭐ Premium Users Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="margin-bottom: 15px; display: block;"><i class="fas fa-tasks" style="margin-right: 8px; color: var(--primary-color);"></i>Select Task Types to Create</label>
+                        <div id="bulkTaskTypes" class="bulk-task-types">
+                            <!-- Task type checkboxes will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="bulk-summary" id="bulkSummary" style="display: none;">
+                        <div style="background: var(--bg-secondary); border-radius: 10px; padding: 15px; border: 1px solid var(--border-color);">
+                            <h4 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-list-check" style="margin-right: 8px;"></i>Tasks to Create</h4>
+                            <div id="summaryList"></div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                                <span><strong>Total Tasks:</strong> <span id="totalTasksCount">0</span></span>
+                                <span><strong>Total Points:</strong> <span id="totalPointsSum" style="color: #f59e0b;">🪙 0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('bulkTaskModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="createBulkTasks()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none;">
+                    <i class="fas fa-rocket"></i> Create All Tasks
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let tasks = [];
+        let currentCategory = 'youtube';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadTasks();
+        });
+
+        function loadTasks() {
+            tasks = Storage.get('workTasks') || [];
+            updateStats();
+            renderTasks();
+        }
+
+        function updateStats() {
+            const completions = Storage.get('taskCompletions') || [];
+            
+            document.getElementById('youtubeTasks').textContent = tasks.filter(t => t.category === 'youtube').length;
+            document.getElementById('socialTasks').textContent = tasks.filter(t => t.category === 'social').length;
+            document.getElementById('surveyTasks').textContent = tasks.filter(t => t.category === 'survey').length;
+            
+            const totalPoints = completions.reduce((sum, c) => sum + (c.pointsAwarded || 0), 0);
+            document.getElementById('totalPointsAwarded').textContent = totalPoints.toLocaleString();
+        }
+
+        function switchTab(category) {
+            currentCategory = category;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const filtered = tasks.filter(t => {
+                if (currentCategory !== 'all' && t.category !== currentCategory) return false;
+                return true;
+            });
+
+            const tbody = document.getElementById('tasksTable');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-tasks" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No tasks in this category. Create your first task!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const completions = Storage.get('taskCompletions') || [];
+
+            const categoryIcons = {
+                youtube: { icon: 'fab fa-youtube', color: '#ef4444' },
+                social: { icon: 'fas fa-share-alt', color: '#3b82f6' },
+                survey: { icon: 'fas fa-clipboard-list', color: '#10b981' },
+                custom: { icon: 'fas fa-puzzle-piece', color: '#8b5cf6' }
+            };
+
+            const visibilityLabels = {
+                everyone: '👥 Everyone',
+                users: '👤 Users',
+                premium: '⭐ Premium',
+                new: '🆕 New Users'
+            };
+
+            tbody.innerHTML = filtered.map(task => {
+                const cat = categoryIcons[task.category] || categoryIcons.custom;
+                const taskCompletions = completions.filter(c => c.taskId === task.id).length;
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: ${cat.color}20; display: flex; align-items: center; justify-content: center;">
+                                    <i class="${cat.icon}" style="color: ${cat.color};"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">${task.title}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">${task.type}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge" style="background: ${cat.color}20; color: ${cat.color};">${task.category}</span></td>
+                        <td><strong style="color: #f59e0b;">🪙 ${task.points}</strong></td>
+                        <td>${task.dailyLimit || 'Unlimited'}</td>
+                        <td>${taskCompletions}</td>
+                        <td><span class="badge badge-secondary">${visibilityLabels[task.visibility] || 'Everyone'}</span></td>
+                        <td><span class="badge badge-${task.active ? 'success' : 'danger'}">${task.active ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn-edit" onclick="editTask(${task.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn-${task.active ? 'reject' : 'approve'}" onclick="toggleTaskStatus(${task.id})" title="${task.active ? 'Deactivate' : 'Activate'}">
+                                    <i class="fas fa-${task.active ? 'pause' : 'play'}"></i>
+                                </button>
+                                <button class="action-btn-view" onclick="duplicateTask(${task.id})" title="Duplicate"><i class="fas fa-copy"></i></button>
+                                <button class="action-btn-reject" onclick="openDeleteModal(${task.id})" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function searchTasks() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = tasks.filter(t => 
+                t.title.toLowerCase().includes(query) ||
+                t.description?.toLowerCase().includes(query)
+            );
+            renderFilteredTasks(filtered);
+        }
+
+        function filterTasks() {
+            const status = document.getElementById('filterStatus').value;
+            const visibility = document.getElementById('filterVisibility').value;
+            
+            let filtered = tasks.filter(t => t.category === currentCategory || currentCategory === 'all');
+            
+            if (status !== 'all') {
+                filtered = filtered.filter(t => status === 'active' ? t.active : !t.active);
+            }
+            if (visibility !== 'all') {
+                filtered = filtered.filter(t => t.visibility === visibility);
+            }
+            
+            renderFilteredTasks(filtered);
+        }
+
+        function renderFilteredTasks(filtered) {
+            // Same as renderTasks but with provided list
+            const tbody = document.getElementById('tasksTable');
+            const completions = Storage.get('taskCompletions') || [];
+
+            const categoryIcons = {
+                youtube: { icon: 'fab fa-youtube', color: '#ef4444' },
+                social: { icon: 'fas fa-share-alt', color: '#3b82f6' },
+                survey: { icon: 'fas fa-clipboard-list', color: '#10b981' },
+                custom: { icon: 'fas fa-puzzle-piece', color: '#8b5cf6' }
+            };
+
+            const visibilityLabels = {
+                everyone: '👥 Everyone',
+                users: '👤 Users',
+                premium: '⭐ Premium',
+                new: '🆕 New Users'
+            };
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-search" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No tasks match your search</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(task => {
+                const cat = categoryIcons[task.category] || categoryIcons.custom;
+                const taskCompletions = completions.filter(c => c.taskId === task.id).length;
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: ${cat.color}20; display: flex; align-items: center; justify-content: center;">
+                                    <i class="${cat.icon}" style="color: ${cat.color};"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">${task.title}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">${task.type}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge" style="background: ${cat.color}20; color: ${cat.color};">${task.category}</span></td>
+                        <td><strong style="color: #f59e0b;">🪙 ${task.points}</strong></td>
+                        <td>${task.dailyLimit || 'Unlimited'}</td>
+                        <td>${taskCompletions}</td>
+                        <td><span class="badge badge-secondary">${visibilityLabels[task.visibility] || 'Everyone'}</span></td>
+                        <td><span class="badge badge-${task.active ? 'success' : 'danger'}">${task.active ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn-edit" onclick="editTask(${task.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn-${task.active ? 'reject' : 'approve'}" onclick="toggleTaskStatus(${task.id})" title="${task.active ? 'Deactivate' : 'Activate'}">
+                                    <i class="fas fa-${task.active ? 'pause' : 'play'}"></i>
+                                </button>
+                                <button class="action-btn-view" onclick="duplicateTask(${task.id})" title="Duplicate"><i class="fas fa-copy"></i></button>
+                                <button class="action-btn-reject" onclick="openDeleteModal(${task.id})" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openTaskModal() {
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskId').value = '';
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus" style="margin-right: 10px;"></i>Add New Task';
+            document.getElementById('taskCategory').value = currentCategory !== 'all' ? currentCategory : 'youtube';
+            document.getElementById('taskActive').checked = true;
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function editTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            document.getElementById('taskId').value = id;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('taskCategory').value = task.category;
+            document.getElementById('taskType').value = task.type;
+            document.getElementById('taskUrl').value = task.url || '';
+            document.getElementById('taskPoints').value = task.points;
+            document.getElementById('taskDailyLimit').value = task.dailyLimit || 0;
+            document.getElementById('taskTotalLimit').value = task.totalLimit || 0;
+            document.getElementById('taskVisibility').value = task.visibility;
+            document.getElementById('taskVerification').value = task.verification || 'auto';
+            document.getElementById('taskProofInstructions').value = task.proofInstructions || '';
+            document.getElementById('taskActive').checked = task.active;
+            document.getElementById('taskFeatured').checked = task.featured || false;
+            document.getElementById('taskVerified').checked = task.verified || false;
+
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="margin-right: 10px;"></i>Edit Task';
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function saveTask() {
+            const id = document.getElementById('taskId').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const category = document.getElementById('taskCategory').value;
+            const type = document.getElementById('taskType').value;
+            const url = document.getElementById('taskUrl').value.trim();
+            const points = parseInt(document.getElementById('taskPoints').value) || 0;
+            const dailyLimit = parseInt(document.getElementById('taskDailyLimit').value) || 0;
+            const totalLimit = parseInt(document.getElementById('taskTotalLimit').value) || 0;
+            const visibility = document.getElementById('taskVisibility').value;
+            const verification = document.getElementById('taskVerification').value;
+            const proofInstructions = document.getElementById('taskProofInstructions').value.trim();
+            const active = document.getElementById('taskActive').checked;
+            const featured = document.getElementById('taskFeatured').checked;
+            const verified = document.getElementById('taskVerified').checked;
+
+            if (!title || !points) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            let allTasks = Storage.get('workTasks') || [];
+
+            const taskData = {
+                title, description, category, type, url, points,
+                dailyLimit, totalLimit, visibility, verification,
+                proofInstructions, active, featured, verified,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (id) {
+                // Edit existing
+                const index = allTasks.findIndex(t => t.id === parseInt(id));
+                if (index !== -1) {
+                    allTasks[index] = { ...allTasks[index], ...taskData };
+                    logAdminActivity('task_edited', `Edited task: ${title}`);
+                }
+            } else {
+                // Create new
+                taskData.id = Date.now();
+                taskData.createdAt = new Date().toISOString();
+                allTasks.push(taskData);
+                logAdminActivity('task_created', `Created task: ${title} (${points} points)`);
+            }
+
+            Storage.set('workTasks', allTasks);
+            showToast('Task saved successfully', 'success');
+            closeModal('taskModal');
+            loadTasks();
+        }
+
+        function toggleTaskStatus(id) {
+            let allTasks = Storage.get('workTasks') || [];
+            const index = allTasks.findIndex(t => t.id === id);
+            if (index !== -1) {
+                allTasks[index].active = !allTasks[index].active;
+                Storage.set('workTasks', allTasks);
+                showToast(`Task ${allTasks[index].active ? 'activated' : 'deactivated'}`, 'success');
+                loadTasks();
+            }
+        }
+
+        function duplicateTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            let allTasks = Storage.get('workTasks') || [];
+            const newTask = {
+                ...task,
+                id: Date.now(),
+                title: task.title + ' (Copy)',
+                createdAt: new Date().toISOString()
+            };
+            allTasks.push(newTask);
+            Storage.set('workTasks', allTasks);
+            
+            showToast('Task duplicated', 'success');
+            loadTasks();
+        }
+
+        function openDeleteModal(id) {
+            document.getElementById('deleteTaskId').value = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function confirmDelete() {
+            const id = parseInt(document.getElementById('deleteTaskId').value);
+            let allTasks = Storage.get('workTasks') || [];
+            const task = allTasks.find(t => t.id === id);
+            allTasks = allTasks.filter(t => t.id !== id);
+            Storage.set('workTasks', allTasks);
+            
+            logAdminActivity('task_deleted', `Deleted task: ${task?.title || id}`);
+            
+            showToast('Task deleted', 'success');
+            closeModal('deleteModal');
+            loadTasks();
+        }
+
+        function updateCategoryFields() {
+            const category = document.getElementById('taskCategory').value;
+            const typeSelect = document.getElementById('taskType');
+            
+            // Update type options based on category
+            const typeOptions = {
+                youtube: [
+                    { value: 'subscribe', label: 'Subscribe' },
+                    { value: 'like', label: 'Like Video' },
+                    { value: 'watch', label: 'Watch Video' },
+                    { value: 'comment', label: 'Comment' }
+                ],
+                social: [
+                    { value: 'follow', label: 'Follow' },
+                    { value: 'like', label: 'Like Post' },
+                    { value: 'share', label: 'Share' },
+                    { value: 'comment', label: 'Comment' }
+                ],
+                survey: [
+                    { value: 'survey', label: 'Complete Survey' },
+                    { value: 'quiz', label: 'Take Quiz' },
+                    { value: 'feedback', label: 'Give Feedback' }
+                ],
+                custom: [
+                    { value: 'other', label: 'Custom Task' },
+                    { value: 'download', label: 'Download App' },
+                    { value: 'signup', label: 'Sign Up' },
+                    { value: 'review', label: 'Write Review' }
+                ]
+            };
+
+            typeSelect.innerHTML = (typeOptions[category] || typeOptions.custom)
+                .map(opt => `<option value="${opt.value}">${opt.label}</option>`)
+                .join('');
+        }
+
+        function logAdminActivity(action, description) {
+            const activities = Storage.get('adminActivities') || [];
+            const currentUser = Storage.get('currentUser');
+            activities.unshift({
+                id: Date.now(),
+                action: action,
+                description: description,
+                admin: currentUser?.email || 'admin',
+                timestamp: new Date().toISOString()
+            });
+            if (activities.length > 500) activities.length = 500;
+            Storage.set('adminActivities', activities);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // ========== BULK TASK CREATION ==========
+        const platformTaskTypes = {
+            youtube: [
+                { type: 'subscribe', label: 'Subscribe to Channel', icon: 'fas fa-bell', defaultPoints: 10 },
+                { type: 'like', label: 'Like Video', icon: 'fas fa-thumbs-up', defaultPoints: 5 },
+                { type: 'watch', label: 'Watch Video (3 min)', icon: 'fas fa-play', defaultPoints: 8 },
+                { type: 'comment', label: 'Comment on Video', icon: 'fas fa-comment', defaultPoints: 15 },
+                { type: 'share', label: 'Share Video', icon: 'fas fa-share', defaultPoints: 10 }
+            ],
+            facebook: [
+                { type: 'follow', label: 'Follow Page', icon: 'fas fa-user-plus', defaultPoints: 10 },
+                { type: 'like', label: 'Like Page', icon: 'fas fa-thumbs-up', defaultPoints: 5 },
+                { type: 'like_post', label: 'Like Post', icon: 'fas fa-heart', defaultPoints: 5 },
+                { type: 'comment', label: 'Comment on Post', icon: 'fas fa-comment', defaultPoints: 15 },
+                { type: 'share', label: 'Share Post', icon: 'fas fa-share', defaultPoints: 10 }
+            ],
+            instagram: [
+                { type: 'follow', label: 'Follow Account', icon: 'fas fa-user-plus', defaultPoints: 10 },
+                { type: 'like', label: 'Like Post', icon: 'fas fa-heart', defaultPoints: 5 },
+                { type: 'comment', label: 'Comment on Post', icon: 'fas fa-comment', defaultPoints: 15 },
+                { type: 'save', label: 'Save Post', icon: 'fas fa-bookmark', defaultPoints: 8 },
+                { type: 'share', label: 'Share Story', icon: 'fas fa-share', defaultPoints: 12 }
+            ],
+            twitter: [
+                { type: 'follow', label: 'Follow Account', icon: 'fas fa-user-plus', defaultPoints: 10 },
+                { type: 'like', label: 'Like Tweet', icon: 'fas fa-heart', defaultPoints: 5 },
+                { type: 'retweet', label: 'Retweet', icon: 'fas fa-retweet', defaultPoints: 8 },
+                { type: 'comment', label: 'Reply to Tweet', icon: 'fas fa-reply', defaultPoints: 15 },
+                { type: 'quote', label: 'Quote Tweet', icon: 'fas fa-quote-right', defaultPoints: 12 }
+            ],
+            telegram: [
+                { type: 'join', label: 'Join Channel', icon: 'fas fa-sign-in-alt', defaultPoints: 10 },
+                { type: 'join_group', label: 'Join Group', icon: 'fas fa-users', defaultPoints: 10 },
+                { type: 'react', label: 'React to Post', icon: 'fas fa-smile', defaultPoints: 5 },
+                { type: 'share', label: 'Share Post', icon: 'fas fa-share', defaultPoints: 8 }
+            ],
+            tiktok: [
+                { type: 'follow', label: 'Follow Account', icon: 'fas fa-user-plus', defaultPoints: 10 },
+                { type: 'like', label: 'Like Video', icon: 'fas fa-heart', defaultPoints: 5 },
+                { type: 'comment', label: 'Comment on Video', icon: 'fas fa-comment', defaultPoints: 15 },
+                { type: 'share', label: 'Share Video', icon: 'fas fa-share', defaultPoints: 10 },
+                { type: 'save', label: 'Save Video', icon: 'fas fa-bookmark', defaultPoints: 8 }
+            ]
+        };
+
+        function openBulkTaskModal() {
+            document.getElementById('bulkTaskForm').reset();
+            document.getElementById('bulkSummary').style.display = 'none';
+            updateBulkTaskTypes();
+            document.getElementById('bulkTaskModal').classList.add('active');
+        }
+
+        function updateBulkTaskTypes() {
+            const platform = document.getElementById('bulkPlatform').value;
+            const taskTypes = platformTaskTypes[platform] || [];
+            const container = document.getElementById('bulkTaskTypes');
+
+            container.innerHTML = taskTypes.map((task, index) => `
+                <div class="bulk-task-item">
+                    <label class="bulk-task-checkbox">
+                        <input type="checkbox" name="bulkTaskType" value="${task.type}" 
+                               data-label="${task.label}" data-default-points="${task.defaultPoints}"
+                               ${index < 3 ? 'checked' : ''} onchange="updateBulkSummary()">
+                        <span class="checkmark"></span>
+                        <i class="${task.icon}" style="margin-right: 8px; color: var(--primary-color);"></i>
+                        ${task.label}
+                    </label>
+                    <div class="bulk-points-input">
+                        <label>Points:</label>
+                        <input type="number" class="task-points-input" data-type="${task.type}" 
+                               value="${task.defaultPoints}" min="1" max="1000" onchange="updateBulkSummary()">
+                    </div>
+                </div>
+            `).join('');
+
+            updateBulkSummary();
+        }
+
+        function updateBulkSummary() {
+            const checkedBoxes = document.querySelectorAll('input[name="bulkTaskType"]:checked');
+            const summaryDiv = document.getElementById('bulkSummary');
+            const summaryList = document.getElementById('summaryList');
+            const channelName = document.getElementById('bulkChannelName').value || 'Channel';
+
+            if (checkedBoxes.length === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            summaryDiv.style.display = 'block';
+            let totalPoints = 0;
+            let listHTML = '';
+
+            checkedBoxes.forEach(cb => {
+                const label = cb.dataset.label;
+                const type = cb.value;
+                const pointsInput = document.querySelector(`.task-points-input[data-type="${type}"]`);
+                const points = parseInt(pointsInput?.value) || parseInt(cb.dataset.defaultPoints);
+                totalPoints += points;
+
+                listHTML += `
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>✓ ${label} - ${channelName}</span>
+                        <span style="color: #f59e0b; font-weight: 600;">🪙 ${points}</span>
+                    </div>
+                `;
+            });
+
+            summaryList.innerHTML = listHTML;
+            document.getElementById('totalTasksCount').textContent = checkedBoxes.length;
+            document.getElementById('totalPointsSum').textContent = `🪙 ${totalPoints}`;
+        }
+
+        function createBulkTasks() {
+            const url = document.getElementById('bulkUrl').value.trim();
+            const channelName = document.getElementById('bulkChannelName').value.trim();
+            const platform = document.getElementById('bulkPlatform').value;
+            const visibility = document.getElementById('bulkVisibility').value;
+            const checkedBoxes = document.querySelectorAll('input[name="bulkTaskType"]:checked');
+
+            if (!url || !channelName) {
+                showToast('Please fill in URL and Channel Name', 'error');
+                return;
+            }
+
+            if (checkedBoxes.length === 0) {
+                showToast('Please select at least one task type', 'error');
+                return;
+            }
+
+            const categoryMap = {
+                youtube: 'youtube',
+                facebook: 'social',
+                instagram: 'social',
+                twitter: 'social',
+                telegram: 'social',
+                tiktok: 'social'
+            };
+
+            let allTasks = Storage.get('workTasks') || [];
+            let createdCount = 0;
+
+            checkedBoxes.forEach(cb => {
+                const type = cb.value;
+                const label = cb.dataset.label;
+                const pointsInput = document.querySelector(`.task-points-input[data-type="${type}"]`);
+                const points = parseInt(pointsInput?.value) || parseInt(cb.dataset.defaultPoints);
+
+                const newTask = {
+                    id: Date.now() + createdCount,
+                    title: `${label} - ${channelName}`,
+                    description: `${label} for ${channelName} on ${platform.charAt(0).toUpperCase() + platform.slice(1)}`,
+                    category: categoryMap[platform] || 'social',
+                    type: type,
+                    url: url,
+                    platform: platform,
+                    channelName: channelName,
+                    points: points,
+                    dailyLimit: 1,
+                    totalLimit: 0,
+                    visibility: visibility,
+                    verification: 'auto',
+                    proofInstructions: '',
+                    active: true,
+                    featured: false,
+                    verified: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                allTasks.push(newTask);
+                createdCount++;
+            });
+
+            Storage.set('workTasks', allTasks);
+            logAdminActivity('bulk_tasks_created', `Created ${createdCount} tasks for ${channelName} (${platform})`);
+            
+            showToast(`Successfully created ${createdCount} tasks!`, 'success');
+            closeModal('bulkTaskModal');
+            loadTasks();
+        }
+
+        // Update summary when channel name changes
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const channelInput = document.getElementById('bulkChannelName');
+                if (channelInput) {
+                    channelInput.addEventListener('input', updateBulkSummary);
+                }
+            }, 100);
+        });
+    </script>
+
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        .tab-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Bulk Task Creation Styles */
+        .bulk-task-types {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bulk-task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .bulk-task-item:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .bulk-task-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .bulk-task-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .bulk-task-checkbox .checkmark {
+            position: absolute;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .bulk-task-checkbox input:checked ~ .checkmark {
+            background: var(--primary-gradient);
+            border-color: var(--primary-color);
+        }
+
+        .bulk-task-checkbox .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .bulk-task-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .bulk-points-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bulk-points-input label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .bulk-points-input input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            background: var(--bg-card);
+        }
+
+        .bulk-points-input input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        [data-theme="dark"] .bulk-info {
+            background: rgba(14, 165, 233, 0.1) !important;
+            border-color: #0ea5e9 !important;
+        }
+
+        [data-theme="dark"] .bulk-info p {
+            color: #7dd3fc !important;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Sell Proofs - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('proofs'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Sell Proof Management</h1>
+                <p>Review and approve sell proofs from users</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="pendingProofs">0</h3>
+                        <p>Pending Review</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="approvedProofs">0</h3>
+                        <p>Approved</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="rejectedProofs">0</h3>
+                        <p>Rejected</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalProofs">0</h3>
+                        <p>Total Proofs</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proofs Table -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by product or buyer..." oninput="searchProofs()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterStatus" onchange="filterProofs()">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Proof</th>
+                                <th>Product</th>
+                                <th>Units Sold</th>
+                                <th>Buyer</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proofsTable">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-receipt" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No proofs found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Proof Details Modal -->
+    <div class="form-modal" id="detailsModal">
+        <div class="form-modal-content" style="max-width: 550px;">
+            <div class="form-modal-header">
+                <h3>Proof Details</h3>
+                <button class="form-modal-close" onclick="closeModal('detailsModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="proofDetails">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="form-modal-footer" id="modalActions">
+                <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="image-modal" id="imageModal" onclick="closeModal('imageModal')">
+        <button class="image-modal-close"><i class="fas fa-times"></i></button>
+        <img id="previewImage" src="" alt="Proof Image">
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let proofs = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadProofs();
+
+            // Check for filter param
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            if (filter) {
+                document.getElementById('filterStatus').value = filter;
+                filterProofs();
+            }
+        });
+
+        function loadProofs() {
+            proofs = Storage.get('sellProofs') || [];
+            updateStats();
+            renderProofs(proofs);
+        }
+
+        function updateStats() {
+            document.getElementById('pendingProofs').textContent = proofs.filter(p => p.status === 'pending').length;
+            document.getElementById('approvedProofs').textContent = proofs.filter(p => p.status === 'approved').length;
+            document.getElementById('rejectedProofs').textContent = proofs.filter(p => p.status === 'rejected').length;
+            document.getElementById('totalProofs').textContent = proofs.length;
+        }
+
+        function renderProofs(proofList) {
+            const tbody = document.getElementById('proofsTable');
+            
+            if (proofList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-receipt" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No proofs found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = proofList.map(proof => `
+                <tr>
+                    <td>
+                        <div class="proof-image" onclick="viewImage('${proof.imageUrl || ''}')">
+                            ${proof.imageUrl ? 
+                                `<img src="${proof.imageUrl}" alt="Proof">` : 
+                                `<i class="fas fa-image" style="font-size: 24px; color: var(--text-muted);"></i>`
+                            }
+                        </div>
+                    </td>
+                    <td><strong>${proof.productName}</strong></td>
+                    <td>${proof.unitsSold} units</td>
+                    <td>${proof.buyerName}</td>
+                    <td>${formatDate(proof.submittedAt)}</td>
+                    <td>
+                        <span class="badge badge-${proof.status === 'approved' ? 'success' : proof.status === 'rejected' ? 'danger' : 'warning'}">
+                            ${proof.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="action-btn-view" onclick="viewProof('${proof.id}')" title="View"><i class="fas fa-eye"></i></button>
+                            ${proof.status === 'pending' ? `
+                                <button class="action-btn-approve" onclick="approveProof('${proof.id}')" title="Approve"><i class="fas fa-check"></i></button>
+                                <button class="action-btn-reject" onclick="rejectProof('${proof.id}')" title="Reject"><i class="fas fa-times"></i></button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchProofs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = proofs.filter(p => 
+                p.productName.toLowerCase().includes(query) ||
+                p.buyerName.toLowerCase().includes(query)
+            );
+            renderProofs(filtered);
+        }
+
+        function filterProofs() {
+            const status = document.getElementById('filterStatus').value;
+            let filtered = proofs;
+            
+            if (status !== 'all') {
+                filtered = proofs.filter(p => p.status === status);
+            }
+            
+            renderProofs(filtered);
+        }
+
+        function viewImage(url) {
+            if (!url) {
+                showToast('No image available', 'error');
+                return;
+            }
+            document.getElementById('previewImage').src = url;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function viewProof(id) {
+            const proof = proofs.find(p => p.id === id);
+            if (!proof) return;
+
+            document.getElementById('proofDetails').innerHTML = `
+                ${proof.imageUrl ? `
+                    <div style="margin-bottom: 20px; text-align: center;">
+                        <img src="${proof.imageUrl}" alt="Proof" style="max-width: 100%; max-height: 300px; border-radius: 12px; cursor: pointer;" onclick="viewImage('${proof.imageUrl}')">
+                    </div>
+                ` : `
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 20px;">
+                        <i class="fas fa-image" style="font-size: 48px; color: var(--text-muted);"></i>
+                        <p style="margin-top: 10px; color: var(--text-muted);">No image uploaded</p>
+                    </div>
+                `}
+
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Proof ID</span>
+                        <strong style="font-family: monospace; font-size: 11px;">${proof.id}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Product</span>
+                        <strong>${proof.productName}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Units Sold</span>
+                        <strong>${proof.unitsSold}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Buyer Name</span>
+                        <strong>${proof.buyerName}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Submitted</span>
+                        <strong>${formatDate(proof.submittedAt)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Status</span>
+                        <span class="badge badge-${proof.status === 'approved' ? 'success' : proof.status === 'rejected' ? 'danger' : 'warning'}">${proof.status}</span>
+                    </div>
+                    ${proof.bonusPoints ? `
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); background: rgba(191, 161, 129, 0.1); margin: 10px -15px; padding-left: 15px; padding-right: 15px;">
+                            <span><i class="fas fa-gift" style="color: #BFA181; margin-right: 5px;"></i> Bonus Points</span>
+                            <strong style="color: #BFA181;">${proof.bonusPoints} pts</strong>
+                        </div>
+                    ` : ''}
+                    ${proof.notes ? `
+                        <div style="padding: 10px 0;">
+                            <span style="display: block; margin-bottom: 5px;">Notes</span>
+                            <p style="background: var(--bg-primary); padding: 10px; border-radius: 8px; font-size: 14px;">${proof.notes}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            const actionsDiv = document.getElementById('modalActions');
+            if (proof.status === 'pending') {
+                const bonusText = proof.bonusPoints ? ` (+${proof.bonusPoints} pts)` : '';
+                actionsDiv.innerHTML = `
+                    <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+                    <button class="btn btn-danger" onclick="rejectProof('${proof.id}'); closeModal('detailsModal');">Reject</button>
+                    <button class="btn btn-success" onclick="approveProof('${proof.id}'); closeModal('detailsModal');">Approve${bonusText}</button>
+                `;
+            } else {
+                actionsDiv.innerHTML = `<button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>`;
+            }
+
+            document.getElementById('detailsModal').classList.add('active');
+        }
+
+        function approveProof(id) {
+            const proof = proofs.find(p => p.id === id);
+            if (!proof) return;
+
+            proof.status = 'approved';
+            proof.processedAt = new Date().toISOString();
+
+            // Find the investment and update it
+            const investments = Storage.get('investments') || [];
+            const invIndex = investments.findIndex(i => i.id === proof.investmentId);
+            
+            if (invIndex !== -1) {
+                const inv = investments[invIndex];
+                // Credit the user for the sold units
+                const unitReturn = (inv.totalAmount / inv.units) * (1 + inv.returnRate / 100);
+                const totalReturn = unitReturn * proof.unitsSold;
+
+                const users = Storage.get('users') || [];
+                const userIndex = users.findIndex(u => u.email === inv.userId);
+                if (userIndex !== -1) {
+                    users[userIndex].balance = (users[userIndex].balance || 0) + totalReturn;
+                    
+                    // Award bonus points if enabled
+                    const bonusPoints = proof.bonusPoints || 0;
+                    if (bonusPoints > 0) {
+                        users[userIndex].points = (users[userIndex].points || 0) + bonusPoints;
+                        
+                        // Send notification to user about bonus
+                        const notifications = Storage.get('notifications') || [];
+                        notifications.push({
+                            id: Date.now(),
+                            userId: inv.userId,
+                            type: 'success',
+                            title: 'Sell Bonus Earned! 🎁',
+                            message: `Congratulations! You earned ${bonusPoints} bonus points for selling ${proof.productName}.`,
+                            date: new Date().toISOString(),
+                            read: false
+                        });
+                        Storage.set('notifications', notifications);
+                    }
+                    
+                    Storage.set('users', users);
+                    
+                    // Update current user if they're the one who got approved
+                    const currentUser = Storage.get('currentUser');
+                    if (currentUser && currentUser.email === inv.userId) {
+                        currentUser.balance = users[userIndex].balance;
+                        currentUser.points = users[userIndex].points;
+                        Storage.set('currentUser', currentUser);
+                    }
+                }
+            }
+
+            Storage.set('sellProofs', proofs);
+            const bonusMsg = proof.bonusPoints ? ` + ${proof.bonusPoints} bonus points awarded` : '';
+            showToast(`Proof approved and user credited${bonusMsg}`, 'success');
+            loadProofs();
+        }
+
+        function rejectProof(id) {
+            const proof = proofs.find(p => p.id === id);
+            if (!proof) return;
+
+            proof.status = 'rejected';
+            proof.processedAt = new Date().toISOString();
+
+            Storage.set('sellProofs', proofs);
+            showToast('Proof rejected', 'success');
+            loadProofs();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

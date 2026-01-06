@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Referrals - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('referrals'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Referral Management</h1>
+                <p>Track referrals and commissions</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalReferrals">0</h3>
+                        <p>Total Referrals</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="activeReferrers">0</h3>
+                        <p>Active Referrers</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalEarnings">৳0</h3>
+                        <p>Total Earnings</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="commissionRate">5%</h3>
+                        <p>Commission Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals Table -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by referrer or referred user..." oninput="searchReferrals()">
+                    </div>
+                    <button class="btn btn-outline" onclick="exportReferrals()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Referrer</th>
+                                <th>Referred User</th>
+                                <th>Referral Code</th>
+                                <th>Commission</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralsTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-user-friends" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No referrals found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Referrers -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color); margin-top: 30px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-trophy" style="color: #f59e0b; margin-right: 10px;"></i>Top Referrers</h3>
+                <div id="topReferrers">
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <i class="fas fa-medal" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>No referrers yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let referrals = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadReferrals();
+        });
+
+        function loadReferrals() {
+            referrals = Storage.get('referrals') || [];
+            updateStats();
+            renderReferrals(referrals);
+            renderTopReferrers();
+        }
+
+        function updateStats() {
+            document.getElementById('totalReferrals').textContent = referrals.length;
+            
+            const referrers = [...new Set(referrals.map(r => r.referrerId))];
+            document.getElementById('activeReferrers').textContent = referrers.length;
+            
+            const totalEarnings = referrals.reduce((sum, r) => sum + (r.earnings || 0), 0);
+            document.getElementById('totalEarnings').textContent = formatCurrency(totalEarnings);
+
+            const settings = Storage.get('settings') || {};
+            document.getElementById('commissionRate').textContent = (settings.referralRate || 5) + '%';
+        }
+
+        function renderReferrals(referralList) {
+            const tbody = document.getElementById('referralsTable');
+            
+            if (referralList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-user-friends" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No referrals found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = referralList.map(ref => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="user-avatar-table">${ref.referrerName ? ref.referrerName.charAt(0).toUpperCase() : 'U'}</div>
+                            <div>
+                                <div style="font-weight: 500;">${ref.referrerName || 'Unknown'}</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">${ref.referrerId}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div style="font-weight: 500;">${ref.referredName || 'Unknown'}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">${ref.referredId}</div>
+                        </div>
+                    </td>
+                    <td><code>${ref.code}</code></td>
+                    <td style="color: #10b981; font-weight: 600;">${formatCurrency(ref.earnings || 0)}</td>
+                    <td>
+                        <span class="badge badge-${ref.status === 'active' ? 'success' : 'secondary'}">
+                            ${ref.status || 'active'}
+                        </span>
+                    </td>
+                    <td>${formatDate(ref.createdAt)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTopReferrers() {
+            const container = document.getElementById('topReferrers');
+            
+            // Group by referrer
+            const referrerStats = {};
+            referrals.forEach(ref => {
+                if (!referrerStats[ref.referrerId]) {
+                    referrerStats[ref.referrerId] = {
+                        email: ref.referrerId,
+                        name: ref.referrerName,
+                        count: 0,
+                        earnings: 0
+                    };
+                }
+                referrerStats[ref.referrerId].count++;
+                referrerStats[ref.referrerId].earnings += ref.earnings || 0;
+            });
+
+            const topReferrers = Object.values(referrerStats)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            if (topReferrers.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <i class="fas fa-medal" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>No referrers yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="display: grid; gap: 15px;">
+                    ${topReferrers.map((ref, index) => `
+                        <div style="display: flex; align-items: center; padding: 15px; background: var(--bg-secondary); border-radius: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${index < 3 ? ['#f59e0b', '#94a3b8', '#cd7f32'][index] : 'var(--primary-color)'}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-right: 15px;">
+                                ${index + 1}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">${ref.name || ref.email}</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">${ref.email}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: var(--primary-color);">${ref.count} referrals</div>
+                                <div style="font-size: 12px; color: #10b981;">${formatCurrency(ref.earnings)} earned</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function searchReferrals() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = referrals.filter(ref => 
+                (ref.referrerId && ref.referrerId.toLowerCase().includes(query)) ||
+                (ref.referrerName && ref.referrerName.toLowerCase().includes(query)) ||
+                (ref.referredId && ref.referredId.toLowerCase().includes(query)) ||
+                (ref.referredName && ref.referredName.toLowerCase().includes(query)) ||
+                (ref.code && ref.code.toLowerCase().includes(query))
+            );
+            renderReferrals(filtered);
+        }
+
+        function exportReferrals() {
+            exportToCSV(referrals.map(ref => ({
+                Referrer: ref.referrerName || ref.referrerId,
+                ReferrerEmail: ref.referrerId,
+                ReferredUser: ref.referredName || ref.referredId,
+                ReferredEmail: ref.referredId,
+                Code: ref.code,
+                Earnings: ref.earnings || 0,
+                Status: ref.status || 'active',
+                Date: ref.createdAt
+            })), 'referrals');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

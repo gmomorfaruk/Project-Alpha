@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Referrals - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item active">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item active">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="content">
+            <div class="page-header">
+                <h1 data-en="Referral Program" data-bn="রেফারেল প্রোগ্রাম">Referral Program</h1>
+                <p data-en="Invite friends and earn rewards" data-bn="বন্ধুদের আমন্ত্রণ জানান এবং পুরস্কার উপার্জন করুন">Invite friends and earn rewards</p>
+            </div>
+
+            <!-- Referral Stats -->
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-icon referral">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Referrals</span>
+                        <span class="stat-value" id="totalReferrals">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Referrals</span>
+                        <span class="stat-value" id="activeReferrals">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon profit">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Earnings</span>
+                        <span class="stat-value" id="totalEarnings">৳0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Code Card -->
+            <div class="referral-card" style="margin-bottom: 30px;">
+                <div class="referral-info">
+                    <h3>Your Referral Code</h3>
+                    <p>Share this code with friends. When they invest, you earn 5% of their first investment!</p>
+                </div>
+                <div class="referral-code-box">
+                    <span class="code" id="referralCode">XXXXXXXX</span>
+                    <button class="copy-btn" onclick="copyReferralCode()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <button class="btn btn-light" onclick="shareReferralLink()">
+                    <i class="fas fa-share"></i>
+                    Share Link
+                </button>
+            </div>
+
+            <!-- How It Works -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 30px; border: 1px solid var(--border-color); margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;">How It Works</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <i class="fas fa-share-alt" style="font-size: 24px; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px;">1. Share Your Code</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">Share your unique referral code or link with friends</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <i class="fas fa-user-plus" style="font-size: 24px; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px;">2. Friends Join</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">Friends sign up using your referral code</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <i class="fas fa-coins" style="font-size: 24px; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px;">3. Earn Rewards</h4>
+                        <p style="font-size: 14px; color: var(--text-secondary);">Earn 5% of their first investment as reward</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Referrals List -->
+            <div class="section">
+                <h2 class="section-title">My Referrals</h2>
+                <div class="investments-list" id="referralsList">
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>No referrals yet</h3>
+                        <p>Share your code to start earning!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'User';
+            document.getElementById('referralCode').textContent = user.referralCode || 'XXXXXXXX';
+            document.getElementById('totalEarnings').textContent = formatCurrency(user.referralEarnings || 0);
+
+            loadReferrals();
+        });
+
+        function loadReferrals() {
+            const user = Storage.get('currentUser');
+            const users = Storage.get('users') || [];
+            
+            // Get current user's full data from users list
+            const fullUser = users.find(u => u.email === user.email);
+            
+            // Get referrals from user's referrals array
+            const referrals = fullUser?.referrals || [];
+            
+            document.getElementById('totalReferrals').textContent = referrals.length;
+            document.getElementById('activeReferrals').textContent = referrals.filter(r => r.hasInvested).length;
+
+            const container = document.getElementById('referralsList');
+
+            if (referrals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>No referrals yet</h3>
+                        <p>Share your code to start earning!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = referrals.map(ref => `
+                <div class="investment-item">
+                    <div class="investment-icon" style="background: ${ref.hasInvested ? 'rgba(16, 185, 129, 0.1)' : 'var(--primary-light)'}; color: ${ref.hasInvested ? '#10b981' : 'var(--primary-color)'};">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="investment-details">
+                        <div class="investment-name">${ref.name}</div>
+                        <div class="investment-meta">
+                            Joined ${formatDate(ref.joinedAt)} • 
+                            <span class="badge badge-${ref.hasInvested ? 'success' : 'warning'}">${ref.hasInvested ? 'Invested' : 'Pending'}</span>
+                        </div>
+                    </div>
+                    <div class="investment-stats">
+                        ${ref.hasInvested ? `
+                            <div class="investment-amount" style="color: var(--success-color);">+${formatCurrency(ref.earnings || 0)}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Earned</div>
+                        ` : `
+                            <div style="font-size: 13px; color: var(--text-secondary);">Waiting for investment</div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function copyReferralCode() {
+            const code = document.getElementById('referralCode').textContent;
+            copyToClipboard(code);
+        }
+
+        function shareReferralLink() {
+            const user = Storage.get('currentUser');
+            const link = `${window.location.origin}/signup.html?ref=${user.referralCode}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join Project Alpha',
+                    text: `Join me on Project Alpha and start earning! Use my referral code: ${user.referralCode}`,
+                    url: link
+                });
+            } else {
+                copyToClipboard(link);
+            }
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

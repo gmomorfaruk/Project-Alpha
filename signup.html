@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign up for Project Alpha - Start your investment journey today">
+    <meta name="theme-color" content="#178582">
+    <title>Sign Up - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span>Loading...</span>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html" class="btn btn-primary active">Sign Up</a>
+            </div>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="lang-toggle" id="langToggle" title="Toggle Language">
+                    <span>EN</span>
+                </button>
+                <button class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Signup Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-wrapper">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h1 data-en="Create Account" data-bn="অ্যাকাউন্ট তৈরি করুন">Create Account</h1>
+                        <p data-en="Join our platform and start earning today" data-bn="আমাদের প্ল্যাটফর্মে যোগ দিন এবং আজই উপার্জন শুরু করুন">Join our platform and start earning today</p>
+                    </div>
+
+                    <form id="signupForm" class="auth-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName" data-en="Full Name" data-bn="পুরো নাম">Full Name</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" id="fullName" name="fullName" required 
+                                        placeholder="Enter your full name" 
+                                        data-placeholder-en="Enter your full name" 
+                                        data-placeholder-bn="আপনার পুরো নাম লিখুন">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" data-en="Phone Number" data-bn="ফোন নম্বর">Phone Number</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" id="phone" name="phone" required data-validate="phone"
+                                        placeholder="01XXXXXXXXX" 
+                                        data-placeholder-en="01XXXXXXXXX" 
+                                        data-placeholder-bn="০১XXXXXXXXX">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" data-en="Email Address" data-bn="ইমেইল ঠিকানা">Email Address</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" required 
+                                    placeholder="Enter your email" 
+                                    data-placeholder-en="Enter your email" 
+                                    data-placeholder-bn="আপনার ইমেইল লিখুন">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="password" name="password" required minlength="6"
+                                        placeholder="Min 6 characters" 
+                                        data-placeholder-en="Min 6 characters" 
+                                        data-placeholder-bn="সর্বনিম্ন ৬ অক্ষর"
+                                        oninput="updatePasswordStrength(this.value)">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength" style="margin-top: 8px;">
+                                    <div style="height: 4px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden;">
+                                        <div id="signupPasswordStrength" style="height: 100%; width: 0%; transition: all 0.3s;"></div>
+                                    </div>
+                                    <span id="signupPasswordStrengthText" style="font-size: 12px; margin-top: 4px; display: block;"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword" data-en="Confirm Password" data-bn="পাসওয়ার্ড নিশ্চিত করুন">Confirm Password</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6"
+                                        placeholder="Confirm password" 
+                                        data-placeholder-en="Confirm password" 
+                                        data-placeholder-bn="পাসওয়ার্ড নিশ্চিত করুন">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="referralCode" data-en="Referral Code (Optional)" data-bn="রেফারেল কোড (ঐচ্ছিক)">Referral Code (Optional)</label>
+                            <div class="input-icon">
+                                <i class="fas fa-gift"></i>
+                                <input type="text" id="referralCode" name="referralCode" 
+                                    placeholder="Enter referral code if you have one" 
+                                    data-placeholder-en="Enter referral code if you have one" 
+                                    data-placeholder-bn="যদি থাকে রেফারেল কোড লিখুন">
+                            </div>
+                            <span class="form-hint" data-en="Get bonus when you use a referral code" data-bn="রেফারেল কোড ব্যবহার করলে বোনাস পাবেন">Get bonus when you use a referral code</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="terms" required>
+                                <span class="checkmark"></span>
+                                <span>
+                                    <span data-en="I agree to the" data-bn="আমি সম্মত">I agree to the</span>
+                                    <a href="#" data-en="Terms of Service" data-bn="সেবার শর্তাবলী">Terms of Service</a>
+                                    <span data-en="and" data-bn="এবং">and</span>
+                                    <a href="#" data-en="Privacy Policy" data-bn="গোপনীয়তা নীতি">Privacy Policy</a>
+                                </span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <span data-en="Create Account" data-bn="অ্যাকাউন্ট তৈরি করুন">Create Account</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>
+                            <span data-en="Already have an account?" data-bn="ইতিমধ্যে অ্যাকাউন্ট আছে?">Already have an account?</span>
+                            <a href="login.html" data-en="Login" data-bn="লগইন">Login</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="auth-side">
+                    <div class="auth-side-content">
+                        <h2 data-en="Why Join Us?" data-bn="কেন আমাদের সাথে যোগ দেবেন?">Why Join Us?</h2>
+                        <p data-en="Create your free account and start your investment journey with us." data-bn="আপনার বিনামূল্যে অ্যাকাউন্ট তৈরি করুন এবং আমাদের সাথে আপনার বিনিয়োগ যাত্রা শুরু করুন।">Create your free account and start your investment journey with us.</p>
+                        <ul class="auth-features">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Free Registration" data-bn="বিনামূল্যে নিবন্ধন">Free Registration</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Get Unique Referral Code" data-bn="ইউনিক রেফারেল কোড পান">Get Unique Referral Code</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Start with just ৳500" data-bn="মাত্র ৳৫০০ দিয়ে শুরু করুন">Start with just ৳500</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Earn Referral Bonuses" data-bn="রেফারেল বোনাস উপার্জন করুন">Earn Referral Bonuses</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Withdraw to bKash/Nagad" data-bn="বিকাশ/নগদে উত্তোলন করুন">Withdraw to bKash/Nagad</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/app-config.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.parentElement.querySelector('.toggle-password i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Password strength indicator for signup
+        function updatePasswordStrength(password) {
+            let strength = 0;
+            const indicators = {
+                length: password.length >= 6,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                numbers: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+            
+            strength = Object.values(indicators).filter(Boolean).length;
+            
+            const strengthBar = document.getElementById('signupPasswordStrength');
+            const strengthText = document.getElementById('signupPasswordStrengthText');
+            
+            if (strengthBar && strengthText) {
+                const percentage = (strength / 5) * 100;
+                strengthBar.style.width = percentage + '%';
+                
+                if (strength <= 2) {
+                    strengthBar.style.background = '#ef4444';
+                    strengthText.textContent = 'Weak password';
+                    strengthText.style.color = '#ef4444';
+                } else if (strength <= 3) {
+                    strengthBar.style.background = '#f59e0b';
+                    strengthText.textContent = 'Medium password';
+                    strengthText.style.color = '#f59e0b';
+                } else {
+                    strengthBar.style.background = '#10b981';
+                    strengthText.textContent = 'Strong password';
+                    strengthText.style.color = '#10b981';
+                }
+            }
+        }
+
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const referralCodeInput = document.getElementById('referralCode').value.trim();
+            
+            // Basic validation
+            if (!email || !fullName || !phone || !password) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Validate phone format (Bangladesh)
+            const cleanedPhone = phone.replace(/[\s\-\+]/g, '');
+            if (!/^(880|0)?1[3-9]\d{8}$/.test(cleanedPhone)) {
+                showToast('Please enter a valid phone number (e.g., 01XXXXXXXXX)', 'error');
+                return;
+            }
+            
+            // Check password length
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            // Check passwords match
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            // Check if email already exists
+            const existingUsers = Storage.get('users') || [];
+            if (existingUsers.find(u => u.email === email)) {
+                showToast('An account with this email already exists', 'error');
+                return;
+            }
+
+            const formData = {
+                fullName: fullName,
+                name: fullName,
+                phone: phone,
+                email: email,
+                password: password,
+                referralCode: referralCodeInput,
+            };
+
+            // Create new user
+            const newUser = {
+                id: generateId(),
+                ...formData,
+                role: 'user',
+                isLoggedIn: true,
+                balance: 0,
+                points: 0,
+                totalInvested: 0,
+                totalProfit: 0,
+                referralEarnings: 0,
+                referralCode: generateReferralCode(),
+                referredBy: formData.referralCode || null,
+                referrals: [],
+                bkashNumber: '',
+                nagadNumber: '',
+                avatar: null,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to users list
+            const users = Storage.get('users') || [];
+            
+            // If user was referred, update the referrer's data
+            if (newUser.referredBy) {
+                const referrerIndex = users.findIndex(u => u.referralCode === newUser.referredBy);
+                if (referrerIndex !== -1) {
+                    // Initialize referrals array if not exists
+                    if (!users[referrerIndex].referrals) {
+                        users[referrerIndex].referrals = [];
+                    }
+                    // Add this user to referrer's referrals
+                    users[referrerIndex].referrals.push({
+                        id: newUser.id,
+                        name: newUser.name,
+                        email: newUser.email,
+                        joinedAt: newUser.createdAt,
+                        earnings: 0
+                    });
+                    
+                    // Give referrer bonus points (optional)
+                    const referralBonus = 50; // Points for each referral
+                    users[referrerIndex].points = (users[referrerIndex].points || 0) + referralBonus;
+                    
+                    // Update referrer in storage
+                    Storage.set('users', users);
+                    
+                    // Also give new user signup bonus for using referral
+                    newUser.points = 25; // Welcome bonus for using referral code
+                }
+            }
+            
+            // Add new user to list
+            users.push(newUser);
+            Storage.set('users', users);
+            
+            // Save current user with secure session
+            Storage.set('currentUser', newUser);
+            Security.createSession(newUser);
+            
+            // Log successful registration
+            Security.logSecurityEvent('signup_success', { email: newUser.email, userId: newUser.id });
+
+            showToast('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard/index.html';
+            }, 1500);
+        });
+
+        // Check for referral code in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+            document.getElementById('referralCode').value = refCode;
+        }
+    </script>
+</body>
+</html>

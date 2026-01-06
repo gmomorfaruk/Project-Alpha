@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earn - Tasks - Project Alpha</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tasks-page {
+            padding: 20px;
+        }
+
+        .tasks-header {
+            margin-bottom: 30px;
+        }
+
+        .tasks-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        /* Stats Row */
+        .tasks-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .task-stat-card .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .task-stat-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .task-stat-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Membership Notice */
+        .membership-notice {
+            background: linear-gradient(135deg, #178582, #0A1828);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .membership-notice-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .membership-notice-content p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .membership-notice .btn {
+            background: white;
+            color: #178582;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Task Categories */
+        .task-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .category-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .category-btn .count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .category-btn.active .count {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tasks List */
+        .tasks-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+            background: var(--bg-secondary);
+        }
+
+        .task-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-info h3 {
+            font-size: 1.05rem;
+            margin-bottom: 5px;
+        }
+
+        .task-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .task-meta span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-reward {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .task-reward .amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #10b981;
+            display: block;
+        }
+
+        .task-reward .bonus {
+            font-size: 0.8rem;
+            color: #BFA181;
+            background: rgba(191, 161, 129, 0.15);
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .task-action {
+            flex-shrink: 0;
+        }
+
+        .task-action .btn {
+            padding: 10px 25px;
+        }
+
+        .task-action .btn.completed {
+            background: #10b981;
+            cursor: default;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Progress Bar */
+        .daily-progress {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .progress-header h4 {
+            font-size: 1rem;
+        }
+
+        .progress-header span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-secondary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Task Modal */
+        .task-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .task-modal.active {
+            display: flex;
+        }
+
+        .task-modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .task-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-modal-body {
+            padding: 20px;
+        }
+
+        .task-preview {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .task-preview iframe {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .task-instructions {
+            margin-bottom: 20px;
+        }
+
+        .task-instructions h4 {
+            margin-bottom: 10px;
+        }
+
+        .task-instructions ol {
+            padding-left: 20px;
+        }
+
+        .task-instructions li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+        }
+
+        .task-timer {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .task-timer .timer {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .task-timer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .complete-task-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .complete-task-btn:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-reward {
+                text-align: left;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .task-action {
+                width: 100%;
+            }
+
+            .task-action .btn {
+                width: 100%;
+            }
+
+            .membership-notice {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="wallet.html">
+                        <i class="fas fa-wallet"></i>
+                        <span>Wallet</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="membership.html">
+                        <i class="fas fa-crown"></i>
+                        <span>Membership</span>
+                    </a>
+                </li>
+                <li class="nav-section">Earn Money</li>
+                <li class="nav-item active">
+                    <a href="earn-tasks.html">
+                        <i class="fas fa-tasks"></i>
+                        <span>All Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="youtube-tasks.html">
+                        <i class="fab fa-youtube"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="social-tasks.html">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-section">Other</li>
+                <li class="nav-item">
+                    <a href="profile.html">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="referrals.html">
+                        <i class="fas fa-users"></i>
+                        <span>Referrals</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-menu">
+                    <span class="user-balance" id="userBalance">৳0.00</span>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content tasks-page">
+            <div class="tasks-header">
+                <h1><i class="fas fa-tasks"></i> Earn Money - Complete Tasks</h1>
+                <p>Complete tasks to earn money. Higher membership = Higher earnings!</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="tasks-stats">
+                <div class="task-stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3 id="todayEarnings">৳0</h3>
+                    <p>Today's Earnings</p>
+                </div>
+                <div class="task-stat-card">
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 id="completedTasks">0</h3>
+                    <p>Tasks Completed</p>
+                </div>
+                <div class="task-stat-card">
+                    <div class="stat-icon" style="background: rgba(191, 161, 129, 0.15); color: #BFA181;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 id="bonusMultiplier">1x</h3>
+                    <p>Your Multiplier</p>
+                </div>
+                <div class="task-stat-card">
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h3 id="tasksRemaining">0</h3>
+                    <p>Tasks Remaining</p>
+                </div>
+            </div>
+
+            <!-- Daily Progress -->
+            <div class="daily-progress">
+                <div class="progress-header">
+                    <h4><i class="fas fa-chart-line"></i> Daily Progress</h4>
+                    <span id="progressText">0 / 5 Tasks</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>Earnings: <strong id="currentEarnings">৳0</strong></span>
+                    <span>Daily Limit: <strong id="dailyLimit">৳50</strong></span>
+                </div>
+            </div>
+
+            <!-- Membership Notice -->
+            <div class="membership-notice" id="membershipNotice">
+                <div class="membership-notice-content">
+                    <h3><i class="fas fa-crown"></i> Upgrade for More Earnings!</h3>
+                    <p>Get up to 3x earnings multiplier and unlimited daily tasks with premium membership</p>
+                </div>
+                <a href="membership.html" class="btn">Upgrade Now</a>
+            </div>
+
+            <!-- Task Categories -->
+            <div class="task-categories">
+                <button class="category-btn active" onclick="filterTasks('all')">
+                    <i class="fas fa-th"></i> All Tasks
+                    <span class="count" id="countAll">0</span>
+                </button>
+                <button class="category-btn" onclick="filterTasks('youtube')">
+                    <i class="fab fa-youtube" style="color: #FF0000;"></i> YouTube
+                    <span class="count" id="countYoutube">0</span>
+                </button>
+                <button class="category-btn" onclick="filterTasks('social')">
+                    <i class="fas fa-share-alt" style="color: #1DA1F2;"></i> Social
+                    <span class="count" id="countSocial">0</span>
+                </button>
+                <button class="category-btn" onclick="filterTasks('survey')">
+                    <i class="fas fa-poll" style="color: #10b981;"></i> Survey
+                    <span class="count" id="countSurvey">0</span>
+                </button>
+                <button class="category-btn" onclick="filterTasks('app')">
+                    <i class="fas fa-mobile-alt" style="color: #8b5cf6;"></i> App Downloads
+                    <span class="count" id="countApp">0</span>
+                </button>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-list" id="tasksList">
+                <!-- Tasks will be rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Modal -->
+    <div class="task-modal" id="taskModal">
+        <div class="task-modal-content">
+            <div class="task-modal-header">
+                <h3 id="modalTaskTitle">Complete Task</h3>
+                <button style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="closeTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="task-modal-body">
+                <div class="task-preview" id="taskPreview">
+                    <!-- Task content preview -->
+                </div>
+                
+                <div class="task-instructions">
+                    <h4><i class="fas fa-list-ol"></i> Instructions</h4>
+                    <ol id="taskInstructions">
+                        <!-- Instructions will be added -->
+                    </ol>
+                </div>
+
+                <div class="task-timer" id="taskTimerSection">
+                    <p>Time remaining to complete</p>
+                    <div class="timer" id="taskTimer">00:30</div>
+                </div>
+
+                <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <span style="color: var(--text-secondary);">You will earn</span>
+                    <h3 style="color: #10b981; font-size: 1.5rem;" id="modalReward">৳0</h3>
+                </div>
+
+                <button class="complete-task-btn" id="completeTaskBtn" disabled onclick="completeTask()">
+                    <i class="fas fa-hourglass-half"></i> Wait for timer...
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        // State
+        let currentUser = null;
+        let tasks = [];
+        let currentTask = null;
+        let timerInterval = null;
+        let todayStats = {
+            completed: 0,
+            earnings: 0
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Authentication check
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            loadUser();
+            loadTasks();
+            loadTodayStats();
+            initializeSidebar();
+            updateUI();
+        });
+
+        // Load user
+        function loadUser() {
+            currentUser = Storage.get('currentUser');
+            if (!currentUser) {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userBalance').textContent = formatCurrency(currentUser.balance);
+            
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            document.getElementById('bonusMultiplier').textContent = membership.earningsMultiplier + 'x';
+            document.getElementById('dailyLimit').textContent = membership.dailyEarningLimit === -1 ? 'Unlimited' : '৳' + membership.dailyEarningLimit;
+            
+            // Hide upgrade notice for VIP
+            if (currentUser.membership === 'vip') {
+                document.getElementById('membershipNotice').style.display = 'none';
+            }
+        }
+
+        // Load tasks from workTasks storage with membership check
+        function loadTasks() {
+            // Refresh user data from storage to get latest membership info
+            const users = Storage.get('users') || [];
+            const latestUser = users.find(u => u.email === currentUser.email);
+            if (latestUser) {
+                currentUser = { ...currentUser, ...latestUser };
+                Storage.set('currentUser', currentUser);
+            }
+            
+            // Check membership - only members can access tasks
+            const userTaskLimit = currentUser.membershipTaskLimit || 0;
+            const container = document.getElementById('tasksGrid') || document.querySelector('.tasks-grid');
+            
+            if (!currentUser.membershipLevel || userTaskLimit === 0) {
+                document.getElementById('availableTasks').textContent = '0';
+                if (container) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; grid-column: 1 / -1;">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white;">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <h3 style="margin-bottom: 10px; color: var(--text-primary);">Upgrade to Access Tasks</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 20px;">Purchase a membership level to unlock tasks and start earning!</p>
+                            <a href="wallet.html?action=deposit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-wallet"></i> Go to Wallet & Upgrade
+                            </a>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            // Check if user reached daily limit
+            const today = new Date().toDateString();
+            const completions = Storage.get('taskCompletions') || [];
+            const todayUserCompletions = completions.filter(c => 
+                c.userId === currentUser.email && 
+                new Date(c.timestamp).toDateString() === today
+            );
+            
+            if (todayUserCompletions.length >= userTaskLimit) {
+                document.getElementById('availableTasks').textContent = '0';
+                if (container) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; grid-column: 1 / -1;">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 style="margin-bottom: 10px; color: var(--text-primary);">Daily Tasks Completed! 🎉</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 10px;">You've completed all ${userTaskLimit} tasks for today.</p>
+                            <a href="wallet.html?action=deposit" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 15px;">
+                                <i class="fas fa-arrow-up"></i> Upgrade for More Tasks
+                            </a>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            // Load tasks from workTasks storage
+            const allWorkTasks = Storage.get('workTasks') || [];
+            
+            tasks = allWorkTasks.filter(task => {
+                if (!task.active) return false;
+                
+                if (task.dailyLimit > 0) {
+                    const todayCompletions = completions.filter(c => 
+                        c.taskId === task.id && 
+                        c.userId === currentUser.email && 
+                        new Date(c.timestamp).toDateString() === today
+                    );
+                    if (todayCompletions.length >= task.dailyLimit) return false;
+                }
+                return true;
+            });
+            
+            // Limit tasks shown based on remaining daily allowance
+            const remainingTasks = userTaskLimit - todayUserCompletions.length;
+            tasks = tasks.slice(0, remainingTasks);
+
+            renderTasks();
+            updateCategoryCounts();
+        }
+
+        // Load today's stats
+        function loadTodayStats() {
+            const today = new Date().toDateString();
+            const stored = localStorage.getItem('todayStats');
+            
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed.date === today) {
+                    todayStats = parsed;
+                } else {
+                    // Reset for new day
+                    todayStats = { date: today, completed: 0, earnings: 0 };
+                    localStorage.removeItem('completedTasksToday');
+                }
+            } else {
+                todayStats = { date: today, completed: 0, earnings: 0 };
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            
+            document.getElementById('todayEarnings').textContent = formatCurrency(todayStats.earnings);
+            document.getElementById('completedTasks').textContent = todayStats.completed;
+            document.getElementById('currentEarnings').textContent = formatCurrency(todayStats.earnings);
+            
+            const taskLimit = membership.taskLimit === -1 ? 999 : membership.taskLimit;
+            const remaining = Math.max(0, taskLimit - todayStats.completed);
+            document.getElementById('tasksRemaining').textContent = membership.taskLimit === -1 ? '∞' : remaining;
+            
+            // Update progress
+            const progress = (todayStats.completed / taskLimit) * 100;
+            document.getElementById('progressFill').style.width = Math.min(100, progress) + '%';
+            document.getElementById('progressText').textContent = `${todayStats.completed} / ${membership.taskLimit === -1 ? '∞' : taskLimit} Tasks`;
+        }
+
+        // Render tasks
+        function renderTasks(filter = 'all') {
+            const list = document.getElementById('tasksList');
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            
+            let filteredTasks = filter === 'all' ? tasks : tasks.filter(t => t.category === filter);
+            
+            if (filteredTasks.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-check"></i>
+                        <h3>No tasks available</h3>
+                        <p>Check back later for new tasks</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filteredTasks.map(task => {
+                const category = AppConfig.tasks.categories[task.category];
+                const reward = task.baseReward * membership.earningsMultiplier;
+                const bonusAmount = reward - task.baseReward;
+                
+                return `
+                    <div class="task-card ${task.completed ? 'completed' : ''}">
+                        <div class="task-icon" style="background: ${category.color};">
+                            <i class="${category.icon}"></i>
+                        </div>
+                        <div class="task-info">
+                            <h3>${task.title}</h3>
+                            <p>${task.description}</p>
+                            <div class="task-meta">
+                                <span><i class="fas fa-clock"></i> ${task.duration}s</span>
+                                <span><i class="fas fa-tag"></i> ${category.name}</span>
+                            </div>
+                        </div>
+                        <div class="task-reward">
+                            <span class="amount">৳${reward.toFixed(0)}</span>
+                            ${bonusAmount > 0 ? `<span class="bonus">+৳${bonusAmount.toFixed(0)} bonus</span>` : ''}
+                        </div>
+                        <div class="task-action">
+                            ${task.completed 
+                                ? '<button class="btn completed"><i class="fas fa-check"></i> Done</button>'
+                                : `<button class="btn btn-primary" onclick="startTask(${task.id})"><i class="fas fa-play"></i> Start</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter tasks
+        function filterTasks(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.category-btn').classList.add('active');
+            renderTasks(category);
+        }
+
+        // Update category counts
+        function updateCategoryCounts() {
+            const available = tasks.filter(t => !t.completed);
+            document.getElementById('countAll').textContent = available.length;
+            document.getElementById('countYoutube').textContent = available.filter(t => t.category === 'youtube').length;
+            document.getElementById('countSocial').textContent = available.filter(t => t.category === 'social').length;
+            document.getElementById('countSurvey').textContent = available.filter(t => t.category === 'survey').length;
+            document.getElementById('countApp').textContent = available.filter(t => t.category === 'app').length;
+        }
+
+        // Start task
+        function startTask(taskId) {
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            
+            // Check task limit
+            if (membership.taskLimit !== -1 && todayStats.completed >= membership.taskLimit) {
+                showToast('Daily task limit reached! Upgrade your membership for more tasks.', 'error');
+                return;
+            }
+
+            // Check earning limit
+            if (membership.dailyEarningLimit !== -1 && todayStats.earnings >= membership.dailyEarningLimit) {
+                showToast('Daily earning limit reached! Upgrade for higher limits.', 'error');
+                return;
+            }
+
+            currentTask = tasks.find(t => t.id === taskId);
+            if (!currentTask || currentTask.completed) return;
+
+            const category = AppConfig.tasks.categories[currentTask.category];
+            const reward = currentTask.baseReward * membership.earningsMultiplier;
+
+            // Setup modal
+            document.getElementById('modalTaskTitle').textContent = currentTask.title;
+            document.getElementById('modalReward').textContent = '৳' + reward.toFixed(0);
+            
+            document.getElementById('taskPreview').innerHTML = `
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: ${category.color}; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2rem; color: white;">
+                    <i class="${category.icon}"></i>
+                </div>
+                <h3>${currentTask.title}</h3>
+                <p style="color: var(--text-secondary);">${currentTask.description}</p>
+                <a href="${currentTask.url}" target="_blank" class="btn btn-primary" style="margin-top: 15px;">
+                    <i class="fas fa-external-link-alt"></i> Open Task
+                </a>
+            `;
+
+            document.getElementById('taskInstructions').innerHTML = `
+                <li>Click "Open Task" to go to the task page</li>
+                <li>Complete the required action (watch, like, follow, etc.)</li>
+                <li>Wait for the timer to complete</li>
+                <li>Click "Complete Task" to claim your reward</li>
+            `;
+
+            // Start timer
+            let timeLeft = currentTask.duration;
+            const completeBtn = document.getElementById('completeTaskBtn');
+            completeBtn.disabled = true;
+            completeBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> Wait for timer...';
+
+            document.getElementById('taskTimer').textContent = formatTime(timeLeft);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('taskTimer').textContent = formatTime(timeLeft);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    completeBtn.disabled = false;
+                    completeBtn.innerHTML = '<i class="fas fa-check"></i> Complete Task';
+                }
+            }, 1000);
+
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        // Complete task
+        function completeTask() {
+            if (!currentTask) return;
+            
+            // Check membership before allowing completion
+            const userTaskLimit = currentUser.membershipTaskLimit || 0;
+            if (!currentUser.membershipLevel || userTaskLimit === 0) {
+                showToast('You need a membership to complete tasks', 'error');
+                closeTaskModal();
+                return;
+            }
+            
+            // Check daily limit
+            const today = new Date().toDateString();
+            const completions = Storage.get('taskCompletions') || [];
+            const todayUserCompletions = completions.filter(c => 
+                c.userId === currentUser.email && 
+                new Date(c.timestamp).toDateString() === today
+            );
+            
+            if (todayUserCompletions.length >= userTaskLimit) {
+                showToast(`Daily limit reached! You can only complete ${userTaskLimit} tasks per day.`, 'error');
+                closeTaskModal();
+                loadTasks();
+                return;
+            }
+
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            const reward = currentTask.baseReward * (membership.earningsMultiplier || 1);
+
+            // Update task
+            currentTask.completed = true;
+            
+            // Record in taskCompletions for consistent tracking
+            completions.push({
+                id: Date.now(),
+                taskId: currentTask.id,
+                userId: currentUser.email,
+                pointsAwarded: reward,
+                status: 'approved',
+                timestamp: new Date().toISOString()
+            });
+            Storage.set('taskCompletions', completions);
+            
+            // Update stats
+            todayStats.completed++;
+            todayStats.earnings += reward;
+            todayStats.date = new Date().toDateString();
+            localStorage.setItem('todayStats', JSON.stringify(todayStats));
+
+            // Save completed tasks
+            const completedToday = JSON.parse(localStorage.getItem('completedTasksToday') || '[]');
+            completedToday.push(currentTask.id);
+            localStorage.setItem('completedTasksToday', JSON.stringify(completedToday));
+
+            // Update user balance
+            currentUser.balance += reward;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('userBalance').textContent = formatCurrency(currentUser.balance);
+
+            // Record transaction
+            if (window.db) {
+                db.create('transactions', {
+                    userId: currentUser.id,
+                    type: 'task_earning',
+                    amount: reward,
+                    taskId: currentTask.id,
+                    taskCategory: currentTask.category,
+                    status: 'completed'
+                });
+            }
+
+            closeTaskModal();
+            showToast(`Task completed! You earned ৳${reward.toFixed(0)}`, 'success');
+            
+            renderTasks();
+            updateCategoryCounts();
+            updateUI();
+        }
+
+        // Close task modal
+        function closeTaskModal() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('taskModal').classList.remove('active');
+            currentTask = null;
+        }
+
+        // Format time
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return '৳' + parseFloat(amount).toLocaleString('en-BD', { minimumFractionDigits: 2 });
+        }
+
+        // Show toast
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            `;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Sidebar
+        function initializeSidebar() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
+            if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.remove('active'));
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Close modal on outside click
+        document.getElementById('taskModal').addEventListener('click', function(e) {
+            if (e.target === this) closeTaskModal();
+        });
+    </script>
+</body>
+</html>

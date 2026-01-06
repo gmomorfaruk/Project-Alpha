@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Dashboard - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+                <span class="navbar-membership-badge" id="navMembershipBadge" style="display: none; padding: 3px 8px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 5px;"></span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Dashboard Content -->
+        <div class="content">
+            <div class="page-header">
+                <h1 data-en="Dashboard" data-bn="ড্যাশবোর্ড">Dashboard</h1>
+                <p class="welcome-text">
+                    <span data-en="Welcome back," data-bn="স্বাগতম,">Welcome back,</span>
+                    <span id="welcomeName">User</span>! 👋
+                </p>
+            </div>
+
+            <!-- Announcements Banner -->
+            <div id="announcementsBanner" style="display: none;">
+                <!-- Announcements will be loaded here -->
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon wallet">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Wallet Balance" data-bn="ওয়ালেট ব্যালেন্স">Wallet Balance</span>
+                        <span class="stat-value" id="walletBalance">৳0</span>
+                    </div>
+                    <a href="wallet.html" class="stat-link">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon investment">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Total Invested" data-bn="মোট বিনিয়োগ">Total Invested</span>
+                        <span class="stat-value" id="totalInvested">৳0</span>
+                    </div>
+                    <a href="investments.html" class="stat-link">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon profit">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Total Profit" data-bn="মোট লাভ">Total Profit</span>
+                        <span class="stat-value" id="totalProfit">৳0</span>
+                    </div>
+                    <a href="investments.html" class="stat-link">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon referral">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label" data-en="Referral Earnings" data-bn="রেফারেল আয়">Referral Earnings</span>
+                        <span class="stat-value" id="referralEarnings">৳0</span>
+                    </div>
+                    <a href="referrals.html" class="stat-link">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sell Bonus Offer Banner -->
+            <div class="section" id="sellBonusSection" style="display: none;">
+                <div class="sell-bonus-banner" style="background: linear-gradient(135deg, #0A1828, #178582); border-radius: 16px; padding: 25px 30px; color: white; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: -30px; top: -30px; width: 150px; height: 150px; background: rgba(191, 161, 129, 0.15); border-radius: 50%;"></div>
+                    <div style="position: absolute; right: 50px; bottom: -40px; width: 100px; height: 100px; background: rgba(191, 161, 129, 0.1); border-radius: 50%;"></div>
+                    <div class="sell-bonus-icon" style="width: 70px; height: 70px; background: rgba(191, 161, 129, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fas fa-hand-holding-usd" style="font-size: 28px; color: #BFA181;"></i>
+                    </div>
+                    <div class="sell-bonus-content" style="flex: 1; min-width: 200px; z-index: 1;">
+                        <h3 style="font-size: 20px; margin-bottom: 5px;">🎁 Sell & Earn Bonus Points!</h3>
+                        <p style="opacity: 0.9; font-size: 14px; margin-bottom: 10px;" data-en="Sell products and earn bonus points! Submit your sell proof and get rewarded." data-bn="পণ্য বিক্রি করুন এবং বোনাস পয়েন্ট অর্জন করুন! আপনার বিক্রয় প্রমাণ জমা দিন এবং পুরস্কৃত হন।">Sell products and earn bonus points! Submit your sell proof and get rewarded.</p>
+                        <div class="sell-bonus-details" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <span class="bonus-tag" style="background: rgba(191, 161, 129, 0.25); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                <i class="fas fa-coins" style="color: #BFA181; margin-right: 5px;"></i>
+                                <span id="sellBonusPointsDisplay">500</span> Base Points
+                            </span>
+                            <span class="bonus-tag" style="background: rgba(191, 161, 129, 0.25); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                <i class="fas fa-percentage" style="color: #BFA181; margin-right: 5px;"></i>
+                                +<span id="sellBonusPercentDisplay">5</span>% of Product Value
+                            </span>
+                        </div>
+                    </div>
+                    <a href="sell-proofs.html" class="btn" style="background: #BFA181; color: #0A1828; padding: 12px 24px; border-radius: 10px; font-weight: 600; flex-shrink: 0; z-index: 1;">
+                        <i class="fas fa-arrow-right" style="margin-right: 8px;"></i>
+                        Submit Proof
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section">
+                <h2 class="section-title" data-en="Quick Actions" data-bn="দ্রুত পদক্ষেপ">Quick Actions</h2>
+                <div class="quick-actions">
+                    <a href="wallet.html?action=deposit" class="action-card">
+                        <div class="action-icon deposit">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span data-en="Deposit" data-bn="জমা">Deposit</span>
+                    </a>
+                    <a href="wallet.html?action=withdraw" class="action-card">
+                        <div class="action-icon withdraw">
+                            <i class="fas fa-minus"></i>
+                        </div>
+                        <span data-en="Withdraw" data-bn="উত্তোলন">Withdraw</span>
+                    </a>
+                    <a href="products.html" class="action-card">
+                        <div class="action-icon invest">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <span data-en="Invest" data-bn="বিনিয়োগ">Invest</span>
+                    </a>
+                    <a href="referrals.html" class="action-card">
+                        <div class="action-icon share">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <span data-en="Share & Earn" data-bn="শেয়ার করুন ও উপার্জন করুন">Share & Earn</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Referral Code Card -->
+            <div class="section">
+                <div class="referral-card">
+                    <div class="referral-info">
+                        <h3 data-en="Your Referral Code" data-bn="আপনার রেফারেল কোড">Your Referral Code</h3>
+                        <p data-en="Share your code and earn rewards when friends invest!" data-bn="আপনার কোড শেয়ার করুন এবং বন্ধুরা বিনিয়োগ করলে পুরস্কার উপার্জন করুন!">Share your code and earn rewards when friends invest!</p>
+                    </div>
+                    <div class="referral-code-box">
+                        <span class="code" id="referralCode">XXXXXXXX</span>
+                        <button class="copy-btn" onclick="copyReferralCode()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" onclick="shareReferralLink()">
+                        <i class="fas fa-share"></i>
+                        <span data-en="Share Link" data-bn="লিংক শেয়ার করুন">Share Link</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="section">
+                <div class="section-header-row">
+                    <h2 class="section-title" data-en="Recent Activity" data-bn="সাম্প্রতিক কার্যকলাপ">Recent Activity</h2>
+                    <a href="wallet.html" class="view-all" data-en="View All" data-bn="সব দেখুন">View All</a>
+                </div>
+                <div class="activity-list" id="activityList">
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p data-en="No recent activity" data-bn="কোন সাম্প্রতিক কার্যকলাপ নেই">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Investments -->
+            <div class="section">
+                <div class="section-header-row">
+                    <h2 class="section-title" data-en="Active Investments" data-bn="সক্রিয় বিনিয়োগ">Active Investments</h2>
+                    <a href="investments.html" class="view-all" data-en="View All" data-bn="সব দেখুন">View All</a>
+                </div>
+                <div class="investments-list" id="investmentsList">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <p data-en="No active investments" data-bn="কোন সক্রিয় বিনিয়োগ নেই">No active investments</p>
+                        <a href="products.html" class="btn btn-primary btn-sm" data-en="Start Investing" data-bn="বিনিয়োগ শুরু করুন">Start Investing</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-panel-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button onclick="markAllAsRead()" class="mark-read-btn">Mark all read</button>
+        </div>
+        <div class="notification-panel-body" id="notificationList">
+            <div class="empty-state" style="padding: 30px; text-align: center;">
+                <i class="fas fa-bell-slash" style="font-size: 30px; color: var(--text-muted);"></i>
+                <p style="color: var(--text-muted); margin-top: 10px;">No notifications</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement Popup Modal -->
+    <div class="form-modal" id="announcementPopup">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header" id="announcementPopupHeader">
+                <h3 id="announcementPopupTitle">Announcement</h3>
+                <button class="form-modal-close" onclick="closeAnnouncementPopup()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="announcementPopupBody">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-primary" onclick="closeAnnouncementPopup()">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/security.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        // Check authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Update user info
+            document.getElementById('userName').textContent = user.name || 'User';
+            document.getElementById('welcomeName').textContent = user.name?.split(' ')[0] || 'User';
+            document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
+            document.getElementById('totalInvested').textContent = formatCurrency(user.totalInvested || 0);
+            document.getElementById('totalProfit').textContent = formatCurrency(user.totalProfit || 0);
+            document.getElementById('referralEarnings').textContent = formatCurrency(user.referralEarnings || 0);
+            document.getElementById('referralCode').textContent = user.referralCode || 'XXXXXXXX';
+            
+            // Show membership badge in navbar
+            const navBadge = document.getElementById('navMembershipBadge');
+            if (user.membershipLevel && user.membershipName) {
+                navBadge.textContent = user.membershipName;
+                navBadge.style.display = 'inline-block';
+            }
+
+            // Load sell bonus settings
+            loadSellBonusOffer();
+            
+            // Load announcements and notifications
+            loadAnnouncements();
+            loadNotifications();
+            
+            // Check for membership approval notification
+            checkMembershipNotification(user);
+        });
+        
+        // Check for membership notification - shows special modal
+        function checkMembershipNotification(user) {
+            const notifications = Storage.get('membershipNotifications') || [];
+            const userNotification = notifications.find(n => 
+                n.userId === user.email && !n.shown
+            );
+            
+            if (userNotification) {
+                // Use the notification data directly (has name and taskLimit)
+                const levelInfo = {
+                    name: userNotification.membershipName,
+                    taskLimit: userNotification.taskLimit || 5
+                };
+                
+                // Mark as shown first
+                userNotification.shown = true;
+                Storage.set('membershipNotifications', notifications);
+                
+                // Show a special congratulations alert
+                setTimeout(() => {
+                    showMembershipCongrats(levelInfo);
+                }, 500);
+            }
+        }
+        
+        // Show membership congratulations popup
+        function showMembershipCongrats(level) {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.id = 'welcomeMembershipModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 450px; text-align: center;">
+                    <div class="modal-body" style="padding: 40px 30px;">
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 2.5rem; color: white; animation: pulse-glow 2s infinite;">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h2 style="margin: 20px 0 10px; color: var(--primary-color);">🎉 Congratulations!</h2>
+                        <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 20px;">
+                            You are now a valuable worker of our company!
+                        </p>
+                        <div style="background: var(--primary-gradient); color: white; padding: 15px 25px; border-radius: 12px; display: inline-block;">
+                            <span style="opacity: 0.9; font-size: 0.9rem;">Your Level</span>
+                            <h3 style="margin: 5px 0 0; font-size: 1.3rem;">${level.name}</h3>
+                            <span style="opacity: 0.9; font-size: 0.85rem;">${level.taskLimit} Tasks Available</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 20px 0;">
+                            Start completing tasks and earn money!
+                        </p>
+                        <button onclick="document.getElementById('welcomeMembershipModal').remove()" style="width: 100%; padding: 15px; background: var(--primary-gradient); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-rocket"></i> Start Working
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            document.body.appendChild(modal);
+            
+            // Add animation style if not exists
+            if (!document.getElementById('pulse-glow-style')) {
+                const style = document.createElement('style');
+                style.id = 'pulse-glow-style';
+                style.textContent = '@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.7); } }';
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Sell Bonus Offer
+        function loadSellBonusOffer() {
+            const settings = Storage.get('workSettings') || {};
+            const sellBonusSection = document.getElementById('sellBonusSection');
+            
+            // Check if sell bonus is enabled
+            if (settings.sellBonusEnabled !== false) {
+                sellBonusSection.style.display = 'block';
+                
+                // Update display values
+                const basePoints = settings.sellBonusPoints || 500;
+                const percent = settings.sellBonusPercent || 5;
+                
+                document.getElementById('sellBonusPointsDisplay').textContent = basePoints;
+                document.getElementById('sellBonusPercentDisplay').textContent = percent;
+            } else {
+                sellBonusSection.style.display = 'none';
+            }
+        }
+
+        // Announcements Functions
+        function loadAnnouncements() {
+            const user = Storage.get('currentUser');
+            const announcements = Storage.get('announcements') || [];
+            const shownPopups = Storage.get('shownAnnouncementPopups') || [];
+            
+            // Filter active announcements for this user
+            const activeAnnouncements = announcements.filter(a => {
+                if (!a.active) return false;
+                if (a.expiry && new Date(a.expiry) < new Date()) return false;
+                if (a.target === 'moderators' && user.role !== 'moderator') return false;
+                if (a.target === 'users' && user.role !== 'user') return false;
+                return true;
+            });
+
+            // Sort: pinned first, then by date
+            activeAnnouncements.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+
+            // Show banner announcements
+            if (activeAnnouncements.length > 0) {
+                renderAnnouncementBanners(activeAnnouncements.slice(0, 3));
+            }
+
+            // Show popup for new popup announcements
+            const popupAnnouncement = activeAnnouncements.find(a => a.popup && !shownPopups.includes(a.id));
+            if (popupAnnouncement) {
+                showAnnouncementPopup(popupAnnouncement);
+            }
+        }
+
+        function renderAnnouncementBanners(announcements) {
+            const container = document.getElementById('announcementsBanner');
+            if (!announcements.length) {
+                container.style.display = 'none';
+                return;
+            }
+
+            const typeColors = {
+                info: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: 'info-circle' },
+                success: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: 'check-circle' },
+                warning: { bg: 'rgba(191, 161, 129, 0.15)', color: '#BFA181', icon: 'exclamation-triangle' },
+                alert: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: 'exclamation-circle' },
+                promo: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', icon: 'gift' }
+            };
+
+            container.innerHTML = announcements.map(a => {
+                const type = typeColors[a.type] || typeColors.info;
+                return `
+                    <div class="announcement-banner" style="background: ${type.bg}; border-left: 4px solid ${type.color}; padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px;">
+                        <i class="fas fa-${type.icon}" style="color: ${type.color}; font-size: 20px; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                            <h4 style="margin-bottom: 5px; font-size: 15px; color: var(--text-primary);">
+                                ${a.pinned ? '📌 ' : ''}${a.title}
+                            </h4>
+                            <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin: 0;">${a.message}</p>
+                        </div>
+                        <button onclick="dismissAnnouncement(${a.id})" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 5px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            container.style.display = 'block';
+        }
+
+        function showAnnouncementPopup(announcement) {
+            const typeColors = {
+                info: { bg: 'linear-gradient(135deg, #3b82f6, #2563eb)', icon: 'info-circle' },
+                success: { bg: 'linear-gradient(135deg, #10b981, #059669)', icon: 'check-circle' },
+                warning: { bg: 'linear-gradient(135deg, #BFA181, #a08968)', icon: 'exclamation-triangle' },
+                alert: { bg: 'linear-gradient(135deg, #ef4444, #dc2626)', icon: 'exclamation-circle' },
+                promo: { bg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', icon: 'gift' }
+            };
+            const type = typeColors[announcement.type] || typeColors.info;
+
+            document.getElementById('announcementPopupHeader').style.background = type.bg;
+            document.getElementById('announcementPopupHeader').style.color = 'white';
+            document.getElementById('announcementPopupTitle').innerHTML = `<i class="fas fa-${type.icon}"></i> ${announcement.title}`;
+            document.getElementById('announcementPopupBody').innerHTML = `
+                <p style="font-size: 15px; line-height: 1.7; color: var(--text-primary);">${announcement.message}</p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">
+                    <i class="fas fa-clock"></i> ${formatDate(announcement.createdAt)}
+                </p>
+            `;
+
+            document.getElementById('announcementPopup').classList.add('active');
+
+            // Mark as shown
+            const shownPopups = Storage.get('shownAnnouncementPopups') || [];
+            shownPopups.push(announcement.id);
+            Storage.set('shownAnnouncementPopups', shownPopups);
+        }
+
+        function closeAnnouncementPopup() {
+            document.getElementById('announcementPopup').classList.remove('active');
+        }
+
+        function dismissAnnouncement(id) {
+            const dismissed = Storage.get('dismissedAnnouncements') || [];
+            dismissed.push(id);
+            Storage.set('dismissedAnnouncements', dismissed);
+            loadAnnouncements();
+        }
+
+        // Notifications Functions
+        function loadNotifications() {
+            const user = Storage.get('currentUser');
+            const allNotifications = Storage.get('notifications') || [];
+            
+            // Filter notifications for this user
+            const userNotifications = allNotifications.filter(n => n.userId === user.email);
+            const unreadCount = userNotifications.filter(n => !n.read).length;
+
+            // Update badge
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Render notification list
+            renderNotificationList(userNotifications);
+        }
+
+        function renderNotificationList(notifications) {
+            const container = document.getElementById('notificationList');
+            
+            if (!notifications.length) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 30px; text-align: center;">
+                        <i class="fas fa-bell-slash" style="font-size: 30px; color: var(--text-muted);"></i>
+                        <p style="color: var(--text-muted); margin-top: 10px;">No notifications</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by date (newest first)
+            notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const typeIcons = {
+                info: { icon: 'info-circle', color: '#3b82f6' },
+                success: { icon: 'check-circle', color: '#10b981' },
+                warning: { icon: 'exclamation-triangle', color: '#BFA181' },
+                alert: { icon: 'exclamation-circle', color: '#ef4444' }
+            };
+
+            container.innerHTML = notifications.slice(0, 10).map(n => {
+                const type = typeIcons[n.type] || typeIcons.info;
+                return `
+                    <div class="notification-item ${n.read ? 'read' : 'unread'}" onclick="markAsRead(${n.id})">
+                        <div class="notification-icon" style="background: ${type.color}20; color: ${type.color};">
+                            <i class="fas fa-${type.icon}"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>${n.title}</h4>
+                            <p>${n.message.substring(0, 60)}${n.message.length > 60 ? '...' : ''}</p>
+                            <span class="notification-time">${getTimeAgo(n.date)}</span>
+                        </div>
+                        ${!n.read ? '<span class="unread-dot"></span>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleNotificationPanel() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function markAsRead(id) {
+            let allNotifications = Storage.get('notifications') || [];
+            const index = allNotifications.findIndex(n => n.id === id);
+            if (index !== -1) {
+                allNotifications[index].read = true;
+                Storage.set('notifications', allNotifications);
+                loadNotifications();
+            }
+        }
+
+        function markAllAsRead() {
+            const user = Storage.get('currentUser');
+            let allNotifications = Storage.get('notifications') || [];
+            allNotifications = allNotifications.map(n => {
+                if (n.userId === user.email) {
+                    n.read = true;
+                }
+                return n;
+            });
+            Storage.set('notifications', allNotifications);
+            loadNotifications();
+            showToast('All notifications marked as read', 'success');
+        }
+
+        function getTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+            return formatDate(dateString);
+        }
+
+        // Close notification panel when clicking outside
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notificationPanel');
+            const btn = document.getElementById('notificationBtn');
+            if (!panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('active');
+            }
+        });
+
+        function copyReferralCode() {
+            const code = document.getElementById('referralCode').textContent;
+            copyToClipboard(code);
+        }
+
+        function shareReferralLink() {
+            const user = Storage.get('currentUser');
+            const link = `${window.location.origin}/signup.html?ref=${user.referralCode}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join Project Alpha',
+                    text: 'Join me on Project Alpha and start earning! Use my referral code.',
+                    url: link
+                });
+            } else {
+                copyToClipboard(link);
+            }
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            showToast('Logged out successfully', 'success');
+            setTimeout(() => {
+                window.location.href = '../login.html';
+            }, 500);
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+    
+    <!-- Chat Widget -->
+    <script src="../js/chat-widget.js"></script>
+</body>
+</html>

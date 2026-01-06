@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Products - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item active">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item active">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="content">
+            <div class="page-header">
+                <h1 data-en="Invest in Products" data-bn="পণ্যে বিনিয়োগ করুন">Invest in Products</h1>
+                <p>Balance: <strong id="walletBalance">৳0</strong></p>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Investment Modal -->
+    <div class="modal-overlay" id="investModal">
+        <div class="modal" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Invest in Product</h3>
+                <button class="modal-close" onclick="Modal.close('investModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="product-summary" id="productSummary"></div>
+
+                <form id="investForm">
+                    <div class="form-group">
+                        <label>Number of Units</label>
+                        <input type="number" id="investUnits" min="1" value="1" onchange="updateInvestmentSummary()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Sell Mode</label>
+                        <div class="sell-mode-selector">
+                            <div class="sell-mode-option active" data-mode="auto" onclick="selectSellMode('auto')">
+                                <h4><i class="fas fa-robot"></i> Auto-Sell</h4>
+                                <p>We sell for you automatically</p>
+                                <span class="profit-badge" id="autoProfit">+12%</span>
+                            </div>
+                            <div class="sell-mode-option" data-mode="self" onclick="selectSellMode('self')">
+                                <h4><i class="fas fa-user"></i> Self-Sell</h4>
+                                <p>Sell yourself for higher profit</p>
+                                <span class="profit-badge" id="selfProfit">+15%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-summary" style="background: var(--success-color); color: white; margin-top: 20px;">
+                        <div class="summary-row" style="border-color: rgba(255,255,255,0.2);">
+                            <span>Total Investment</span>
+                            <strong id="totalInvestment">৳0</strong>
+                        </div>
+                        <div class="summary-row" style="border-color: rgba(255,255,255,0.2);">
+                            <span>Expected Profit</span>
+                            <strong id="expectedProfit">৳0</strong>
+                        </div>
+                        <div class="summary-row" style="border: none;">
+                            <span>Total Return</span>
+                            <strong id="totalReturn">৳0</strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 20px;">
+                        <i class="fas fa-check"></i> Confirm Investment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let currentProduct = null;
+        let selectedSellMode = 'auto';
+        let products = [];
+
+        // Default products (used if no products in storage)
+        const defaultProducts = [
+            { id: '1', name: 'Smartphone Package', category: 'mobile', price: 5000, returnRate: 12, duration: 30, stock: 50, icon: 'fa-mobile-alt', active: true },
+            { id: '2', name: 'Laptop Package', category: 'computer', price: 15000, returnRate: 18, duration: 45, stock: 25, icon: 'fa-laptop', active: true },
+            { id: '3', name: 'Electronics Package', category: 'electronics', price: 10000, returnRate: 15, duration: 30, stock: 40, icon: 'fa-tv', active: true },
+            { id: '4', name: 'Smart Watch Bundle', category: 'accessories', price: 3000, returnRate: 10, duration: 20, stock: 100, icon: 'fa-clock', active: true },
+            { id: '5', name: 'Gaming Console Pack', category: 'electronics', price: 20000, returnRate: 20, duration: 60, stock: 15, icon: 'fa-gamepad', active: true },
+            { id: '6', name: 'Tablet Package', category: 'mobile', price: 8000, returnRate: 14, duration: 35, stock: 30, icon: 'fa-tablet-alt', active: true }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Load products from storage or use defaults
+            products = Storage.get('products');
+            if (!products || products.length === 0) {
+                products = defaultProducts;
+                Storage.set('products', products);
+            }
+
+            document.getElementById('userName').textContent = user.name || 'User';
+            document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
+            renderProducts();
+        });
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            // Filter for active products with stock
+            const activeProducts = products.filter(p => p.stock > 0 && p.active !== false);
+            
+            if (activeProducts.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-box-open" style="font-size: 60px; color: var(--text-muted); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text-secondary);">No Products Available</h3>
+                        <p style="color: var(--text-muted);">Check back later for new investment opportunities</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = activeProducts.map(product => {
+                const icon = product.icon || getCategoryIcon(product.category);
+                const returnRate = product.returnRate || product.autoProfit || 10;
+                return `
+                <div class="product-card" style="background: var(--bg-primary); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden;">
+                    <div style="height: 120px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; position: relative;">
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}" style="max-height: 100%; max-width: 100%; object-fit: cover;">` : `<i class="fas ${icon}" style="font-size: 50px; color: var(--primary-color);"></i>`}
+                        ${returnRate >= 15 ? '<span style="position: absolute; top: 10px; right: 10px; background: var(--danger-color); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">HOT</span>' : ''}
+                    </div>
+                    <div style="padding: 20px;">
+                        <h3 style="font-size: 16px; margin-bottom: 15px;">${product.name}</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                            <div><span style="font-size: 12px; color: var(--text-secondary);">Price</span><br><strong style="color: var(--primary-color);">${formatCurrency(product.price)}</strong></div>
+                            <div><span style="font-size: 12px; color: var(--text-secondary);">Return</span><br><strong style="color: var(--success-color);">+${returnRate}%</strong></div>
+                            <div><span style="font-size: 12px; color: var(--text-secondary);">Duration</span><br><strong>${product.duration} days</strong></div>
+                            <div><span style="font-size: 12px; color: var(--text-secondary);">Stock</span><br><strong>${product.stock} units</strong></div>
+                        </div>
+                        ${product.description ? `<p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">${product.description.substring(0, 50)}${product.description.length > 50 ? '...' : ''}</p>` : ''}
+                        <button class="btn btn-primary btn-block" onclick="openInvestModal('${product.id}')">
+                            <i class="fas fa-shopping-cart"></i> Invest Now
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        
+        function getCategoryIcon(category) {
+            const icons = {
+                electronics: 'fa-tv',
+                fashion: 'fa-tshirt',
+                mobile: 'fa-mobile-alt',
+                computer: 'fa-laptop',
+                accessories: 'fa-clock',
+                home: 'fa-home',
+                health: 'fa-heartbeat',
+                other: 'fa-box'
+            };
+            return icons[category] || 'fa-box';
+        }
+
+        function openInvestModal(productId) {
+            currentProduct = products.find(p => p.id === productId || p.id === String(productId));
+            if (!currentProduct) return;
+
+            const icon = currentProduct.icon || getCategoryIcon(currentProduct.category);
+            const returnRate = currentProduct.returnRate || 10;
+            
+            document.getElementById('productSummary').innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 60px; height: 60px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        ${currentProduct.image ? `<img src="${currentProduct.image}" style="max-width: 100%; max-height: 100%; border-radius: 8px;">` : `<i class="fas ${icon}" style="font-size: 28px; color: var(--primary-color);"></i>`}
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">${currentProduct.name}</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px;">${formatCurrency(currentProduct.price)} per unit • ${currentProduct.duration} days</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('autoProfit').textContent = `+${returnRate}%`;
+            document.getElementById('selfProfit').textContent = `+${Math.round(returnRate * 1.25)}%`;
+            document.getElementById('investUnits').value = currentProduct.minUnits || 1;
+            document.getElementById('investUnits').min = currentProduct.minUnits || 1;
+            document.getElementById('investUnits').max = currentProduct.stock;
+            
+            selectSellMode('auto');
+            updateInvestmentSummary();
+            Modal.open('investModal');
+        }
+
+        function selectSellMode(mode) {
+            selectedSellMode = mode;
+            document.querySelectorAll('.sell-mode-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.mode === mode);
+            });
+            updateInvestmentSummary();
+        }
+
+        function updateInvestmentSummary() {
+            if (!currentProduct) return;
+            
+            const units = parseInt(document.getElementById('investUnits').value) || 1;
+            const total = currentProduct.price * units;
+            const baseRate = currentProduct.returnRate || 10;
+            const profitRate = selectedSellMode === 'auto' ? baseRate : Math.round(baseRate * 1.25);
+            const profit = total * (profitRate / 100);
+            const totalReturn = total + profit;
+
+            document.getElementById('totalInvestment').textContent = formatCurrency(total);
+            document.getElementById('expectedProfit').textContent = formatCurrency(profit);
+            document.getElementById('totalReturn').textContent = formatCurrency(totalReturn);
+        }
+
+        document.getElementById('investForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const user = Storage.get('currentUser');
+            const units = parseInt(document.getElementById('investUnits').value);
+            const total = currentProduct.price * units;
+
+            if (total > (user.balance || 0)) {
+                showToast('Insufficient balance! Please deposit first.', 'error');
+                return;
+            }
+
+            const baseRate = currentProduct.returnRate || 10;
+            const profitRate = selectedSellMode === 'auto' ? baseRate : Math.round(baseRate * 1.25);
+            const profit = total * (profitRate / 100);
+
+            const investment = {
+                id: generateId(),
+                productId: currentProduct.id,
+                productName: currentProduct.name,
+                productIcon: currentProduct.icon,
+                units: units,
+                amount: total,
+                sellMode: selectedSellMode === 'auto' ? 'auto' : 'self',
+                profitRate: profitRate,
+                expectedProfit: profit,
+                duration: currentProduct.duration,
+                status: 'active',
+                startDate: new Date().toISOString(),
+                endDate: new Date(Date.now() + currentProduct.duration * 24 * 60 * 60 * 1000).toISOString()
+            };
+
+            // Save investment
+            const investments = Storage.get('investments') || [];
+            investments.push(investment);
+            Storage.set('investments', investments);
+
+            // Deduct from balance
+            user.balance = (user.balance || 0) - total;
+            user.totalInvested = (user.totalInvested || 0) + total;
+            Storage.set('currentUser', user);
+
+            Modal.close('investModal');
+            showToast('Investment successful!', 'success');
+            document.getElementById('walletBalance').textContent = formatCurrency(user.balance);
+        });
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

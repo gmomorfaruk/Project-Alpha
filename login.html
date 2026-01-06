@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to Project Alpha - Access your investment dashboard">
+    <meta name="theme-color" content="#178582">
+    <title>Login - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span>Loading...</span>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About</a>
+                <a href="login.html" class="active">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="lang-toggle" id="langToggle" title="Toggle Language">
+                    <span>EN</span>
+                </button>
+                <button class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-wrapper">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h1 data-en="Welcome Back" data-bn="স্বাগতম">Welcome Back</h1>
+                        <p data-en="Login to your account to continue" data-bn="চালিয়ে যেতে আপনার অ্যাকাউন্টে লগইন করুন">Login to your account to continue</p>
+                    </div>
+
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email" data-en="Email Address" data-bn="ইমেইল ঠিকানা">Email Address</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" required 
+                                    placeholder="Enter your email" 
+                                    data-placeholder-en="Enter your email" 
+                                    data-placeholder-bn="আপনার ইমেইল লিখুন">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" name="password" required 
+                                    placeholder="Enter your password" 
+                                    data-placeholder-en="Enter your password" 
+                                    data-placeholder-bn="আপনার পাসওয়ার্ড লিখুন">
+                                <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="remember">
+                                <span class="checkmark"></span>
+                                <span data-en="Remember me" data-bn="মনে রাখুন">Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-link" onclick="showForgotPasswordModal(); return false;" data-en="Forgot Password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">Forgot Password?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <span data-en="Login" data-bn="লগইন">Login</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>
+                            <span data-en="Don't have an account?" data-bn="অ্যাকাউন্ট নেই?">Don't have an account?</span>
+                            <a href="signup.html" data-en="Sign Up" data-bn="সাইন আপ">Sign Up</a>
+                        </p>
+                    </div>
+
+                    <div class="demo-accounts">
+                        <p data-en="Demo Accounts:" data-bn="ডেমো অ্যাকাউন্ট:">Demo Accounts:</p>
+                        <div class="demo-buttons">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="fillDemo('user')">
+                                <i class="fas fa-user"></i> User
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="fillDemo('admin')">
+                                <i class="fas fa-user-shield"></i> Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-side">
+                    <div class="auth-side-content">
+                        <h2 data-en="Start Earning Today" data-bn="আজই উপার্জন শুরু করুন">Start Earning Today</h2>
+                        <p data-en="Join thousands of investors who trust our platform for their investment needs." data-bn="হাজার হাজার বিনিয়োগকারীদের সাথে যোগ দিন যারা তাদের বিনিয়োগের জন্য আমাদের প্ল্যাটফর্মে বিশ্বাস করেন।">Join thousands of investors who trust our platform for their investment needs.</p>
+                        <ul class="auth-features">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Secure & Trusted Platform" data-bn="নিরাপদ এবং বিশ্বস্ত প্ল্যাটফর্ম">Secure & Trusted Platform</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Up to 25% Monthly Returns" data-bn="মাসিক ২৫% পর্যন্ত রিটার্ন">Up to 25% Monthly Returns</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Instant Withdrawals" data-bn="তাৎক্ষণিক উত্তোলন">Instant Withdrawals</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="24/7 Customer Support" data-bn="২৪/৭ গ্রাহক সেবা">24/7 Customer Support</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forgot Password Modal -->
+    <div class="form-modal" id="forgotPasswordModal">
+        <div class="form-modal-content" style="max-width: 450px;">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-key" style="margin-right: 10px;"></i>Reset Password</h3>
+                <button class="form-modal-close" onclick="closeForgotPasswordModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="forgotPasswordForm">
+                <div class="form-modal-body">
+                    <!-- Step 1: Email Verification -->
+                    <div id="resetStep1">
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Enter your registered email address to reset your password.</p>
+                        <div class="form-group">
+                            <label for="resetEmail">Email Address</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="resetEmail" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block" onclick="verifyEmail()">
+                            <span>Continue</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Step 2: Phone Verification -->
+                    <div id="resetStep2" style="display: none;">
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Verify your identity by entering your registered phone number.</p>
+                        <div class="form-group">
+                            <label for="resetPhone">Phone Number</label>
+                            <div class="input-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="resetPhone" placeholder="01XXXXXXXXX" required>
+                            </div>
+                            <span class="form-hint" id="phoneHint">Enter your registered phone number</span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-outline" onclick="goBackStep(2)" style="flex: 1;">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="verifyPhone()" style="flex: 1;">
+                                Verify <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: New Password -->
+                    <div id="resetStep3" style="display: none;">
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Create a new strong password for your account.</p>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="newPassword" placeholder="Min 6 characters" required minlength="6" oninput="checkPasswordStrength(this.value)">
+                                <button type="button" class="toggle-password" onclick="togglePassword('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" style="margin-top: 8px;">
+                                <div style="height: 4px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden;">
+                                    <div id="passwordStrength" style="height: 100%; width: 0%; transition: all 0.3s;"></div>
+                                </div>
+                                <span id="passwordStrengthText" style="font-size: 12px; margin-top: 4px; display: block;"></span>
+                            </div>
+                            <span class="form-hint">Use at least 6 characters with letters and numbers</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmNewPassword">Confirm Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="confirmNewPassword" placeholder="Confirm password" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('confirmNewPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-outline" onclick="goBackStep(3)" style="flex: 1;">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="resetPassword()" style="flex: 1;">
+                                <i class="fas fa-check"></i> Reset Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .form-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .form-modal.active {
+            display: flex;
+        }
+        .form-modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .form-modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .form-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .form-modal-close:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+        .form-modal-body {
+            padding: 25px;
+        }
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+
+    <script src="js/app-config.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.parentElement.querySelector('.toggle-password i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function fillDemo(type) {
+            if (type === 'user') {
+                document.getElementById('email').value = 'user@demo.com';
+                document.getElementById('password').value = 'demo123';
+            } else if (type === 'admin') {
+                document.getElementById('email').value = 'admin@demo.com';
+                document.getElementById('password').value = 'admin123';
+            }
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            
+            // Basic validation
+            if (!email || !password) {
+                showToast('Please enter email and password', 'error');
+                return;
+            }
+
+            // Demo admin login
+            if (email === 'admin@demo.com' && password === 'admin123') {
+                const userData = {
+                    id: 'admin1',
+                    email: email,
+                    name: 'Admin User',
+                    role: 'admin',
+                    isLoggedIn: true,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save demo admin to users list if not exists
+                const users = Storage.get('users') || [];
+                if (!users.find(u => u.id === 'admin1')) {
+                    users.push({...userData, isLoggedIn: false});
+                    Storage.set('users', users);
+                }
+                
+                Storage.set('currentUser', userData);
+                Security.createSession(userData);
+                Security.logSecurityEvent('login_success', { email: email, role: 'admin' });
+                showToast('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin/index.html';
+                }, 1000);
+                return;
+            }
+            
+            // Demo user login
+            if (email === 'user@demo.com' && password === 'demo123') {
+                const userData = {
+                    id: 'user1',
+                    email: email,
+                    name: 'Demo User',
+                    phone: '01700000000',
+                    role: 'user',
+                    isLoggedIn: true,
+                    balance: 5000,
+                    points: 100,
+                    membership: 'free',
+                    referralCode: 'DEMO1234',
+                    referrals: [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save demo user to users list if not exists
+                let users = Storage.get('users') || [];
+                
+                const existingUser = users.find(u => u.id === 'user1');
+                if (!existingUser) {
+                    const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
+                    users.push(userToSave);
+                    Storage.set('users', users);
+                }
+                
+                Storage.set('currentUser', userData);
+                Security.createSession(userData);
+                Security.logSecurityEvent('login_success', { email: email, role: 'user' });
+                showToast('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard/index.html';
+                }, 1000);
+                return;
+            }
+            
+            // Check registered users
+            const users = Storage.get('users') || [];
+            const user = users.find(u => u.email === email);
+            
+            if (user) {
+                if (user.password === password) {
+                    const userData = {
+                        ...user,
+                        isLoggedIn: true
+                    };
+                    Storage.set('currentUser', userData);
+                    Security.createSession(userData);
+                    Security.logSecurityEvent('login_success', { email: email, role: user.role || 'user' });
+                    showToast('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard/index.html';
+                    }, 1000);
+                } else {
+                    Security.logSecurityEvent('login_failed', { email: email, reason: 'wrong_password' });
+                    showToast('Incorrect password', 'error');
+                }
+            } else {
+                Security.logSecurityEvent('login_failed', { email: email, reason: 'user_not_found' });
+                showToast('No account found with this email', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project Alpha - Your trusted investment platform. Earn daily profits through secure investments.">
+    <meta name="theme-color" content="#178582">
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Project Alpha - Investment Platform</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span>Loading...</span>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="active">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="lang-toggle" id="langToggle" title="Toggle Language">
+                    <span>EN</span>
+                </button>
+                <button class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 data-en="Invest Smart, Grow Fast" data-bn="স্মার্ট বিনিয়োগ, দ্রুত বৃদ্ধি">Invest Smart, Grow Fast</h1>
+                <p data-en="Join thousands of investors earning daily profits through our secure investment platform. Start with as little as ৳500 and watch your money grow." data-bn="আমাদের নিরাপদ বিনিয়োগ প্ল্যাটফর্মের মাধ্যমে দৈনিক মুনাফা অর্জনকারী হাজার হাজার বিনিয়োগকারীদের সাথে যোগ দিন। মাত্র ৳৫০০ দিয়ে শুরু করুন।">Join thousands of investors earning daily profits through our secure investment platform. Start with as little as ৳500 and watch your money grow.</p>
+                <div class="hero-buttons">
+                    <a href="signup.html" class="btn btn-primary btn-lg" data-en="Get Started" data-bn="শুরু করুন">Get Started</a>
+                    <a href="#how-it-works" class="btn btn-outline btn-lg" data-en="Learn More" data-bn="আরও জানুন">Learn More</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label" data-en="Active Investors" data-bn="সক্রিয় বিনিয়োগকারী">Active Investors</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">৳50M+</span>
+                        <span class="stat-label" data-en="Total Invested" data-bn="মোট বিনিয়োগ">Total Invested</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">15%</span>
+                        <span class="stat-label" data-en="Avg. Monthly Return" data-bn="গড় মাসিক রিটার্ন">Avg. Monthly Return</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="floating-card card-1">
+                    <i class="fas fa-chart-line"></i>
+                    <span>+15.5%</span>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-wallet"></i>
+                    <span>৳25,000</span>
+                </div>
+                <div class="hero-illustration">
+                    <i class="fas fa-coins"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Showcase -->
+    <section class="product-showcase" id="products">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Featured Products" data-bn="বৈশিষ্ট্যযুক্ত পণ্য">Featured Products</h2>
+                <p data-en="Choose from our carefully selected investment products" data-bn="আমাদের যত্ন সহকারে নির্বাচিত বিনিয়োগ পণ্য থেকে বেছে নিন">Choose from our carefully selected investment products</p>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-badge">Hot</div>
+                    <div class="product-image">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Smartphone Package</h3>
+                    <div class="product-details">
+                        <div class="detail">
+                            <span class="label" data-en="Price" data-bn="মূল্য">Price</span>
+                            <span class="value">৳5,000</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Profit" data-bn="লাভ">Profit</span>
+                            <span class="value profit">+12%</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Duration" data-bn="সময়কাল">Duration</span>
+                            <span class="value">30 days</span>
+                        </div>
+                    </div>
+                    <a href="products.html" class="btn btn-primary btn-block" data-en="Invest Now" data-bn="এখনই বিনিয়োগ করুন">Invest Now</a>
+                </div>
+                <div class="product-card featured">
+                    <div class="product-badge special">Special Offer</div>
+                    <div class="product-image">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>Laptop Package</h3>
+                    <div class="product-details">
+                        <div class="detail">
+                            <span class="label" data-en="Price" data-bn="মূল্য">Price</span>
+                            <span class="value">৳15,000</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Profit" data-bn="লাভ">Profit</span>
+                            <span class="value profit">+18%</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Duration" data-bn="সময়কাল">Duration</span>
+                            <span class="value">45 days</span>
+                        </div>
+                    </div>
+                    <a href="products.html" class="btn btn-primary btn-block" data-en="Invest Now" data-bn="এখনই বিনিয়োগ করুন">Invest Now</a>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <h3>Electronics Package</h3>
+                    <div class="product-details">
+                        <div class="detail">
+                            <span class="label" data-en="Price" data-bn="মূল্য">Price</span>
+                            <span class="value">৳10,000</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Profit" data-bn="লাভ">Profit</span>
+                            <span class="value profit">+15%</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label" data-en="Duration" data-bn="সময়কাল">Duration</span>
+                            <span class="value">30 days</span>
+                        </div>
+                    </div>
+                    <a href="products.html" class="btn btn-primary btn-block" data-en="Invest Now" data-bn="এখনই বিনিয়োগ করুন">Invest Now</a>
+                </div>
+            </div>
+            <div class="view-all">
+                <a href="products.html" class="btn btn-outline" data-en="View All Products" data-bn="সব পণ্য দেখুন">View All Products</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="How It Works" data-bn="এটি কিভাবে কাজ করে">How It Works</h2>
+                <p data-en="Start earning in just 4 simple steps" data-bn="মাত্র ৪টি সহজ ধাপে উপার্জন শুরু করুন">Start earning in just 4 simple steps</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 data-en="Create Account" data-bn="অ্যাকাউন্ট তৈরি করুন">Create Account</h3>
+                    <p data-en="Sign up for free and verify your account in minutes" data-bn="বিনামূল্যে সাইন আপ করুন এবং মিনিটের মধ্যে আপনার অ্যাকাউন্ট যাচাই করুন">Sign up for free and verify your account in minutes</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3 data-en="Add Funds" data-bn="তহবিল যোগ করুন">Add Funds</h3>
+                    <p data-en="Deposit money via bKash or Nagad securely" data-bn="bKash বা Nagad এর মাধ্যমে নিরাপদে টাকা জমা দিন">Deposit money via bKash or Nagad securely</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 data-en="Choose Product" data-bn="পণ্য বাছাই করুন">Choose Product</h3>
+                    <p data-en="Select from various investment packages" data-bn="বিভিন্ন বিনিয়োগ প্যাকেজ থেকে বেছে নিন">Select from various investment packages</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 data-en="Earn Profits" data-bn="মুনাফা অর্জন করুন">Earn Profits</h3>
+                    <p data-en="Watch your investment grow and withdraw anytime" data-bn="আপনার বিনিয়োগ বৃদ্ধি দেখুন এবং যেকোনো সময় উত্তোলন করুন">Watch your investment grow and withdraw anytime</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Why Choose Us" data-bn="কেন আমাদের বেছে নেবেন">Why Choose Us</h2>
+                <p data-en="We provide the best investment experience" data-bn="আমরা সেরা বিনিয়োগ অভিজ্ঞতা প্রদান করি">We provide the best investment experience</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 data-en="Secure Platform" data-bn="নিরাপদ প্ল্যাটফর্ম">Secure Platform</h3>
+                    <p data-en="Your investments are protected with bank-level security" data-bn="আপনার বিনিয়োগ ব্যাংক-স্তরের নিরাপত্তা দিয়ে সুরক্ষিত">Your investments are protected with bank-level security</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 data-en="Instant Withdrawals" data-bn="তাৎক্ষণিক উত্তোলন">Instant Withdrawals</h3>
+                    <p data-en="Get your profits directly to bKash/Nagad within hours" data-bn="ঘণ্টার মধ্যে সরাসরি bKash/Nagad এ আপনার মুনাফা পান">Get your profits directly to bKash/Nagad within hours</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 data-en="Referral Rewards" data-bn="রেফারেল পুরস্কার">Referral Rewards</h3>
+                    <p data-en="Earn extra income by inviting friends and family" data-bn="বন্ধু এবং পরিবারকে আমন্ত্রণ জানিয়ে অতিরিক্ত আয় করুন">Earn extra income by inviting friends and family</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 data-en="24/7 Support" data-bn="২৪/৭ সাপোর্ট">24/7 Support</h3>
+                    <p data-en="Our support team is always ready to help you" data-bn="আমাদের সাপোর্ট টিম সবসময় আপনাকে সাহায্য করতে প্রস্তুত">Our support team is always ready to help you</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="What Our Investors Say" data-bn="আমাদের বিনিয়োগকারীরা কি বলেন">What Our Investors Say</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"I've been investing for 6 months and already earned ৳50,000 in profits. Highly recommended!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Rahim Ahmed</h4>
+                            <span>Dhaka</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"The auto-sell feature is amazing. I don't have to worry about anything, profits come automatically."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Fatima Begum</h4>
+                            <span>Chittagong</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Withdrawals are super fast! I received my money within 2 hours. Great platform!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Karim Hossain</h4>
+                            <span>Sylhet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 data-en="Ready to Start Earning?" data-bn="উপার্জন শুরু করতে প্রস্তুত?">Ready to Start Earning?</h2>
+                <p data-en="Join thousands of successful investors today and start your journey to financial freedom." data-bn="আজই হাজার হাজার সফল বিনিয়োগকারীদের সাথে যোগ দিন এবং আর্থিক স্বাধীনতার দিকে আপনার যাত্রা শুরু করুন।">Join thousands of successful investors today and start your journey to financial freedom.</p>
+                <a href="signup.html" class="btn btn-light btn-lg" data-en="Create Free Account" data-bn="বিনামূল্যে অ্যাকাউন্ট তৈরি করুন">Create Free Account</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <i class="fas fa-rocket"></i>
+                        <span>Project Alpha</span>
+                    </a>
+                    <p data-en="Your trusted investment platform for secure and profitable investments." data-bn="নিরাপদ এবং লাভজনক বিনিয়োগের জন্য আপনার বিশ্বস্ত বিনিয়োগ প্ল্যাটফর্ম।">Your trusted investment platform for secure and profitable investments.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4 data-en="Quick Links" data-bn="দ্রুত লিংক">Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html" data-en="Home" data-bn="হোম">Home</a></li>
+                        <li><a href="products.html" data-en="Products" data-bn="পণ্য">Products</a></li>
+                        <li><a href="about.html" data-en="About Us" data-bn="আমাদের সম্পর্কে">About Us</a></li>
+                        <li><a href="login.html" data-en="Login" data-bn="লগইন">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4 data-en="Support" data-bn="সাপোর্ট">Support</h4>
+                    <ul>
+                        <li><a href="#" data-en="FAQ" data-bn="সাধারণ প্রশ্ন">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><a href="mailto:support@projectalpha.com"><i class="fas fa-envelope"></i> support@projectalpha.com</a></li>
+                        <li><a href="tel:+8801XXXXXXXXX"><i class="fas fa-phone"></i> +880 1XXX-XXXXXX</a></li>
+                        <li><span><i class="fas fa-map-marker-alt"></i> Dhaka, Bangladesh</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Project Alpha. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app-config.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Chat Widget -->
+    <script src="js/chat-widget.js"></script>
+</body>
+</html>

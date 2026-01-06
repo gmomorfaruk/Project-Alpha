@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Investments - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('investments'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Investment Management</h1>
+                <p>Track all user investments</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalInvestments">0</h3>
+                        <p>Total Investments</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="activeInvestments">0</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalAmount">৳0</h3>
+                        <p>Total Invested</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalReturns">৳0</h3>
+                        <p>Expected Returns</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investments Table -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by user or product..." oninput="searchInvestments()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterStatus" onchange="filterInvestments()">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="filterMode" onchange="filterInvestments()">
+                            <option value="all">All Modes</option>
+                            <option value="auto">Auto Sell</option>
+                            <option value="self">Self Sell</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="exportInvestments()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Product</th>
+                                <th>Units</th>
+                                <th>Amount</th>
+                                <th>Return</th>
+                                <th>Mode</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="investmentsTable">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-chart-line" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No investments found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Investment Details Modal -->
+    <div class="form-modal" id="detailsModal">
+        <div class="form-modal-content" style="max-width: 550px;">
+            <div class="form-modal-header">
+                <h3>Investment Details</h3>
+                <button class="form-modal-close" onclick="closeModal('detailsModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="investmentDetails">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let investments = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadInvestments();
+        });
+
+        function loadInvestments() {
+            investments = Storage.get('investments') || [];
+            updateStats();
+            renderInvestments(investments);
+        }
+
+        function updateStats() {
+            document.getElementById('totalInvestments').textContent = investments.length;
+            document.getElementById('activeInvestments').textContent = investments.filter(i => i.status === 'active').length;
+            
+            const totalAmount = investments.reduce((sum, i) => sum + i.totalAmount, 0);
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+
+            const totalReturns = investments.reduce((sum, i) => sum + i.expectedReturn, 0);
+            document.getElementById('totalReturns').textContent = formatCurrency(totalReturns);
+        }
+
+        function calculateProgress(investment) {
+            const start = new Date(investment.startDate);
+            const end = new Date(investment.endDate);
+            const now = new Date();
+
+            if (now >= end) return 100;
+            if (now <= start) return 0;
+
+            const total = end - start;
+            const elapsed = now - start;
+            return Math.min(100, Math.round((elapsed / total) * 100));
+        }
+
+        function renderInvestments(investmentList) {
+            const tbody = document.getElementById('investmentsTable');
+            
+            if (investmentList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-chart-line" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No investments found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = investmentList.map(inv => {
+                const progress = calculateProgress(inv);
+                return `
+                    <tr>
+                        <td>${inv.userId}</td>
+                        <td><strong>${inv.productName}</strong></td>
+                        <td>${inv.units}</td>
+                        <td><strong>${formatCurrency(inv.totalAmount)}</strong></td>
+                        <td style="color: #10b981;">${formatCurrency(inv.expectedReturn)}</td>
+                        <td>
+                            <span class="badge badge-${inv.sellMode === 'auto' ? 'primary' : 'secondary'}">
+                                ${inv.sellMode === 'auto' ? 'Auto' : 'Self'}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="flex: 1; height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: ${progress}%; height: 100%; background: var(--primary-color);"></div>
+                                </div>
+                                <span style="font-size: 12px;">${progress}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-${inv.status === 'active' ? 'success' : inv.status === 'completed' ? 'primary' : 'secondary'}">
+                                ${inv.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn-view" onclick="viewInvestment('${inv.id}')" title="View"><i class="fas fa-eye"></i></button>
+                                ${inv.status === 'active' ? `
+                                    <button class="action-btn-approve" onclick="completeInvestment('${inv.id}')" title="Mark Complete"><i class="fas fa-check"></i></button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function searchInvestments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = investments.filter(inv => 
+                inv.userId.toLowerCase().includes(query) ||
+                inv.productName.toLowerCase().includes(query)
+            );
+            renderInvestments(filtered);
+        }
+
+        function filterInvestments() {
+            const status = document.getElementById('filterStatus').value;
+            const mode = document.getElementById('filterMode').value;
+            
+            let filtered = investments;
+            
+            if (status !== 'all') {
+                filtered = filtered.filter(inv => inv.status === status);
+            }
+            
+            if (mode !== 'all') {
+                filtered = filtered.filter(inv => inv.sellMode === mode);
+            }
+            
+            renderInvestments(filtered);
+        }
+
+        function viewInvestment(id) {
+            const inv = investments.find(i => i.id === id);
+            if (!inv) return;
+
+            const progress = calculateProgress(inv);
+
+            document.getElementById('investmentDetails').innerHTML = `
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">${inv.productName}</h4>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));"></div>
+                        </div>
+                        <span style="font-weight: 600;">${progress}%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                        <span>Started: ${formatDate(inv.startDate)}</span>
+                        <span>Ends: ${formatDate(inv.endDate)}</span>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Investment ID</span>
+                        <strong style="font-family: monospace; font-size: 11px;">${inv.id}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>User</span>
+                        <strong>${inv.userId}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Units</span>
+                        <strong>${inv.units}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Unit Price</span>
+                        <strong>${formatCurrency(inv.unitPrice)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Total Amount</span>
+                        <strong>${formatCurrency(inv.totalAmount)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Return Rate</span>
+                        <strong style="color: #10b981;">${inv.returnRate}%</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Expected Return</span>
+                        <strong style="color: #10b981;">${formatCurrency(inv.expectedReturn)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Sell Mode</span>
+                        <span class="badge badge-${inv.sellMode === 'auto' ? 'primary' : 'secondary'}">${inv.sellMode === 'auto' ? 'Auto Sell' : 'Self Sell'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Status</span>
+                        <span class="badge badge-${inv.status === 'active' ? 'success' : inv.status === 'completed' ? 'primary' : 'secondary'}">${inv.status}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailsModal').classList.add('active');
+        }
+
+        function completeInvestment(id) {
+            if (!confirm('Mark this investment as complete and credit the return to user?')) return;
+
+            const inv = investments.find(i => i.id === id);
+            if (!inv) return;
+
+            // Update investment status
+            inv.status = 'completed';
+            inv.completedAt = new Date().toISOString();
+
+            // Credit return to user
+            const users = Storage.get('users') || [];
+            const userIndex = users.findIndex(u => u.email === inv.userId);
+            if (userIndex !== -1) {
+                const totalReturn = inv.totalAmount + inv.expectedReturn;
+                users[userIndex].balance = (users[userIndex].balance || 0) + totalReturn;
+                Storage.set('users', users);
+            }
+
+            Storage.set('investments', investments);
+            showToast('Investment completed and return credited', 'success');
+            loadInvestments();
+        }
+
+        function exportInvestments() {
+            exportToCSV(investments.map(inv => ({
+                ID: inv.id,
+                User: inv.userId,
+                Product: inv.productName,
+                Units: inv.units,
+                Amount: inv.totalAmount,
+                Return: inv.expectedReturn,
+                Mode: inv.sellMode,
+                Status: inv.status,
+                StartDate: inv.startDate,
+                EndDate: inv.endDate
+            })), 'investments');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

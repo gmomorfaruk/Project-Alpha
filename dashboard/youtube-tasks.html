@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>YouTube Tasks - Earn Points - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .youtube-banner {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .youtube-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .youtube-icon i { font-size: 40px; }
+        .youtube-banner-content { flex: 1; min-width: 200px; }
+        .youtube-banner-content h1 { margin: 0 0 5px 0; font-size: 28px; }
+        .youtube-banner-content p { margin: 0; opacity: 0.9; }
+        .youtube-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .youtube-stat {
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            padding: 15px 25px;
+            border-radius: 12px;
+        }
+        .youtube-stat .stat-value { display: block; font-size: 24px; font-weight: 700; }
+        .youtube-stat .stat-label { font-size: 12px; opacity: 0.9; }
+        .task-type-filters { display: flex; gap: 10px; flex-wrap: wrap; }
+        .type-filter {
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .type-filter:hover { border-color: #ef4444; color: #ef4444; }
+        .type-filter.active { background: #ef4444; color: white; border-color: #ef4444; }
+        .youtube-tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .youtube-task-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .youtube-task-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: #ef4444;
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .youtube-task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15);
+        }
+        .youtube-task-card:hover::before { transform: scaleX(1); }
+        .task-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            margin-bottom: 15px;
+        }
+        .youtube-task-content h4 { margin: 0 0 8px 0; font-size: 16px; }
+        .youtube-task-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .youtube-task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        .task-points-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #BFA181, #a08968);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .verified { color: #10b981; font-size: 18px; }
+        .instructions-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .instructions-section h3 { margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; }
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .instruction-card {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+        .instruction-number {
+            width: 40px; height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 15px;
+        }
+        .instruction-card h4 { margin: 0 0 8px 0; font-size: 14px; }
+        .instruction-card p { margin: 0; font-size: 12px; color: var(--text-muted); }
+        .btn-youtube {
+            background: #ef4444;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-youtube:hover { background: #dc2626; }
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover { border-color: var(--primary-color); background: var(--primary-light); }
+        .upload-area i { font-size: 40px; color: var(--text-muted); margin-bottom: 10px; }
+        .points-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 15px 30px;
+            border-radius: 30px;
+        }
+        .success-circle {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            animation: scaleIn 0.5s ease;
+        }
+        .success-circle i { font-size: 40px; color: white; }
+        .points-earned {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #BFA181;
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .task-count {
+            font-size: 14px;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            .youtube-banner { padding: 20px; gap: 15px; }
+            .youtube-icon { width: 60px; height: 60px; }
+            .youtube-icon i { font-size: 30px; }
+            .youtube-banner-content h1 { font-size: 22px; }
+            .youtube-stats { width: 100%; justify-content: center; }
+            .youtube-stat { padding: 12px 20px; }
+        }
+        /* Modal Styles */
+        .form-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .form-modal.active {
+            display: flex;
+        }
+        .form-modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .form-modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .form-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .form-modal-close:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+        .form-modal-body {
+            padding: 25px;
+        }
+        .form-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+
+        <!-- Main Navigation Menu -->
+        <div class="navbar-menu">
+            <!-- Dashboard -->
+            <div class="navbar-item">
+                <a href="index.html" class="navbar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Tasks Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="tasks.html" class="dropdown-item">
+                        <i class="fas fa-list-check"></i>
+                        <span>All Tasks</span>
+                    </a>
+                    <a href="youtube-tasks.html" class="dropdown-item active">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                        <span>YouTube Tasks</span>
+                    </a>
+                    <a href="social-tasks.html" class="dropdown-item">
+                        <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                        <span>Social Tasks</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="wallet.html" class="dropdown-item">
+                        <i class="fas fa-wallet" style="color: #10b981;"></i>
+                        <span>Wallet</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="investments.html" class="dropdown-item">
+                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
+                        <span>My Investments</span>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        <i class="fas fa-box" style="color: #f59e0b;"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Dropdown -->
+            <div class="navbar-item">
+                <button class="navbar-link">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Other</span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="navbar-dropdown">
+                    <a href="sell-proofs.html" class="dropdown-item">
+                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
+                        <span>Sell Proofs</span>
+                    </a>
+                    <a href="referrals.html" class="dropdown-item">
+                        <i class="fas fa-users" style="color: #ec4899;"></i>
+                        <span>Referrals</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
+                <span style="font-size: 12px; font-weight: 600;">EN</span>
+            </button>
+            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
+            </button>
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="navbar-user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="navbar-user-name" id="userName">User</span>
+            </div>
+            <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Main</div>
+            <a href="index.html" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="wallet.html" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Earn Points</div>
+            <a href="tasks.html" class="mobile-menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>All Tasks</span>
+            </a>
+            <a href="youtube-tasks.html" class="mobile-menu-item active">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube Tasks</span>
+            </a>
+            <a href="social-tasks.html" class="mobile-menu-item">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Tasks</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Account</div>
+            <a href="profile.html" class="mobile-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            <a href="investments.html" class="mobile-menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Investments</span>
+            </a>
+            <a href="products.html" class="mobile-menu-item">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Other</div>
+            <a href="sell-proofs.html" class="mobile-menu-item">
+                <i class="fas fa-receipt"></i>
+                <span>Sell Proofs</span>
+            </a>
+            <a href="referrals.html" class="mobile-menu-item">
+                <i class="fas fa-users"></i>
+                <span>Referrals</span>
+            </a>
+        </div>
+        
+        <div class="mobile-menu-footer">
+            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="content">
+            <!-- YouTube Banner -->
+            <div class="youtube-banner">
+                <div class="youtube-icon">
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <div class="youtube-banner-content">
+                    <h1>YouTube Tasks</h1>
+                    <p data-lang-key="youtube_subtitle">Subscribe, Like, Watch & Earn Points!</p>
+                </div>
+                <div class="youtube-stats">
+                    <div class="youtube-stat">
+                        <span class="stat-value" id="myPoints">0</span>
+                        <span class="stat-label">My Points / আমার পয়েন্ট</span>
+                    </div>
+                    <div class="youtube-stat">
+                        <span class="stat-value" id="todayEarned">0</span>
+                        <span class="stat-label">Today's Earning / আজকের আয়</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Type Filters -->
+            <div class="section" style="margin-bottom: 20px;">
+                <div class="task-type-filters">
+                    <button class="type-filter active" onclick="filterByType('all')">
+                        <i class="fas fa-th-large"></i> All
+                    </button>
+                    <button class="type-filter" onclick="filterByType('subscribe')">
+                        <i class="fas fa-bell"></i> Subscribe
+                    </button>
+                    <button class="type-filter" onclick="filterByType('like')">
+                        <i class="fas fa-thumbs-up"></i> Like
+                    </button>
+                    <button class="type-filter" onclick="filterByType('watch')">
+                        <i class="fas fa-play"></i> Watch
+                    </button>
+                    <button class="type-filter" onclick="filterByType('comment')">
+                        <i class="fas fa-comment"></i> Comment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tasks Grid -->
+            <div class="section">
+                <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2><i class="fab fa-youtube" style="color: #ef4444; margin-right: 10px;"></i>Available Tasks / উপলব্ধ কাজ</h2>
+                    <span class="task-count"><span id="taskCount">0</span> tasks available</span>
+                </div>
+                
+                <div class="youtube-tasks-grid" id="tasksGrid">
+                    <!-- Tasks will be loaded here -->
+                </div>
+
+                <div id="noTasksMessage" style="display: none; text-align: center; padding: 60px;">
+                    <div style="width: 100px; height: 100px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fab fa-youtube" style="font-size: 50px; color: #ef4444;"></i>
+                    </div>
+                    <h3>No YouTube Tasks Available</h3>
+                    <p style="color: var(--text-muted);">Check back later for new tasks!</p>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="section instructions-section">
+                <h3><i class="fas fa-info-circle" style="color: var(--primary-color);"></i> How to Complete YouTube Tasks / কিভাবে ইউটিউব কাজ সম্পন্ন করবেন</h3>
+                <div class="instructions-grid">
+                    <div class="instruction-card">
+                        <div class="instruction-number">1</div>
+                        <h4>Click on Task</h4>
+                        <p>Select any available YouTube task from the list above</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-number">2</div>
+                        <h4>Complete Action</h4>
+                        <p>Subscribe, Like, Watch or Comment as instructed</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-number">3</div>
+                        <h4>Submit Proof</h4>
+                        <p>Take a screenshot and submit as proof if required</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-number">4</div>
+                        <h4>Earn Points</h4>
+                        <p>Get points credited after verification</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Modal -->
+    <div class="form-modal" id="taskModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                <h3 id="taskModalTitle"><i class="fab fa-youtube" style="margin-right: 10px;"></i>Complete Task</h3>
+                <button class="form-modal-close" onclick="closeModal('taskModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <div id="taskDetails">
+                    <!-- Task details -->
+                </div>
+                <div class="form-group" id="proofGroup" style="display: none; margin-top: 20px;">
+                    <label>Upload Screenshot / স্ক্রিনশট আপলোড করুন</label>
+                    <div class="upload-area" onclick="document.getElementById('proofImage').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload screenshot</p>
+                        <input type="file" id="proofImage" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </div>
+                    <div id="imagePreview" style="display: none; margin-top: 10px;">
+                        <img id="previewImg" src="" style="max-width: 100%; border-radius: 8px;">
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;" id="proofInstructions"></p>
+                </div>
+            </div>
+            <div class="form-modal-footer" style="flex-direction: column; gap: 10px;">
+                <a href="#" id="taskLink" target="_blank" class="btn btn-youtube" style="width: 100%;">
+                    <i class="fab fa-youtube"></i> Open YouTube
+                </a>
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <button class="btn btn-outline" onclick="closeModal('taskModal')" style="flex: 1;">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitTask()" id="submitBtn" style="flex: 1;">
+                        <i class="fas fa-check"></i> Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="form-modal" id="successModal">
+        <div class="form-modal-content" style="max-width: 400px; text-align: center;">
+            <div class="form-modal-body" style="padding: 40px;">
+                <div class="success-animation">
+                    <div class="success-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <h2 style="margin-top: 20px;">🎉 Congratulations!</h2>
+                <p style="color: var(--text-muted); margin: 15px 0;">You earned</p>
+                <div class="points-earned">
+                    <i class="fas fa-coins"></i>
+                    <span id="pointsEarned">0</span> Points
+                </div>
+                <button class="btn btn-primary" onclick="closeModal('successModal')" style="margin-top: 20px; width: 100%;">
+                    Continue Earning
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let currentUser = null;
+        let allTasks = [];
+        let currentType = 'all';
+        let currentTaskId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            currentUser = Storage.get('currentUser');
+            if (!currentUser || !currentUser.isLoggedIn) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Check visibility setting
+            const settings = Storage.get('workSettings') || {};
+            if (settings.visYoutube === false) {
+                document.querySelector('.content').innerHTML = `
+                    <div style="text-align: center; padding: 60px;">
+                        <i class="fas fa-lock" style="font-size: 60px; color: var(--text-muted); margin-bottom: 20px;"></i>
+                        <h2>YouTube Tasks Unavailable</h2>
+                        <p style="color: var(--text-muted);">This feature is currently disabled by admin.</p>
+                        <a href="tasks.html" class="btn btn-primary" style="margin-top: 20px;">View Other Tasks</a>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('userName').textContent = currentUser.name || 'User';
+            loadUserPoints();
+            loadTasks();
+        });
+
+        function loadUserPoints() {
+            const users = Storage.get('users') || [];
+            const user = users.find(u => u.email === currentUser.email);
+            const points = user?.points || 0;
+            
+            document.getElementById('myPoints').textContent = points.toLocaleString();
+            
+            // Calculate today's earnings
+            const today = new Date().toDateString();
+            const completions = Storage.get('taskCompletions') || [];
+            const todayPoints = completions
+                .filter(c => c.userId === currentUser.email && new Date(c.timestamp).toDateString() === today)
+                .reduce((sum, c) => sum + (c.pointsAwarded || 0), 0);
+            
+            document.getElementById('todayEarned').textContent = todayPoints.toLocaleString();
+        }
+
+        function loadTasks() {
+            // Refresh user data from storage to get latest membership info
+            const users = Storage.get('users') || [];
+            const latestUser = users.find(u => u.email === currentUser.email);
+            if (latestUser) {
+                currentUser = { ...currentUser, ...latestUser };
+                Storage.set('currentUser', currentUser);
+            }
+            
+            // Check membership - only members can access tasks
+            const userTaskLimit = currentUser.membershipTaskLimit || 0;
+            if (!currentUser.membershipLevel || userTaskLimit === 0) {
+                document.getElementById('taskCount').textContent = '0';
+                document.getElementById('tasksGrid').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; grid-column: 1 / -1;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white;">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3 style="margin-bottom: 10px; color: var(--text-primary);">Upgrade to Access YouTube Tasks</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Purchase a membership level to unlock tasks and start earning!</p>
+                        <a href="wallet.html?action=deposit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-wallet"></i> Go to Wallet & Upgrade
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Check if user reached daily limit
+            const today = new Date().toDateString();
+            const completions = Storage.get('taskCompletions') || [];
+            const todayUserCompletions = completions.filter(c => 
+                c.userId === currentUser.email && 
+                new Date(c.timestamp).toDateString() === today
+            );
+            
+            if (todayUserCompletions.length >= userTaskLimit) {
+                document.getElementById('taskCount').textContent = '0';
+                document.getElementById('tasksGrid').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; grid-column: 1 / -1;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 style="margin-bottom: 10px; color: var(--text-primary);">Daily Tasks Completed! 🎉</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 10px;">You've completed all ${userTaskLimit} tasks for today.</p>
+                        <a href="wallet.html?action=deposit" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 15px;">
+                            <i class="fas fa-arrow-up"></i> Upgrade for More Tasks
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const allWorkTasks = Storage.get('workTasks') || [];
+            
+            // Filter only YouTube tasks that are active and visible
+            allTasks = allWorkTasks.filter(task => {
+                if (task.category !== 'youtube' || !task.active) return false;
+                
+                // Check daily limit
+                if (task.dailyLimit > 0) {
+                    const todayCompletions = completions.filter(c => 
+                        c.taskId === task.id && 
+                        c.userId === currentUser.email && 
+                        new Date(c.timestamp).toDateString() === today
+                    );
+                    if (todayCompletions.length >= task.dailyLimit) return false;
+                }
+                
+                return true;
+            });
+            
+            // Limit tasks shown based on remaining daily allowance
+            const remainingTasks = userTaskLimit - todayUserCompletions.length;
+            allTasks = allTasks.slice(0, remainingTasks);
+
+            renderTasks();
+        }
+
+        function filterByType(type) {
+            currentType = type;
+            document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.type-filter').classList.add('active');
+            renderTasks();
+        }
+
+        function renderTasks() {
+            let filtered = allTasks;
+            if (currentType !== 'all') {
+                filtered = allTasks.filter(t => t.type === currentType);
+            }
+
+            document.getElementById('taskCount').textContent = filtered.length;
+            
+            const container = document.getElementById('tasksGrid');
+            const noTasksMsg = document.getElementById('noTasksMessage');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noTasksMsg.style.display = 'block';
+                return;
+            }
+
+            noTasksMsg.style.display = 'none';
+
+            const typeIcons = {
+                subscribe: 'fa-bell',
+                like: 'fa-thumbs-up',
+                watch: 'fa-play',
+                comment: 'fa-comment'
+            };
+
+            container.innerHTML = filtered.map(task => `
+                <div class="youtube-task-card" onclick="openTask(${task.id})">
+                    <div class="task-type-badge">
+                        <i class="fas ${typeIcons[task.type] || 'fa-tasks'}"></i>
+                        ${task.type}
+                    </div>
+                    <div class="youtube-task-content">
+                        <h4>${task.title}</h4>
+                        <p>${task.description || 'Complete this YouTube task to earn points'}</p>
+                    </div>
+                    <div class="youtube-task-footer">
+                        <div class="task-points-badge">
+                            <i class="fas fa-coins"></i>
+                            <span>${task.points}</span>
+                        </div>
+                        ${task.verified ? '<span class="verified"><i class="fas fa-check-circle"></i></span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openTask(taskId) {
+            const task = allTasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            currentTaskId = taskId;
+
+            const typeLabels = {
+                subscribe: 'Subscribe to Channel',
+                like: 'Like Video',
+                watch: 'Watch Video',
+                comment: 'Comment on Video'
+            };
+
+            document.getElementById('taskModalTitle').innerHTML = `
+                <i class="fab fa-youtube" style="margin-right: 10px;"></i>
+                ${typeLabels[task.type] || 'Complete Task'}
+            `;
+
+            document.getElementById('taskDetails').innerHTML = `
+                <div style="text-align: center; padding: 20px 0;">
+                    <h3 style="margin-bottom: 10px;">${task.title}</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">${task.description || ''}</p>
+                    <div class="points-display">
+                        <i class="fas fa-coins" style="color: #BFA181; font-size: 24px;"></i>
+                        <span style="font-size: 28px; font-weight: 700; color: #BFA181;">${task.points}</span>
+                        <span style="color: var(--text-muted);">points</span>
+                    </div>
+                </div>
+            `;
+
+            // Show proof section if needed
+            if (task.verification === 'screenshot' || task.verification === 'manual') {
+                document.getElementById('proofGroup').style.display = 'block';
+                document.getElementById('proofInstructions').textContent = task.proofInstructions || 'Take a screenshot showing proof of completion';
+            } else {
+                document.getElementById('proofGroup').style.display = 'none';
+            }
+
+            // Set task link
+            document.getElementById('taskLink').href = task.url || '#';
+            document.getElementById('taskLink').style.display = task.url ? 'flex' : 'none';
+
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function submitTask() {
+            if (!currentTaskId) return;
+
+            const task = allTasks.find(t => t.id === currentTaskId);
+            if (!task) return;
+            
+            // Check membership before allowing completion
+            const userTaskLimit = currentUser.membershipTaskLimit || 0;
+            if (!currentUser.membershipLevel || userTaskLimit === 0) {
+                showToast('You need a membership to complete tasks', 'error');
+                closeModal('taskModal');
+                return;
+            }
+            
+            // Check daily limit
+            const today = new Date().toDateString();
+            const completions = Storage.get('taskCompletions') || [];
+            const todayUserCompletions = completions.filter(c => 
+                c.userId === currentUser.email && 
+                new Date(c.timestamp).toDateString() === today
+            );
+            
+            if (todayUserCompletions.length >= userTaskLimit) {
+                showToast(`Daily limit reached! You can only complete ${userTaskLimit} tasks per day.`, 'error');
+                closeModal('taskModal');
+                loadTasks();
+                return;
+            }
+
+            // Check proof if required
+            if ((task.verification === 'screenshot' || task.verification === 'manual') && !document.getElementById('proofImage').files[0]) {
+                showToast('Please upload a screenshot as proof', 'error');
+                return;
+            }
+
+            // Record completion
+            completions.push({
+                id: Date.now(),
+                taskId: task.id,
+                userId: currentUser.email,
+                pointsAwarded: task.points,
+                status: task.verification === 'manual' ? 'pending' : 'approved',
+                timestamp: new Date().toISOString()
+            });
+            Storage.set('taskCompletions', completions);
+
+            // Award points if auto-approved
+            if (task.verification === 'auto') {
+                awardPoints(task.points);
+                closeModal('taskModal');
+                document.getElementById('pointsEarned').textContent = task.points;
+                document.getElementById('successModal').classList.add('active');
+            } else {
+                closeModal('taskModal');
+                showToast('Task submitted for review. Points will be awarded after approval.', 'info');
+            }
+
+            // Reset form
+            document.getElementById('proofImage').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            
+            loadUserPoints();
+            loadTasks();
+        }
+
+        function awardPoints(points) {
+            const users = Storage.get('users') || [];
+            const index = users.findIndex(u => u.email === currentUser.email);
+            if (index !== -1) {
+                users[index].points = (users[index].points || 0) + points;
+                Storage.set('users', users);
+            }
+
+            const history = Storage.get('pointsHistory') || [];
+            history.unshift({
+                id: Date.now(),
+                userId: currentUser.email,
+                points: points,
+                type: 'earned',
+                description: 'YouTube Task',
+                timestamp: new Date().toISOString()
+            });
+            Storage.set('pointsHistory', history);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = mobileMenu.classList.toggle('active');
+            
+            if (isOpen) {
+                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Desktop dropdown handling
+        document.querySelectorAll('.navbar-item').forEach(item => {
+            const dropdown = item.querySelector('.navbar-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.style.display = 'block';
+                    setTimeout(() => dropdown.style.opacity = '1', 10);
+                });
+                item.addEventListener('mouseleave', () => {
+                    dropdown.style.opacity = '0';
+                    setTimeout(() => dropdown.style.display = 'none', 200);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

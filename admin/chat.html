@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#635bff">
+    <title>Chat Support - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 300px;
+            gap: 0;
+            height: calc(100vh - var(--admin-topbar-height));
+            background: var(--bg-primary);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Chat List */
+        .chat-list-panel {
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            overflow: hidden;
+            min-height: 0;
+        }
+        .chat-list-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .chat-list-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .chat-search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+        }
+        .chat-search i { color: var(--text-muted); }
+        .chat-search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            color: var(--text-primary);
+            outline: none;
+        }
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        .chat-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-list::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        .chat-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s;
+        }
+        .chat-list-item:hover { background: var(--bg-secondary); }
+        .chat-list-item.active { background: var(--primary-light); border-left: 3px solid var(--primary-color); }
+        .chat-list-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .chat-list-info { flex: 1; min-width: 0; }
+        .chat-list-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-list-name span { color: var(--text-primary); }
+        .chat-list-time { font-size: 11px; color: var(--text-muted); }
+        .chat-list-preview {
+            font-size: 13px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .unread-count {
+            background: var(--primary-color);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        /* Chat Messages Panel */
+        .chat-messages-panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            overflow: hidden;
+            min-height: 0;
+        }
+        .chat-messages-header {
+            padding: 16px 20px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .chat-messages-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-messages-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 0;
+        }
+        .chat-messages-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages-body::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        .chat-messages-body::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .chat-messages-body::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        .admin-message {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            width: fit-content;
+        }
+        .admin-message.incoming {
+            background: var(--bg-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .admin-message.incoming.bot { border-left: 3px solid var(--warning-color); }
+        .admin-message.outgoing {
+            background: var(--primary-gradient);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .admin-message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 2px;
+            display: block;
+        }
+        .chat-input-panel {
+            padding: 16px 20px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .chat-input-wrapper textarea {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            resize: none;
+            min-height: 48px;
+            max-height: 120px;
+            outline: none;
+        }
+        .chat-input-wrapper textarea:focus { border-color: var(--primary-color); }
+        .chat-send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .chat-send-btn:hover { transform: scale(1.05); }
+        
+        /* Settings Panel */
+        .chat-settings-panel {
+            border-left: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            overflow-y: auto;
+        }
+        .settings-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .settings-header h3 { font-size: 15px; font-weight: 600; }
+        .settings-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .settings-section h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .user-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .user-detail i { color: var(--text-muted); width: 16px; }
+        .quick-reply-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .quick-reply-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        /* Empty State */
+        .empty-chat-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px;
+        }
+        .empty-chat-state i { font-size: 64px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-chat-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--text-secondary); }
+        .empty-chat-state p { font-size: 14px; }
+        
+        /* Stats Row */
+        .chat-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .chat-stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .chat-stat-card i {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .chat-stat-card h4 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .chat-stat-card p { font-size: 12px; color: var(--text-muted); }
+        
+        @media (max-width: 1200px) {
+            .chat-layout { grid-template-columns: 280px 1fr; }
+            .chat-settings-panel { display: none; }
+        }
+        @media (max-width: 768px) {
+            .chat-layout { grid-template-columns: 1fr; }
+            .chat-list-panel { display: none; }
+            .chat-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('chat'));</script>
+
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-comments" style="color: var(--primary-color); margin-right: 10px;"></i>Chat Support</h1>
+                <p>Manage customer conversations and support requests</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="chat-stats">
+                <div class="chat-stat-card">
+                    <i class="fas fa-comments"></i>
+                    <h4 id="totalChats">0</h4>
+                    <p>Total Chats</p>
+                </div>
+                <div class="chat-stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h4 id="pendingChats">0</h4>
+                    <p>Awaiting Reply</p>
+                </div>
+                <div class="chat-stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h4 id="resolvedChats">0</h4>
+                    <p>Resolved Today</p>
+                </div>
+                <div class="chat-stat-card">
+                    <i class="fas fa-robot"></i>
+                    <h4 id="autoReplies">0</h4>
+                    <p>Auto Replies</p>
+                </div>
+            </div>
+
+            <!-- Chat Layout -->
+            <div class="chat-layout">
+                <!-- Chat List -->
+                <div class="chat-list-panel">
+                    <div class="chat-list-header">
+                        <h3>Conversations</h3>
+                        <div class="chat-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search chats..." id="chatSearch" oninput="filterChats()">
+                        </div>
+                    </div>
+                    <div class="chat-list" id="chatList">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Messages Panel -->
+                <div class="chat-messages-panel" id="messagesPanel">
+                    <div class="empty-chat-state" id="emptyState">
+                        <i class="fas fa-comments"></i>
+                        <h3>Select a conversation</h3>
+                        <p>Choose a chat from the left panel to view messages</p>
+                    </div>
+                    
+                    <div class="chat-messages-header" id="chatHeader" style="display: none;">
+                        <div class="chat-messages-user">
+                            <div class="chat-list-avatar" id="chatUserAvatar">U</div>
+                            <div>
+                                <div style="font-weight: 600;" id="chatUserName">User Name</div>
+                                <div style="font-size: 12px; color: var(--text-muted);" id="chatUserEmail">email@example.com</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-outline" onclick="markAsResolved()">
+                            <i class="fas fa-check"></i> Mark Resolved
+                        </button>
+                    </div>
+                    
+                    <div class="chat-messages-body" id="chatMessagesBody" style="display: none;">
+                        <!-- Messages loaded here -->
+                    </div>
+                    
+                    <div class="chat-input-panel" id="chatInputPanel" style="display: none;">
+                        <div class="chat-input-wrapper">
+                            <textarea id="adminReplyInput" placeholder="Type your reply..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendAdminReply();}"></textarea>
+                            <button class="chat-send-btn" onclick="sendAdminReply()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Panel -->
+                <div class="chat-settings-panel">
+                    <div class="settings-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+                    
+                    <div class="settings-section" id="userDetails" style="display: none;">
+                        <h4>User Details</h4>
+                        <div class="user-detail"><i class="fas fa-user"></i> <span id="detailName">-</span></div>
+                        <div class="user-detail"><i class="fas fa-envelope"></i> <span id="detailEmail">-</span></div>
+                        <div class="user-detail"><i class="fas fa-calendar"></i> <span id="detailJoined">-</span></div>
+                        <div class="user-detail"><i class="fas fa-comment"></i> <span id="detailMessages">0 messages</span></div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Quick Replies</h4>
+                        <div class="quick-reply-item" onclick="insertQuickReply('Thank you for contacting us! Your issue has been noted and we will resolve it shortly.')">
+                            <i class="fas fa-bolt"></i> Thank you message
+                        </div>
+                        <div class="quick-reply-item" onclick="insertQuickReply('Your transaction has been processed successfully. Please check your wallet.')">
+                            <i class="fas fa-check"></i> Transaction processed
+                        </div>
+                        <div class="quick-reply-item" onclick="insertQuickReply('We are currently reviewing your request. Please allow 1-2 hours for processing.')">
+                            <i class="fas fa-clock"></i> Under review
+                        </div>
+                        <div class="quick-reply-item" onclick="insertQuickReply('Could you please provide more details about your issue? This will help us assist you better.')">
+                            <i class="fas fa-question"></i> Need more info
+                        </div>
+                        <div class="quick-reply-item" onclick="insertQuickReply('Your withdrawal request has been approved and will be processed within 24 hours.')">
+                            <i class="fas fa-money-bill"></i> Withdrawal approved
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Manage Auto-Replies</h4>
+                        <a href="chat-settings.html" class="btn btn-sm btn-outline" style="width: 100%;">
+                            <i class="fas fa-cog"></i> Configure Bot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        let selectedUserId = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            loadChatList();
+            loadStats();
+        });
+        
+        function loadStats() {
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            const chatIds = Object.keys(allChats);
+            
+            document.getElementById('totalChats').textContent = chatIds.length;
+            
+            let pending = 0;
+            let autoRepliesCount = 0;
+            
+            chatIds.forEach(id => {
+                const messages = JSON.parse(localStorage.getItem('chatMessages_' + id) || '[]');
+                const unread = messages.filter(m => m.type === 'user' && !m.adminRead).length;
+                if (unread > 0) pending++;
+                autoRepliesCount += messages.filter(m => m.type === 'bot').length;
+            });
+            
+            document.getElementById('pendingChats').textContent = pending;
+            document.getElementById('autoReplies').textContent = autoRepliesCount;
+            document.getElementById('resolvedChats').textContent = localStorage.getItem('resolvedToday') || '0';
+        }
+        
+        function loadChatList() {
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            const container = document.getElementById('chatList');
+            
+            const sortedChats = Object.values(allChats).sort((a, b) => 
+                new Date(b.lastTime) - new Date(a.lastTime)
+            );
+            
+            if (sortedChats.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-inbox" style="font-size: 32px; margin-bottom: 10px; opacity: 0.3;"></i>
+                        <p>No conversations yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sortedChats.map(chat => {
+                const initial = (chat.name || 'U')[0].toUpperCase();
+                const time = new Date(chat.lastTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const unreadBadge = chat.unreadCount > 0 ? `<span class="unread-count">${chat.unreadCount}</span>` : '';
+                
+                return `
+                    <div class="chat-list-item ${selectedUserId === chat.id ? 'active' : ''}" onclick="selectChat('${chat.id}')">
+                        <div class="chat-list-avatar">${initial}</div>
+                        <div class="chat-list-info">
+                            <div class="chat-list-name">
+                                <span>${chat.name || 'Guest User'}</span>
+                                <span class="chat-list-time">${time}</span>
+                            </div>
+                            <div class="chat-list-preview">${chat.lastMessage || 'No messages'}${unreadBadge}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectChat(userId) {
+            selectedUserId = userId;
+            
+            // Update UI
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('chatMessagesBody').style.display = 'flex';
+            document.getElementById('chatInputPanel').style.display = 'block';
+            document.getElementById('userDetails').style.display = 'block';
+            
+            // Load chat info
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            const chatInfo = allChats[userId] || {};
+            
+            document.getElementById('chatUserAvatar').textContent = (chatInfo.name || 'U')[0].toUpperCase();
+            document.getElementById('chatUserName').textContent = chatInfo.name || 'Guest User';
+            document.getElementById('chatUserEmail').textContent = chatInfo.email || 'No email';
+            
+            // Update details panel
+            document.getElementById('detailName').textContent = chatInfo.name || 'Guest User';
+            document.getElementById('detailEmail').textContent = chatInfo.email || 'N/A';
+            document.getElementById('detailMessages').textContent = (chatInfo.totalMessages || 0) + ' messages';
+            
+            // Load messages
+            loadMessages(userId);
+            
+            // Mark as read
+            markMessagesAsRead(userId);
+            
+            // Update list
+            loadChatList();
+        }
+        
+        function loadMessages(userId) {
+            const messages = JSON.parse(localStorage.getItem('chatMessages_' + userId) || '[]');
+            const container = document.getElementById('chatMessagesBody');
+            
+            container.innerHTML = messages.map(msg => {
+                const time = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const isIncoming = msg.type === 'user';
+                const isBot = msg.type === 'bot';
+                
+                return `
+                    <div class="admin-message ${isIncoming ? 'incoming' : 'outgoing'} ${isBot ? 'bot' : ''}">
+                        ${msg.text}
+                        <span class="admin-message-time">
+                            ${isBot ? '🤖 Bot • ' : (msg.type === 'admin' ? '👤 You • ' : '')}${time}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+            
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function markMessagesAsRead(userId) {
+            const messages = JSON.parse(localStorage.getItem('chatMessages_' + userId) || '[]');
+            messages.forEach(m => m.adminRead = true);
+            localStorage.setItem('chatMessages_' + userId, JSON.stringify(messages));
+            
+            // Update allChats
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            if (allChats[userId]) {
+                allChats[userId].unreadCount = 0;
+                localStorage.setItem('allChatUsers', JSON.stringify(allChats));
+            }
+            
+            loadStats();
+        }
+        
+        function sendAdminReply() {
+            if (!selectedUserId) return;
+            
+            const input = document.getElementById('adminReplyInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Save message
+            const messages = JSON.parse(localStorage.getItem('chatMessages_' + selectedUserId) || '[]');
+            messages.push({
+                id: Date.now(),
+                type: 'admin',
+                text: text,
+                time: new Date().toISOString(),
+                read: false
+            });
+            localStorage.setItem('chatMessages_' + selectedUserId, JSON.stringify(messages));
+            
+            // Update allChats
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            if (allChats[selectedUserId]) {
+                allChats[selectedUserId].lastMessage = text.substring(0, 50) + '...';
+                allChats[selectedUserId].lastTime = new Date().toISOString();
+                allChats[selectedUserId].totalMessages = messages.length;
+                localStorage.setItem('allChatUsers', JSON.stringify(allChats));
+            }
+            
+            input.value = '';
+            loadMessages(selectedUserId);
+            loadChatList();
+        }
+        
+        function insertQuickReply(text) {
+            document.getElementById('adminReplyInput').value = text;
+            document.getElementById('adminReplyInput').focus();
+        }
+        
+        function markAsResolved() {
+            if (!selectedUserId) return;
+            
+            const resolved = parseInt(localStorage.getItem('resolvedToday') || '0') + 1;
+            localStorage.setItem('resolvedToday', resolved.toString());
+            
+            showToast('Chat marked as resolved!', 'success');
+            loadStats();
+        }
+        
+        function filterChats() {
+            const search = document.getElementById('chatSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.chat-list-item');
+            
+            items.forEach(item => {
+                const name = item.querySelector('.chat-list-name span').textContent.toLowerCase();
+                item.style.display = name.includes(search) ? 'flex' : 'none';
+            });
+        }
+        
+        // Auto-refresh for new messages
+        let lastChatCount = 0;
+        let lastMessageCount = 0;
+        
+        function startAutoRefresh() {
+            setInterval(() => {
+                const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+                const chatCount = Object.keys(allChats).length;
+                
+                // Check for new chats
+                if (chatCount > lastChatCount && lastChatCount > 0) {
+                    showToast('New conversation received!', 'info');
+                    loadChatList();
+                    loadStats();
+                }
+                lastChatCount = chatCount;
+                
+                // Check for new messages in selected chat
+                if (selectedUserId) {
+                    const messages = JSON.parse(localStorage.getItem('chatMessages_' + selectedUserId) || '[]');
+                    if (messages.length > lastMessageCount && lastMessageCount > 0) {
+                        loadMessages(selectedUserId);
+                    }
+                    lastMessageCount = messages.length;
+                }
+                
+                // Update badge in sidebar
+                updateSidebarBadge();
+            }, 2000);
+        }
+        
+        function updateSidebarBadge() {
+            const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
+            let totalUnread = 0;
+            Object.values(allChats).forEach(chat => {
+                totalUnread += chat.unreadCount || 0;
+            });
+            
+            const badge = document.getElementById('chatBadge');
+            if (badge) {
+                badge.textContent = totalUnread > 0 ? totalUnread : '';
+            }
+        }
+        
+        // Start auto-refresh
+        startAutoRefresh();
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icon = type === 'success' ? 'check-circle' : (type === 'info' ? 'info-circle' : 'exclamation-circle');
+            const bg = type === 'success' ? '#10b981' : (type === 'info' ? '#635bff' : '#ef4444');
+            toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; padding: 14px 24px;
+                background: ${bg}; color: white;
+                border-radius: 10px; font-weight: 500; z-index: 9999;
+                display: flex; align-items: center; gap: 10px;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

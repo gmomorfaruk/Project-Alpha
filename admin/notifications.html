@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Notifications - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('notifications'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-bell" style="color: var(--primary-color); margin-right: 10px;"></i>Notifications Center</h1>
+                <p>Manage and send notifications to users</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="totalNotifications">0</h3>
+                        <p>Total Sent</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="readNotifications">0</h3>
+                        <p>Read</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="unreadNotifications">0</h3>
+                        <p>Unread</p>
+                    </div>
+                </div>
+                <div class="stat-card-admin">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info">
+                        <h3 id="uniqueUsers">0</h3>
+                        <p>Users Notified</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulk Notification -->
+            <div class="section" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); border-radius: 16px; padding: 25px; color: white; margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="margin-bottom: 5px;"><i class="fas fa-paper-plane" style="margin-right: 10px;"></i>Broadcast Notification</h3>
+                        <p style="opacity: 0.9;">Send a notification to all users or specific groups</p>
+                    </div>
+                    <button class="btn" onclick="openBroadcastModal()" style="background: white; color: var(--primary-color); font-weight: 600;">
+                        <i class="fas fa-broadcast-tower"></i> Send Broadcast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color);">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search notifications..." oninput="searchNotifications()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterType" onchange="filterNotifications()">
+                            <option value="all">All Types</option>
+                            <option value="info">Information</option>
+                            <option value="success">Success</option>
+                            <option value="warning">Warning</option>
+                            <option value="alert">Alert</option>
+                        </select>
+                        <select id="filterStatus" onchange="filterNotifications()">
+                            <option value="all">All Status</option>
+                            <option value="read">Read</option>
+                            <option value="unread">Unread</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="exportNotifications()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>User</th>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notificationsTable">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-bell-slash" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                    <p style="color: var(--text-muted);">No notifications found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Broadcast Modal -->
+    <div class="form-modal" id="broadcastModal">
+        <div class="form-modal-content" style="max-width: 600px;">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-broadcast-tower" style="margin-right: 10px;"></i>Broadcast Notification</h3>
+                <button class="form-modal-close" onclick="closeModal('broadcastModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="broadcastForm">
+                    <div class="form-group">
+                        <label>Target Audience *</label>
+                        <select id="broadcastTarget" required>
+                            <option value="all">All Users</option>
+                            <option value="users">Regular Users Only</option>
+                            <option value="moderators">Moderators Only</option>
+                            <option value="active">Users with Active Investments</option>
+                            <option value="inactive">Inactive Users (No investments)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Notification Type</label>
+                            <select id="broadcastType">
+                                <option value="info">ℹ️ Information</option>
+                                <option value="success">✅ Success</option>
+                                <option value="warning">⚠️ Warning</option>
+                                <option value="alert">🚨 Alert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preview Count</label>
+                            <input type="text" id="targetCount" value="0 users" disabled style="background: var(--bg-secondary);">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" id="broadcastTitle" placeholder="Notification title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message *</label>
+                        <textarea id="broadcastMessage" rows="4" placeholder="Write your message here..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="broadcastPush">
+                            <span>🔔 Send as push notification (if supported)</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('broadcastModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> Send to All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Notification Modal -->
+    <div class="form-modal" id="viewModal">
+        <div class="form-modal-content" style="max-width: 500px;">
+            <div class="form-modal-header">
+                <h3>Notification Details</h3>
+                <button class="form-modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body" id="notificationDetails">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        let notifications = [];
+        let users = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadData();
+
+            // Update target count when selection changes
+            document.getElementById('broadcastTarget').addEventListener('change', updateTargetCount);
+        });
+
+        function loadData() {
+            notifications = Storage.get('notifications') || [];
+            users = (Storage.get('users') || []).filter(u => u.role !== 'admin');
+            updateStats();
+            renderNotifications(notifications);
+        }
+
+        function updateStats() {
+            document.getElementById('totalNotifications').textContent = notifications.length;
+            document.getElementById('readNotifications').textContent = notifications.filter(n => n.read).length;
+            document.getElementById('unreadNotifications').textContent = notifications.filter(n => !n.read).length;
+            
+            const uniqueUsers = [...new Set(notifications.map(n => n.userId))];
+            document.getElementById('uniqueUsers').textContent = uniqueUsers.length;
+        }
+
+        function renderNotifications(list) {
+            const tbody = document.getElementById('notificationsTable');
+            
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-bell-slash" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                            <p style="color: var(--text-muted);">No notifications found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Sort by date (newest first)
+            list.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const typeIcons = {
+                info: { icon: 'info-circle', color: '#3b82f6' },
+                success: { icon: 'check-circle', color: '#10b981' },
+                warning: { icon: 'exclamation-triangle', color: '#f59e0b' },
+                alert: { icon: 'exclamation-circle', color: '#ef4444' }
+            };
+
+            tbody.innerHTML = list.map(notification => {
+                const type = typeIcons[notification.type] || typeIcons.info;
+                const user = users.find(u => u.email === notification.userId);
+                
+                return `
+                    <tr style="${notification.read ? '' : 'background: rgba(59, 130, 246, 0.05);'}">
+                        <td>
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: ${type.color}20; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-${type.icon}" style="color: ${type.color}; font-size: 14px;"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="user-avatar-table" style="width: 28px; height: 28px; font-size: 11px;">${user?.name?.charAt(0).toUpperCase() || 'U'}</div>
+                                <div>
+                                    <div style="font-weight: 500; font-size: 13px;">${user?.name || 'Unknown'}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">${notification.userId}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>${notification.title}</strong></td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notification.message}</td>
+                        <td>
+                            <span class="badge badge-${notification.read ? 'success' : 'warning'}">
+                                ${notification.read ? 'Read' : 'Unread'}
+                            </span>
+                        </td>
+                        <td>${formatDate(notification.date)}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn-view" onclick="viewNotification(${notification.id})" title="View"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn-reject" onclick="deleteNotification(${notification.id})" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function searchNotifications() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = notifications.filter(n => 
+                n.title.toLowerCase().includes(query) ||
+                n.message.toLowerCase().includes(query) ||
+                n.userId.toLowerCase().includes(query)
+            );
+            renderNotifications(filtered);
+        }
+
+        function filterNotifications() {
+            const typeFilter = document.getElementById('filterType').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            let filtered = notifications;
+            
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(n => n.type === typeFilter);
+            }
+            
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(n => statusFilter === 'read' ? n.read : !n.read);
+            }
+            
+            renderNotifications(filtered);
+        }
+
+        function viewNotification(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (!notification) return;
+
+            const user = users.find(u => u.email === notification.userId);
+
+            const typeLabels = {
+                info: { icon: 'info-circle', color: '#3b82f6', label: 'Information' },
+                success: { icon: 'check-circle', color: '#10b981', label: 'Success' },
+                warning: { icon: 'exclamation-triangle', color: '#f59e0b', label: 'Warning' },
+                alert: { icon: 'exclamation-circle', color: '#ef4444', label: 'Alert' }
+            };
+            const type = typeLabels[notification.type] || typeLabels.info;
+
+            document.getElementById('notificationDetails').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: ${type.color}20; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        <i class="fas fa-${type.icon}" style="font-size: 24px; color: ${type.color};"></i>
+                    </div>
+                    <span class="badge" style="background: ${type.color}20; color: ${type.color};">${type.label}</span>
+                </div>
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 10px;">${notification.title}</h3>
+                    <p style="color: var(--text-muted); line-height: 1.6;">${notification.message}</p>
+                </div>
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Recipient</span>
+                        <strong>${user?.name || 'Unknown'}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Email</span>
+                        <strong>${notification.userId}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>Status</span>
+                        <span class="badge badge-${notification.read ? 'success' : 'warning'}">${notification.read ? 'Read' : 'Unread'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                        <span>Sent</span>
+                        <strong>${formatDate(notification.date)}</strong>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function deleteNotification(id) {
+            if (!confirm('Delete this notification?')) return;
+            
+            let allNotifications = Storage.get('notifications') || [];
+            allNotifications = allNotifications.filter(n => n.id !== id);
+            Storage.set('notifications', allNotifications);
+            
+            showToast('Notification deleted', 'success');
+            loadData();
+        }
+
+        function openBroadcastModal() {
+            document.getElementById('broadcastForm').reset();
+            updateTargetCount();
+            document.getElementById('broadcastModal').classList.add('active');
+        }
+
+        function updateTargetCount() {
+            const target = document.getElementById('broadcastTarget').value;
+            const investments = Storage.get('investments') || [];
+            
+            let count = 0;
+            switch (target) {
+                case 'all':
+                    count = users.length;
+                    break;
+                case 'users':
+                    count = users.filter(u => u.role !== 'moderator').length;
+                    break;
+                case 'moderators':
+                    count = users.filter(u => u.role === 'moderator').length;
+                    break;
+                case 'active':
+                    const activeUserIds = [...new Set(investments.filter(i => i.status === 'active').map(i => i.userId))];
+                    count = activeUserIds.length;
+                    break;
+                case 'inactive':
+                    const investorIds = [...new Set(investments.map(i => i.userId))];
+                    count = users.filter(u => !investorIds.includes(u.email)).length;
+                    break;
+            }
+            
+            document.getElementById('targetCount').value = count + ' user' + (count !== 1 ? 's' : '');
+        }
+
+        function sendBroadcast() {
+            const target = document.getElementById('broadcastTarget').value;
+            const type = document.getElementById('broadcastType').value;
+            const title = document.getElementById('broadcastTitle').value.trim();
+            const message = document.getElementById('broadcastMessage').value.trim();
+
+            if (!title || !message) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            const investments = Storage.get('investments') || [];
+            let targetUsers = [];
+
+            switch (target) {
+                case 'all':
+                    targetUsers = users;
+                    break;
+                case 'users':
+                    targetUsers = users.filter(u => u.role !== 'moderator');
+                    break;
+                case 'moderators':
+                    targetUsers = users.filter(u => u.role === 'moderator');
+                    break;
+                case 'active':
+                    const activeUserIds = [...new Set(investments.filter(i => i.status === 'active').map(i => i.userId))];
+                    targetUsers = users.filter(u => activeUserIds.includes(u.email));
+                    break;
+                case 'inactive':
+                    const investorIds = [...new Set(investments.map(i => i.userId))];
+                    targetUsers = users.filter(u => !investorIds.includes(u.email));
+                    break;
+            }
+
+            if (targetUsers.length === 0) {
+                showToast('No users match the selected criteria', 'error');
+                return;
+            }
+
+            let allNotifications = Storage.get('notifications') || [];
+            const timestamp = new Date().toISOString();
+
+            targetUsers.forEach(user => {
+                allNotifications.push({
+                    id: Date.now() + Math.random(),
+                    userId: user.email,
+                    type: type,
+                    title: title,
+                    message: message,
+                    read: false,
+                    date: timestamp
+                });
+            });
+
+            Storage.set('notifications', allNotifications);
+
+            // Log activity
+            logAdminActivity('notification_broadcast', `Sent broadcast "${title}" to ${targetUsers.length} users (${target})`);
+
+            showToast(`Notification sent to ${targetUsers.length} users`, 'success');
+            closeModal('broadcastModal');
+            loadData();
+        }
+
+        function exportNotifications() {
+            exportToCSV(notifications.map(n => ({
+                User: n.userId,
+                Type: n.type,
+                Title: n.title,
+                Message: n.message,
+                Status: n.read ? 'Read' : 'Unread',
+                Date: n.date
+            })), 'notifications');
+            showToast('Notifications exported', 'success');
+        }
+
+        function logAdminActivity(action, description) {
+            const activities = Storage.get('adminActivities') || [];
+            const currentUser = Storage.get('currentUser');
+            activities.unshift({
+                id: Date.now(),
+                action: action,
+                description: description,
+                admin: currentUser?.email || 'admin',
+                timestamp: new Date().toISOString()
+            });
+            if (activities.length > 500) activities.length = 500;
+            Storage.set('adminActivities', activities);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

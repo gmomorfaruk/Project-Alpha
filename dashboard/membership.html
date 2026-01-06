@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Plans - Project Alpha</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .membership-page {
+            padding: 20px;
+        }
+
+        .membership-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .membership-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .membership-header p {
+            color: var(--text-secondary);
+        }
+
+        .current-membership {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .current-membership-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .current-membership-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .current-membership-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .membership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .membership-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .membership-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .membership-card.popular {
+            border-color: var(--primary-color);
+        }
+
+        .membership-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 5px 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .membership-card.current {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .membership-card.current::after {
+            content: 'Current Plan';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .membership-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .membership-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .membership-price {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .membership-price span {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .membership-period {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .membership-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .membership-features li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .membership-features li i {
+            color: #10b981;
+            font-size: 0.85rem;
+        }
+
+        .membership-stats {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .membership-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .membership-stat:last-child {
+            border-bottom: none;
+        }
+
+        .membership-stat span:first-child {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .membership-stat span:last-child {
+            font-weight: 600;
+        }
+
+        .buy-membership-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-membership-btn.primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .buy-membership-btn.primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .buy-membership-btn.disabled {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-color);
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .payment-method-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .payment-method-info h4 {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .payment-method-info span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .payment-summary {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .payment-row.total {
+            border-top: 1px solid var(--border-color);
+            margin-top: 10px;
+            padding-top: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .confirm-payment-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-payment-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .membership-benefits {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .benefits-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .benefits-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 10px;
+        }
+
+        .benefit-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .benefit-info h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .benefit-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .membership-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .current-membership {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>Project Alpha</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="wallet.html">
+                        <i class="fas fa-wallet"></i>
+                        <span>Wallet</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="membership.html">
+                        <i class="fas fa-crown"></i>
+                        <span>Membership</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tasks.html">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="profile.html">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="referrals.html">
+                        <i class="fas fa-users"></i>
+                        <span>Referrals</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-menu">
+                    <span class="user-balance" id="userBalance">৳0.00</span>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content membership-page">
+            <div class="membership-header">
+                <h1><i class="fas fa-crown"></i> Membership Plans</h1>
+                <p>Upgrade your membership to unlock more earning potential</p>
+            </div>
+
+            <!-- Current Membership -->
+            <div class="current-membership" id="currentMembership">
+                <div class="current-membership-icon" id="currentMembershipIcon" style="background: #6b7280;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="current-membership-info">
+                    <h3 id="currentMembershipName">Free Member</h3>
+                    <p id="currentMembershipDetails">5 tasks/day • ৳50 daily limit • 1x earnings</p>
+                </div>
+                <button class="btn btn-primary" onclick="openPurchaseModal()" style="margin-left: auto;">
+                    <i class="fas fa-crown"></i> Upgrade
+                </button>
+            </div>
+
+            <!-- Membership Cards -->
+            <div class="membership-grid" id="membershipGrid">
+                <!-- Cards will be generated by JavaScript -->
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="membership-benefits">
+                <div class="benefits-header">
+                    <h2><i class="fas fa-gift"></i> Why Upgrade?</h2>
+                    <p>Unlock exclusive benefits with premium memberships</p>
+                </div>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="benefit-info">
+                            <h4>Higher Earnings</h4>
+                            <p>Earn up to 3x more per task with VIP membership</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <div class="benefit-info">
+                            <h4>More Tasks</h4>
+                            <p>Access unlimited tasks and remove daily limits</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="benefit-info">
+                            <h4>Instant Withdrawals</h4>
+                            <p>VIP members get priority withdrawal processing</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="benefit-info">
+                            <h4>Priority Support</h4>
+                            <p>Get 24/7 dedicated support for premium members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Welcome Notification Modal -->
+    <div class="modal" id="welcomeModal">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <div class="modal-body" style="padding: 40px 30px;">
+                <div class="welcome-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h2 style="margin: 20px 0 10px; color: var(--primary-color);">🎉 Congratulations!</h2>
+                <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 20px;">
+                    You are now a valuable worker of our company!
+                </p>
+                <div class="welcome-designation" id="welcomeDesignation">
+                    <!-- Designation will be filled -->
+                </div>
+                <p style="color: var(--text-secondary); margin: 20px 0;">
+                    Start completing tasks and earn more with your enhanced benefits!
+                </p>
+                <button class="confirm-payment-btn" onclick="closeWelcomeModal()" style="width: 100%;">
+                    <i class="fas fa-rocket"></i> Start Working
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal - Step 1: Select Payment Method -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-crown"></i> Purchase Membership</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Step 1: Select Tier & Payment Method -->
+                <div id="step1" class="payment-step">
+                    <!-- Tier Selection -->
+                    <div class="tier-select-group">
+                        <label><i class="fas fa-crown"></i> Select Membership Tier</label>
+                        <select class="tier-select" id="tierSelect" onchange="onTierChange()">
+                            <option value="">-- Choose a Membership --</option>
+                            <!-- Options will be generated -->
+                        </select>
+                    </div>
+                    
+                    <div class="tier-price-display" id="tierPriceDisplay" style="display: none;">
+                        <div class="price-label">Amount to Pay</div>
+                        <div class="price-amount" id="tierPriceAmount">৳0</div>
+                        <div class="tier-benefits" id="tierBenefits"></div>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 15px;"><i class="fas fa-wallet"></i> Select Payment Method</h4>
+                    <div class="payment-methods" id="paymentMethods">
+                        <!-- Payment methods will be generated -->
+                    </div>
+
+                    <div class="payment-summary">
+                        <div class="payment-row">
+                            <span>Membership Price</span>
+                            <span id="membershipPrice">৳0</span>
+                        </div>
+                        <div class="payment-row total">
+                            <span>Total Amount</span>
+                            <span id="totalAmount">৳0</span>
+                        </div>
+                    </div>
+
+                    <button class="confirm-payment-btn" onclick="goToStep2()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Step 2: Payment Instructions -->
+                <div id="step2" class="payment-step" style="display: none;">
+                    <div class="payment-instructions-box">
+                        <div class="payment-method-header" id="selectedMethodHeader">
+                            <!-- Method header will be filled -->
+                        </div>
+                        
+                        <div class="payment-number-box">
+                            <p style="margin-bottom: 8px; color: var(--text-secondary);">Send <strong id="amountToSend">৳0</strong> to:</p>
+                            <div class="copy-number-box">
+                                <span id="paymentNumber" class="payment-number">01XXXXXXXXX</span>
+                                <button class="copy-btn" onclick="copyNumber()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="account-type" id="accountType">Personal Account</p>
+                        </div>
+
+                        <div class="instructions-text" id="paymentInstructions">
+                            <!-- Instructions will be filled -->
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="goToStep1()" style="flex: 1;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="confirm-payment-btn" onclick="goToStep3()" style="flex: 2;">
+                            I've Sent the Money <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Enter Transaction ID -->
+                <div id="step3" class="payment-step" style="display: none;">
+                    <div class="trx-form">
+                        <div class="form-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h4>Enter Transaction ID</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                            Enter the Transaction ID (TrxID) you received after sending the payment
+                        </p>
+
+                        <div class="form-group">
+                            <label>Transaction ID (TrxID) *</label>
+                            <input type="text" id="transactionId" placeholder="e.g., TRX1234567890" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sender Number *</label>
+                            <input type="text" id="senderNumber" placeholder="e.g., 01XXXXXXXXX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Additional Note (Optional)</label>
+                            <textarea id="paymentNote" rows="2" placeholder="Any additional information..."></textarea>
+                        </div>
+
+                        <div class="payment-summary" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981;">
+                            <div class="payment-row">
+                                <span>Membership</span>
+                                <span id="summaryMembership">-</span>
+                            </div>
+                            <div class="payment-row">
+                                <span>Amount Sent</span>
+                                <span id="summaryAmount">৳0</span>
+                            </div>
+                            <div class="payment-row">
+                                <span>Payment Method</span>
+                                <span id="summaryMethod">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="goToStep2()" style="flex: 1;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="confirm-payment-btn" onclick="submitPayment()" style="flex: 2;">
+                            <i class="fas fa-paper-plane"></i> Submit for Verification
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Success Step -->
+                <div id="successStep" class="payment-step" style="display: none;">
+                    <div class="success-box">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Request Submitted!</h3>
+                        <p>Your membership purchase request has been submitted successfully. Our admin team will verify your payment and activate your membership.</p>
+                        <div class="request-id-box">
+                            <span>Request ID:</span>
+                            <strong id="requestId">-</strong>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 15px;">
+                            <i class="fas fa-clock"></i> Usually verified within 1-24 hours
+                        </p>
+                        <button class="confirm-payment-btn" onclick="closeModal()" style="margin-top: 20px;">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .payment-step { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .payment-instructions-box {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .payment-method-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .payment-method-header .method-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        .payment-method-header h4 { font-size: 1.2rem; }
+        
+        .payment-number-box {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .copy-number-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--bg-primary);
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .payment-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--primary-color);
+        }
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover { transform: scale(1.05); }
+        .account-type {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .instructions-text {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            text-align: left;
+        }
+        .instructions-text h5 {
+            color: #3b82f6;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .instructions-text ol {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-secondary);
+        }
+        .instructions-text li { margin: 8px 0; }
+        
+        .trx-form { text-align: center; }
+        .form-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.8rem;
+            color: white;
+        }
+        .trx-form .form-group { text-align: left; margin-bottom: 15px; }
+        .trx-form .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .trx-form .form-group input,
+        .trx-form .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            transition: border-color 0.3s;
+        }
+        .trx-form .form-group input:focus,
+        .trx-form .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .success-box { text-align: center; padding: 20px; }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: #10b981;
+        }
+        .success-box h3 { color: #10b981; margin-bottom: 10px; }
+        .request-id-box {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .request-id-box strong { color: var(--primary-color); font-size: 1.1rem; }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover { background: var(--bg-secondary); }
+        
+        /* Welcome Modal Styles */
+        .welcome-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 2.5rem;
+            color: white;
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.7); }
+        }
+        .welcome-designation {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .welcome-designation h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        .welcome-designation span {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        /* Tier Selection Dropdown */
+        .tier-select-group {
+            margin-bottom: 20px;
+        }
+        .tier-select-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .tier-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .tier-select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .tier-price-display {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(23, 133, 130, 0.1), rgba(23, 133, 130, 0.05));
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .tier-price-display .price-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .tier-price-display .price-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .tier-benefits {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+    </style>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        // Current user state
+        let currentUser = null;
+        let selectedMembership = null;
+        
+        // Get payment accounts from storage or config
+        function getPaymentAccounts() {
+            return Storage.get('paymentAccounts') || AppConfig.paymentAccounts;
+        }
+        let selectedPaymentMethod = null;
+        let currentStep = 1;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Authentication check
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'user') {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            loadCurrentUser();
+            renderMembershipCards();
+            initializeSidebar();
+            checkMembershipNotification();
+        });
+
+        // Load current user
+        function loadCurrentUser() {
+            currentUser = Storage.get('currentUser');
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name || 'User';
+                document.getElementById('userBalance').textContent = formatCurrency(currentUser.balance || 0);
+                updateCurrentMembershipDisplay();
+            }
+        }
+
+        // Update current membership display
+        function updateCurrentMembershipDisplay() {
+            const membership = AppConfig.membershipLevels[currentUser.membership] || AppConfig.membershipLevels.free;
+            
+            document.getElementById('currentMembershipIcon').style.background = membership.color;
+            document.getElementById('currentMembershipIcon').innerHTML = `<i class="fas ${membership.icon}"></i>`;
+            document.getElementById('currentMembershipName').textContent = membership.name;
+            
+            const taskLimit = membership.taskLimit === -1 ? 'Unlimited' : membership.taskLimit;
+            const earningLimit = membership.dailyEarningLimit === -1 ? 'Unlimited' : '৳' + membership.dailyEarningLimit;
+            document.getElementById('currentMembershipDetails').textContent = 
+                `${taskLimit} tasks/day • ${earningLimit} daily limit • ${membership.earningsMultiplier}x earnings`;
+        }
+
+        // Render membership cards
+        function renderMembershipCards() {
+            const grid = document.getElementById('membershipGrid');
+            grid.innerHTML = '';
+
+            const levels = Object.values(AppConfig.membershipLevels);
+            
+            // Check for pending membership requests
+            const pendingRequests = (Storage.get('membershipRequests') || [])
+                .filter(r => r.userId === currentUser.email && r.status === 'pending');
+            
+            levels.forEach((level, index) => {
+                const isCurrent = currentUser && currentUser.membership === level.id;
+                const isPopular = level.id === 'assistant';
+                const hasPending = pendingRequests.some(r => r.membershipId === level.id);
+                
+                const card = document.createElement('div');
+                card.className = `membership-card ${isCurrent ? 'current' : ''} ${isPopular ? 'popular' : ''}`;
+                
+                let buttonText = 'Upgrade Now';
+                let buttonClass = 'primary';
+                let buttonDisabled = '';
+                
+                if (isCurrent) {
+                    buttonText = 'Current Plan';
+                    buttonClass = 'disabled';
+                    buttonDisabled = 'disabled';
+                } else if (level.id === 'free') {
+                    buttonText = 'Default Plan';
+                    buttonClass = 'disabled';
+                    buttonDisabled = 'disabled';
+                } else if (hasPending) {
+                    buttonText = '⏳ Pending Approval';
+                    buttonClass = 'disabled';
+                    buttonDisabled = 'disabled';
+                }
+                
+                card.innerHTML = `
+                    <div class="membership-icon" style="background: ${level.color};">
+                        <i class="fas ${level.icon}"></i>
+                    </div>
+                    <h3 class="membership-name">${level.name}</h3>
+                    <div class="membership-price">
+                        ${level.price === 0 ? 'Free' : '৳' + level.price.toLocaleString()}
+                        ${level.price > 0 ? '<span>/lifetime</span>' : ''}
+                    </div>
+                    <p class="membership-period">${level.price === 0 ? 'Always free' : 'One-time payment'}</p>
+                    
+                    <ul class="membership-features">
+                        ${level.features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
+                    </ul>
+                    
+                    <div class="membership-stats">
+                        <div class="membership-stat">
+                            <span>Daily Tasks</span>
+                            <span>${level.taskLimit === -1 ? 'Unlimited' : level.taskLimit}</span>
+                        </div>
+                        <div class="membership-stat">
+                            <span>Daily Earning Limit</span>
+                            <span>${level.dailyEarningLimit === -1 ? 'Unlimited' : '৳' + level.dailyEarningLimit}</span>
+                        </div>
+                        <div class="membership-stat">
+                            <span>Earnings Multiplier</span>
+                            <span>${level.earningsMultiplier}x</span>
+                        </div>
+                        <div class="membership-stat">
+                            <span>Min Withdrawal</span>
+                            <span>৳${level.withdrawalMin}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="buy-membership-btn ${buttonClass}" 
+                            ${buttonDisabled} 
+                            onclick="openPurchaseModal('${level.id}')">
+                        ${buttonText}
+                    </button>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Open purchase modal - now with tier selection
+        function openPurchaseModal(levelId = null) {
+            selectedMembership = levelId ? AppConfig.membershipLevels[levelId] : null;
+            selectedPaymentMethod = null;
+            currentStep = 1;
+            
+            // Reset all steps
+            document.querySelectorAll('.payment-step').forEach(step => step.style.display = 'none');
+            document.getElementById('step1').style.display = 'block';
+            
+            // Populate tier dropdown
+            const tierSelect = document.getElementById('tierSelect');
+            tierSelect.innerHTML = '<option value="">-- Choose a Membership --</option>';
+            
+            // Get pending requests to disable tiers
+            const pendingRequests = Storage.get('membershipRequests') || [];
+            const userPendingRequest = pendingRequests.find(r => 
+                r.userId === currentUser?.email && r.status === 'pending'
+            );
+            
+            Object.entries(AppConfig.membershipLevels).forEach(([key, level]) => {
+                if (key === 'free') return; // Skip free tier
+                
+                const isCurrentMembership = currentUser?.membership === key;
+                const hasPending = userPendingRequest?.membershipId === key;
+                
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${level.name} - ৳${level.price.toLocaleString()}`;
+                
+                if (isCurrentMembership) {
+                    option.disabled = true;
+                    option.textContent += ' (Current)';
+                } else if (hasPending) {
+                    option.disabled = true;
+                    option.textContent += ' (Pending)';
+                }
+                
+                tierSelect.appendChild(option);
+            });
+            
+            // Pre-select if levelId provided
+            if (levelId && levelId !== 'free') {
+                tierSelect.value = levelId;
+                onTierChange();
+            } else {
+                document.getElementById('tierPriceDisplay').style.display = 'none';
+            }
+            
+            // Render payment methods from paymentAccounts config
+            renderPaymentMethods();
+            
+            document.getElementById('purchaseModal').classList.add('active');
+        }
+        
+        // Render payment methods
+        function renderPaymentMethods() {
+            const methodsContainer = document.getElementById('paymentMethods');
+            methodsContainer.innerHTML = '';
+            
+            Object.entries(getPaymentAccounts()).forEach(([key, method]) => {
+                if (method.enabled) {
+                    const div = document.createElement('div');
+                    div.className = 'payment-method';
+                    div.onclick = () => selectPaymentMethod(key);
+                    div.id = `payment-${key}`;
+                    div.innerHTML = `
+                        <div class="payment-method-icon" style="background: ${method.color};">
+                            <i class="fas ${method.icon}"></i>
+                        </div>
+                        <div class="payment-method-info">
+                            <h4>${method.name}</h4>
+                            <span>Send to: ${method.number}</span>
+                        </div>
+                    `;
+                    methodsContainer.appendChild(div);
+                }
+            });
+        }
+        
+        // Handle tier selection change
+        function onTierChange() {
+            const tierSelect = document.getElementById('tierSelect');
+            const selectedTier = tierSelect.value;
+            const priceDisplay = document.getElementById('tierPriceDisplay');
+            
+            if (!selectedTier) {
+                priceDisplay.style.display = 'none';
+                selectedMembership = null;
+                return;
+            }
+            
+            selectedMembership = AppConfig.membershipLevels[selectedTier];
+            priceDisplay.style.display = 'block';
+            
+            document.getElementById('tierPriceAmount').textContent = '৳' + selectedMembership.price.toLocaleString();
+            document.getElementById('tierBenefits').innerHTML = `
+                ${selectedMembership.earningsMultiplier}x earnings • 
+                ${selectedMembership.taskLimit === -1 ? 'Unlimited' : selectedMembership.taskLimit} tasks/day •
+                ${selectedMembership.dailyEarningLimit === -1 ? 'No limit' : '৳' + selectedMembership.dailyEarningLimit + '/day'}
+            `;
+            
+            updatePaymentSummary();
+        }
+
+        // Select payment method
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById(`payment-${method}`).classList.add('selected');
+        }
+
+        // Update payment summary
+        function updatePaymentSummary() {
+            if (!selectedMembership) {
+                document.getElementById('membershipPrice').textContent = '৳0';
+                document.getElementById('totalAmount').textContent = '৳0';
+                return;
+            }
+            const price = selectedMembership.price;
+            document.getElementById('membershipPrice').textContent = '৳' + price.toLocaleString();
+            document.getElementById('totalAmount').textContent = '৳' + price.toLocaleString();
+        }
+
+        // Step navigation
+        function goToStep1() {
+            currentStep = 1;
+            document.querySelectorAll('.payment-step').forEach(step => step.style.display = 'none');
+            document.getElementById('step1').style.display = 'block';
+        }
+
+        function goToStep2() {
+            if (!selectedMembership) {
+                showToast('Please select a membership tier', 'error');
+                return;
+            }
+            if (!selectedPaymentMethod) {
+                showToast('Please select a payment method', 'error');
+                return;
+            }
+            
+            currentStep = 2;
+            document.querySelectorAll('.payment-step').forEach(step => step.style.display = 'none');
+            document.getElementById('step2').style.display = 'block';
+            
+            // Fill payment method details
+            const method = getPaymentAccounts()[selectedPaymentMethod];
+            document.getElementById('selectedMethodHeader').innerHTML = `
+                <div class="method-icon" style="background: ${method.color};">
+                    <i class="fas ${method.icon}"></i>
+                </div>
+                <h4>Pay via ${method.name}</h4>
+            `;
+            
+            document.getElementById('amountToSend').textContent = '৳' + selectedMembership.price.toLocaleString();
+            document.getElementById('paymentNumber').textContent = method.number;
+            document.getElementById('accountType').textContent = method.type + ' Account';
+            
+            document.getElementById('paymentInstructions').innerHTML = `
+                <h5><i class="fas fa-info-circle"></i> Payment Instructions</h5>
+                <ol>
+                    <li>Open your <strong>${method.name}</strong> app</li>
+                    <li>Go to "Send Money"</li>
+                    <li>Enter number: <strong>${method.number}</strong></li>
+                    <li>Enter amount: <strong>৳${selectedMembership.price.toLocaleString()}</strong></li>
+                    <li>Enter your PIN and confirm</li>
+                    <li><strong>Copy the Transaction ID (TrxID)</strong> from the confirmation</li>
+                    <li>Come back here and enter the TrxID</li>
+                </ol>
+            `;
+        }
+
+        function goToStep3() {
+            currentStep = 3;
+            document.querySelectorAll('.payment-step').forEach(step => step.style.display = 'none');
+            document.getElementById('step3').style.display = 'block';
+            
+            // Update summary
+            const method = getPaymentAccounts()[selectedPaymentMethod];
+            document.getElementById('summaryMembership').textContent = selectedMembership.name;
+            document.getElementById('summaryAmount').textContent = '৳' + selectedMembership.price.toLocaleString();
+            document.getElementById('summaryMethod').textContent = method.name;
+        }
+
+        // Copy payment number
+        function copyNumber() {
+            const number = document.getElementById('paymentNumber').textContent;
+            navigator.clipboard.writeText(number).then(() => {
+                showToast('Number copied to clipboard!', 'success');
+            });
+        }
+
+        // Submit payment for verification
+        function submitPayment() {
+            const transactionId = document.getElementById('transactionId').value.trim();
+            const senderNumber = document.getElementById('senderNumber').value.trim();
+            const note = document.getElementById('paymentNote').value.trim();
+            
+            if (!transactionId) {
+                showToast('Please enter the Transaction ID', 'error');
+                return;
+            }
+            
+            if (!senderNumber) {
+                showToast('Please enter your sender number', 'error');
+                return;
+            }
+            
+            // Validate sender number format
+            const cleanedPhone = senderNumber.replace(/[\s\-\+]/g, '');
+            if (!/^(880|0)?1[3-9]\d{8}$/.test(cleanedPhone)) {
+                showToast('Please enter a valid phone number', 'error');
+                return;
+            }
+            
+            // Check if TrxID already exists
+            const existingRequests = Storage.get('membershipRequests') || [];
+            if (existingRequests.some(r => r.transactionId === transactionId)) {
+                showToast('This Transaction ID has already been submitted', 'error');
+                return;
+            }
+            
+            // Create membership request
+            const requestId = 'MR' + Date.now().toString(36).toUpperCase();
+            const method = getPaymentAccounts()[selectedPaymentMethod];
+            
+            const request = {
+                id: requestId,
+                userId: currentUser.email,
+                userName: currentUser.name,
+                userPhone: currentUser.phone,
+                membershipId: selectedMembership.id,
+                membershipName: selectedMembership.name,
+                amount: selectedMembership.price,
+                paymentMethod: selectedPaymentMethod,
+                paymentMethodName: method.name,
+                transactionId: transactionId,
+                senderNumber: senderNumber,
+                note: note,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                processedAt: null,
+                processedBy: null
+            };
+            
+            // Save to storage
+            existingRequests.push(request);
+            Storage.set('membershipRequests', existingRequests);
+            
+            // Show success
+            document.querySelectorAll('.payment-step').forEach(step => step.style.display = 'none');
+            document.getElementById('successStep').style.display = 'block';
+            document.getElementById('requestId').textContent = requestId;
+            
+            showToast('Request submitted successfully!', 'success');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('purchaseModal').classList.remove('active');
+            selectedMembership = null;
+            selectedPaymentMethod = null;
+            currentStep = 1;
+            
+            // Clear form
+            document.getElementById('transactionId').value = '';
+            document.getElementById('senderNumber').value = '';
+            document.getElementById('paymentNote').value = '';
+            
+            // Refresh cards to show pending status
+            renderMembershipCards();
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return '৳' + parseFloat(amount).toLocaleString('en-BD', { minimumFractionDigits: 2 });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            `;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Sidebar functionality
+        function initializeSidebar() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
+            }
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => sidebar.classList.remove('active'));
+            }
+        }
+        
+        // Check for membership approval notification
+        function checkMembershipNotification() {
+            if (!currentUser) return;
+            
+            const notifications = Storage.get('membershipNotifications') || [];
+            const userNotification = notifications.find(n => 
+                n.userId === currentUser.email && !n.shown
+            );
+            
+            if (userNotification) {
+                // Show welcome modal
+                const level = AppConfig.membershipLevels[userNotification.membershipId];
+                if (level) {
+                    document.getElementById('welcomeDesignation').innerHTML = `
+                        <span>Your Designation</span>
+                        <h3>${level.name}</h3>
+                    `;
+                    document.getElementById('welcomeModal').classList.add('active');
+                    
+                    // Mark as shown
+                    userNotification.shown = true;
+                    Storage.set('membershipNotifications', notifications);
+                }
+            }
+        }
+        
+        // Close welcome modal
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').classList.remove('active');
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '../login.html';
+        }
+
+        // Close modal on outside click
+        document.getElementById('purchaseModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        document.getElementById('welcomeModal').addEventListener('click', function(e) {
+            if (e.target === this) closeWelcomeModal();
+        });
+    </script>
+</body>
+</html>

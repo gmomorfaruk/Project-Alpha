@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Work Settings - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('work-settings'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-sliders-h" style="color: var(--primary-color); margin-right: 10px;"></i>Work Settings</h1>
+                <p>Configure points conversion rates, limits, and page visibility</p>
+            </div>
+
+            <!-- Settings Grid -->
+            <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px;">
+                
+                <!-- Points Conversion Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-coins" style="color: #f59e0b;"></i> Points Conversion</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label>Points Required for Conversion</label>
+                            <input type="number" id="pointsPerMoney" placeholder="1000" min="1">
+                            <p class="form-hint">How many points equal the money amount below</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Money Value (in Currency)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="currency" style="width: 80px;">
+                                    <option value="৳">৳ BDT</option>
+                                    <option value="$">$ USD</option>
+                                    <option value="₹">₹ INR</option>
+                                    <option value="€">€ EUR</option>
+                                </select>
+                                <input type="number" id="moneyPerPoints" placeholder="10" min="0.01" step="0.01" style="flex: 1;">
+                            </div>
+                            <p class="form-hint">How much money the points convert to</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Minimum Points for Conversion</label>
+                            <input type="number" id="minConvertPoints" placeholder="1000" min="1">
+                            <p class="form-hint">Users must have at least this many points to convert</p>
+                        </div>
+                        <div class="conversion-preview" style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; text-align: center;">
+                            <p style="color: var(--text-muted); margin-bottom: 5px;">Preview</p>
+                            <h3 id="conversionPreview" style="color: var(--primary-color);">1000 Points = ৳10</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Limits Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-clock" style="color: #3b82f6;"></i> Daily Limits</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label>Max Points Per Day (Per User)</label>
+                            <input type="number" id="maxDailyPoints" placeholder="0 = Unlimited" min="0">
+                            <p class="form-hint">Maximum points a user can earn per day (0 = unlimited)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Tasks Per Day (Per User)</label>
+                            <input type="number" id="maxDailyTasks" placeholder="0 = Unlimited" min="0">
+                            <p class="form-hint">Maximum tasks a user can complete per day (0 = unlimited)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Conversions Per Day</label>
+                            <input type="number" id="maxDailyConversions" placeholder="0 = Unlimited" min="0">
+                            <p class="form-hint">Maximum conversions a user can make per day</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Conversion Amount Per Day</label>
+                            <input type="number" id="maxDailyConversionAmount" placeholder="0 = Unlimited" min="0">
+                            <p class="form-hint">Maximum money amount from conversions per day</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page Visibility Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-eye" style="color: #10b981;"></i> Page Visibility</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <p style="color: var(--text-muted); margin-bottom: 15px;">Control which work pages are visible to users</p>
+                        
+                        <div class="visibility-option">
+                            <div class="visibility-info">
+                                <i class="fab fa-youtube" style="color: #ef4444;"></i>
+                                <span>YouTube Tasks</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="visYoutube" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="visibility-option">
+                            <div class="visibility-info">
+                                <i class="fas fa-share-alt" style="color: #3b82f6;"></i>
+                                <span>Social Media Tasks</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="visSocial" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="visibility-option">
+                            <div class="visibility-info">
+                                <i class="fas fa-clipboard-list" style="color: #10b981;"></i>
+                                <span>Survey Tasks</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="visSurvey" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="visibility-option">
+                            <div class="visibility-info">
+                                <i class="fas fa-puzzle-piece" style="color: #8b5cf6;"></i>
+                                <span>Custom Tasks</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="visCustom" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="visibility-option">
+                            <div class="visibility-info">
+                                <i class="fas fa-coins" style="color: #f59e0b;"></i>
+                                <span>Points Conversion</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="visConversion" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Category Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-tasks" style="color: #8b5cf6;"></i> Category Settings</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <p style="color: var(--text-muted); margin-bottom: 15px;">Set default point multipliers for each category</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fab fa-youtube" style="color: #ef4444;"></i> YouTube Tasks Multiplier</label>
+                            <input type="number" id="multYoutube" placeholder="1.0" min="0.1" step="0.1" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-share-alt" style="color: #3b82f6;"></i> Social Tasks Multiplier</label>
+                            <input type="number" id="multSocial" placeholder="1.0" min="0.1" step="0.1" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-clipboard-list" style="color: #10b981;"></i> Survey Tasks Multiplier</label>
+                            <input type="number" id="multSurvey" placeholder="1.5" min="0.1" step="0.1" value="1.5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-puzzle-piece" style="color: #8b5cf6;"></i> Custom Tasks Multiplier</label>
+                            <input type="number" id="multCustom" placeholder="1.0" min="0.1" step="0.1" value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral Points Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-user-friends" style="color: #ec4899;"></i> Referral Points</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label>Points for Successful Referral</label>
+                            <input type="number" id="referralPoints" placeholder="500" min="0">
+                            <p class="form-hint">Points awarded when referred user signs up</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus Points on First Task</label>
+                            <input type="number" id="referralFirstTaskBonus" placeholder="100" min="0">
+                            <p class="form-hint">Extra points when referred user completes first task</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Percentage of Referred Earnings</label>
+                            <div class="input-with-addon">
+                                <input type="number" id="referralEarningsPercent" placeholder="5" min="0" max="50">
+                                <span class="addon">%</span>
+                            </div>
+                            <p class="form-hint">Ongoing percentage of points from referrals' earnings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New User Bonus -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-gift" style="color: #06b6d4;"></i> New User Bonus</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label>Signup Bonus Points</label>
+                            <input type="number" id="signupBonus" placeholder="100" min="0">
+                            <p class="form-hint">Points awarded on successful registration</p>
+                        </div>
+                        <div class="form-group">
+                            <label>First Task Bonus Points</label>
+                            <input type="number" id="firstTaskBonus" placeholder="50" min="0">
+                            <p class="form-hint">Extra points for completing first task</p>
+                        </div>
+                        <div class="form-group">
+                            <label>New User Days</label>
+                            <input type="number" id="newUserDays" placeholder="7" min="1">
+                            <p class="form-hint">How many days a user is considered "new"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sell Bonus Settings -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3><i class="fas fa-hand-holding-usd" style="color: #BFA181;"></i> Sell Bonus Program</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="visibility-option" style="margin-bottom: 20px;">
+                            <div class="visibility-info">
+                                <i class="fas fa-toggle-on" style="color: #10b981;"></i>
+                                <span>Enable Sell Bonus</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="sellBonusEnabled" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus Points Per Sale</label>
+                            <input type="number" id="sellBonusPoints" placeholder="500" min="0">
+                            <p class="form-hint">Points awarded when user sells a product</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus Percentage (% of Product Value)</label>
+                            <div class="input-with-addon">
+                                <input type="number" id="sellBonusPercent" placeholder="5" min="0" max="100" step="0.5">
+                                <span class="addon">%</span>
+                            </div>
+                            <p class="form-hint">Additional bonus based on product price (0 = disabled)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Maximum Bonus Points Per Sale</label>
+                            <input type="number" id="sellBonusMax" placeholder="5000" min="0">
+                            <p class="form-hint">Cap on total bonus points per sale (0 = unlimited)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Minimum Units to Sell</label>
+                            <input type="number" id="sellBonusMinUnits" placeholder="1" min="1">
+                            <p class="form-hint">Minimum units to qualify for bonus</p>
+                        </div>
+                        <div class="sell-bonus-preview" style="background: linear-gradient(135deg, rgba(191, 161, 129, 0.1), rgba(23, 133, 130, 0.1)); padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px;">
+                            <p style="color: var(--text-muted); margin-bottom: 5px;">Example Bonus</p>
+                            <h3 id="sellBonusPreview" style="color: #BFA181;">500 + 5% = Up to 5000 pts</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Save Button -->
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="resetToDefaults()">
+                    <i class="fas fa-undo"></i> Reset to Defaults
+                </button>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save All Settings
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        const defaultSettings = {
+            // Conversion
+            pointsPerMoney: 1000,
+            moneyPerPoints: 10,
+            minConvertPoints: 1000,
+            currency: '৳',
+            
+            // Daily Limits
+            maxDailyPoints: 0,
+            maxDailyTasks: 0,
+            maxDailyConversions: 3,
+            maxDailyConversionAmount: 0,
+            
+            // Visibility
+            visYoutube: true,
+            visSocial: true,
+            visSurvey: true,
+            visCustom: true,
+            visConversion: true,
+            
+            // Multipliers
+            multYoutube: 1,
+            multSocial: 1,
+            multSurvey: 1.5,
+            multCustom: 1,
+            
+            // Referral
+            referralPoints: 500,
+            referralFirstTaskBonus: 100,
+            referralEarningsPercent: 5,
+            
+            // New User
+            signupBonus: 100,
+            firstTaskBonus: 50,
+            newUserDays: 7,
+            
+            // Sell Bonus
+            sellBonusEnabled: true,
+            sellBonusPoints: 500,
+            sellBonusPercent: 5,
+            sellBonusMax: 5000,
+            sellBonusMinUnits: 1
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadSettings();
+            setupPreviewUpdates();
+        });
+
+        function loadSettings() {
+            const settings = Storage.get('workSettings') || defaultSettings;
+            
+            // Populate all fields
+            document.getElementById('pointsPerMoney').value = settings.pointsPerMoney || defaultSettings.pointsPerMoney;
+            document.getElementById('moneyPerPoints').value = settings.moneyPerPoints || defaultSettings.moneyPerPoints;
+            document.getElementById('minConvertPoints').value = settings.minConvertPoints || defaultSettings.minConvertPoints;
+            document.getElementById('currency').value = settings.currency || defaultSettings.currency;
+            
+            document.getElementById('maxDailyPoints').value = settings.maxDailyPoints || 0;
+            document.getElementById('maxDailyTasks').value = settings.maxDailyTasks || 0;
+            document.getElementById('maxDailyConversions').value = settings.maxDailyConversions || 0;
+            document.getElementById('maxDailyConversionAmount').value = settings.maxDailyConversionAmount || 0;
+            
+            document.getElementById('visYoutube').checked = settings.visYoutube !== false;
+            document.getElementById('visSocial').checked = settings.visSocial !== false;
+            document.getElementById('visSurvey').checked = settings.visSurvey !== false;
+            document.getElementById('visCustom').checked = settings.visCustom !== false;
+            document.getElementById('visConversion').checked = settings.visConversion !== false;
+            
+            document.getElementById('multYoutube').value = settings.multYoutube || 1;
+            document.getElementById('multSocial').value = settings.multSocial || 1;
+            document.getElementById('multSurvey').value = settings.multSurvey || 1.5;
+            document.getElementById('multCustom').value = settings.multCustom || 1;
+            
+            document.getElementById('referralPoints').value = settings.referralPoints || 0;
+            document.getElementById('referralFirstTaskBonus').value = settings.referralFirstTaskBonus || 0;
+            document.getElementById('referralEarningsPercent').value = settings.referralEarningsPercent || 0;
+            
+            document.getElementById('signupBonus').value = settings.signupBonus || 0;
+            document.getElementById('firstTaskBonus').value = settings.firstTaskBonus || 0;
+            document.getElementById('newUserDays').value = settings.newUserDays || 7;
+            
+            // Sell Bonus
+            document.getElementById('sellBonusEnabled').checked = settings.sellBonusEnabled !== false;
+            document.getElementById('sellBonusPoints').value = settings.sellBonusPoints || 500;
+            document.getElementById('sellBonusPercent').value = settings.sellBonusPercent || 5;
+            document.getElementById('sellBonusMax').value = settings.sellBonusMax || 5000;
+            document.getElementById('sellBonusMinUnits').value = settings.sellBonusMinUnits || 1;
+
+            updatePreview();
+            updateSellBonusPreview();
+        }
+
+        function setupPreviewUpdates() {
+            ['pointsPerMoney', 'moneyPerPoints', 'currency'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updatePreview);
+            });
+            
+            // Sell bonus preview
+            ['sellBonusPoints', 'sellBonusPercent', 'sellBonusMax'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateSellBonusPreview);
+            });
+        }
+
+        function updatePreview() {
+            const points = document.getElementById('pointsPerMoney').value || 1000;
+            const money = document.getElementById('moneyPerPoints').value || 10;
+            const currency = document.getElementById('currency').value || '৳';
+            
+            document.getElementById('conversionPreview').textContent = `${points} Points = ${currency}${money}`;
+        }
+        
+        function updateSellBonusPreview() {
+            const basePoints = document.getElementById('sellBonusPoints').value || 0;
+            const percent = document.getElementById('sellBonusPercent').value || 0;
+            const maxPoints = document.getElementById('sellBonusMax').value || 0;
+            
+            let preview = `${basePoints} pts`;
+            if (percent > 0) preview += ` + ${percent}%`;
+            if (maxPoints > 0) preview += ` (max ${maxPoints} pts)`;
+            
+            document.getElementById('sellBonusPreview').textContent = preview;
+        }
+
+        function saveSettings() {
+            const settings = {
+                // Conversion
+                pointsPerMoney: parseInt(document.getElementById('pointsPerMoney').value) || 1000,
+                moneyPerPoints: parseFloat(document.getElementById('moneyPerPoints').value) || 10,
+                minConvertPoints: parseInt(document.getElementById('minConvertPoints').value) || 1000,
+                currency: document.getElementById('currency').value || '৳',
+                
+                // Daily Limits
+                maxDailyPoints: parseInt(document.getElementById('maxDailyPoints').value) || 0,
+                maxDailyTasks: parseInt(document.getElementById('maxDailyTasks').value) || 0,
+                maxDailyConversions: parseInt(document.getElementById('maxDailyConversions').value) || 0,
+                maxDailyConversionAmount: parseFloat(document.getElementById('maxDailyConversionAmount').value) || 0,
+                
+                // Visibility
+                visYoutube: document.getElementById('visYoutube').checked,
+                visSocial: document.getElementById('visSocial').checked,
+                visSurvey: document.getElementById('visSurvey').checked,
+                visCustom: document.getElementById('visCustom').checked,
+                visConversion: document.getElementById('visConversion').checked,
+                
+                // Multipliers
+                multYoutube: parseFloat(document.getElementById('multYoutube').value) || 1,
+                multSocial: parseFloat(document.getElementById('multSocial').value) || 1,
+                multSurvey: parseFloat(document.getElementById('multSurvey').value) || 1.5,
+                multCustom: parseFloat(document.getElementById('multCustom').value) || 1,
+                
+                // Referral
+                referralPoints: parseInt(document.getElementById('referralPoints').value) || 0,
+                referralFirstTaskBonus: parseInt(document.getElementById('referralFirstTaskBonus').value) || 0,
+                referralEarningsPercent: parseFloat(document.getElementById('referralEarningsPercent').value) || 0,
+                
+                // New User
+                signupBonus: parseInt(document.getElementById('signupBonus').value) || 0,
+                firstTaskBonus: parseInt(document.getElementById('firstTaskBonus').value) || 0,
+                newUserDays: parseInt(document.getElementById('newUserDays').value) || 7,
+                
+                // Sell Bonus
+                sellBonusEnabled: document.getElementById('sellBonusEnabled').checked,
+                sellBonusPoints: parseInt(document.getElementById('sellBonusPoints').value) || 500,
+                sellBonusPercent: parseFloat(document.getElementById('sellBonusPercent').value) || 5,
+                sellBonusMax: parseInt(document.getElementById('sellBonusMax').value) || 5000,
+                sellBonusMinUnits: parseInt(document.getElementById('sellBonusMinUnits').value) || 1,
+                
+                updatedAt: new Date().toISOString()
+            };
+
+            Storage.set('workSettings', settings);
+            
+            // Log activity
+            logAdminActivity('settings_updated', 'Updated work settings (rates, limits, visibility)');
+            
+            showToast('Settings saved successfully!', 'success');
+        }
+
+        function resetToDefaults() {
+            if (!confirm('Are you sure you want to reset all settings to defaults?')) return;
+            
+            Storage.set('workSettings', defaultSettings);
+            loadSettings();
+            showToast('Settings reset to defaults', 'info');
+        }
+
+        function logAdminActivity(action, description) {
+            const activities = Storage.get('adminActivities') || [];
+            const currentUser = Storage.get('currentUser');
+            activities.unshift({
+                id: Date.now(),
+                action: action,
+                description: description,
+                admin: currentUser?.email || 'admin',
+                timestamp: new Date().toISOString()
+            });
+            if (activities.length > 500) activities.length = 500;
+            Storage.set('adminActivities', activities);
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+
+    <style>
+        .settings-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .settings-card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        .settings-card-header h3 {
+            margin: 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-card-body {
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        .visibility-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .visibility-option:last-child {
+            border-bottom: none;
+        }
+        .visibility-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 26px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background: var(--primary-color);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        .input-with-addon {
+            display: flex;
+            align-items: center;
+        }
+        .input-with-addon input {
+            border-radius: 8px 0 0 8px;
+        }
+        .input-with-addon .addon {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: none;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-muted);
+        }
+    </style>
+</body>
+</html>

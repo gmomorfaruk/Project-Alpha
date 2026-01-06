@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Admin Dashboard - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('dashboard'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-tachometer-alt" style="color: var(--primary-color); margin-right: 10px;"></i>Admin Dashboard</h1>
+                <p>Overview of your platform performance</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalUsers">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalProducts">0</h3>
+                        <p>Active Products</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalInvestments">0</h3>
+                        <p>Total Investments</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalRevenue">৳0</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Actions -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-bell" style="color: #f59e0b; margin-right: 10px;"></i>Pending Actions</h3>
+                <div class="pending-grid">
+                    <a href="transactions.html?filter=pending" class="pending-item">
+                        <div class="pending-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="pending-info">
+                            <h4 id="pendingTransactions">0</h4>
+                            <p>Pending Transactions</p>
+                        </div>
+                    </a>
+                    <a href="transactions.html?tab=membership" class="pending-item" style="border-left-color: #8b5cf6;">
+                        <div class="pending-icon" style="background: rgba(139, 92, 246, 0.1);"><i class="fas fa-crown" style="color: #8b5cf6;"></i></div>
+                        <div class="pending-info">
+                            <h4 id="pendingMemberships">0</h4>
+                            <p>Membership Requests</p>
+                        </div>
+                    </a>
+                    <a href="proofs.html?filter=pending" class="pending-item">
+                        <div class="pending-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="pending-info">
+                            <h4 id="pendingProofs">0</h4>
+                            <p>Pending Proofs</p>
+                        </div>
+                    </a>
+                    <a href="users.html?filter=new" class="pending-item">
+                        <div class="pending-icon"><i class="fas fa-user-plus"></i></div>
+                        <div class="pending-info">
+                            <h4 id="newUsers">0</h4>
+                            <p>New Users (Today)</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <!-- Recent Transactions -->
+                <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Recent Transactions</h3>
+                        <a href="transactions.html" class="btn btn-sm btn-outline">View All</a>
+                    </div>
+                    <div id="recentTransactions" class="transactions-list">
+                        <div class="empty-state" style="padding: 30px;">
+                            <i class="fas fa-exchange-alt"></i>
+                            <p>No transactions yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Users -->
+                <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Recent Users</h3>
+                        <a href="users.html" class="btn btn-sm btn-outline">View All</a>
+                    </div>
+                    <div id="recentUsers" class="users-list">
+                        <div class="empty-state" style="padding: 30px;">
+                            <i class="fas fa-users"></i>
+                            <p>No users yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section" style="margin-top: 30px; background: var(--bg-primary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-bolt" style="color: var(--primary-color); margin-right: 10px;"></i>Quick Actions</h3>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="products.html?action=add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Product</a>
+                    <a href="users.html" class="btn btn-outline"><i class="fas fa-users"></i> Manage Users</a>
+                    <a href="backup.html" class="btn btn-outline"><i class="fas fa-download"></i> Backup Data</a>
+                    <a href="settings.html" class="btn btn-outline"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/security.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            
+            // Check admin access
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            // Ensure default users exist
+            if (typeof initializeAppData === 'function') {
+                initializeAppData();
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadDashboardStats();
+        });
+
+        function loadDashboardStats() {
+            // Ensure app data is initialized
+            if (typeof initializeAppData === 'function') {
+                initializeAppData();
+            }
+            
+            // Users
+            const users = Storage.get('users') || [];
+            const regularUsers = users.filter(u => u.role !== 'admin');
+            document.getElementById('totalUsers').textContent = regularUsers.length;
+
+            // Products
+            const products = Storage.get('products') || getDemoProducts();
+            document.getElementById('totalProducts').textContent = products.length;
+
+            // Investments
+            const investments = Storage.get('investments') || [];
+            document.getElementById('totalInvestments').textContent = investments.length;
+
+            // Revenue
+            const totalRevenue = investments.reduce((sum, inv) => sum + inv.totalAmount, 0);
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+
+            // Pending Transactions
+            const transactions = Storage.get('transactions') || [];
+            const pendingTrans = transactions.filter(t => t.status === 'pending');
+            document.getElementById('pendingTransactions').textContent = pendingTrans.length;
+
+            // Pending Membership Requests
+            const membershipRequests = Storage.get('membershipRequests') || [];
+            const pendingMemberships = membershipRequests.filter(r => r.status === 'pending');
+            document.getElementById('pendingMemberships').textContent = pendingMemberships.length;
+
+            const proofs = Storage.get('sellProofs') || [];
+            const pendingProofs = proofs.filter(p => p.status === 'pending');
+            document.getElementById('pendingProofs').textContent = pendingProofs.length;
+
+            // New users today
+            const today = new Date().toDateString();
+            const newUsers = users.filter(u => new Date(u.createdAt).toDateString() === today);
+            document.getElementById('newUsers').textContent = newUsers.length;
+
+            // Recent transactions
+            renderRecentTransactions(transactions.slice(-5).reverse());
+
+            // Recent users
+            renderRecentUsers(regularUsers.slice(-5).reverse());
+        }
+
+        function renderRecentTransactions(transactions) {
+            const container = document.getElementById('recentTransactions');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 30px;">
+                        <i class="fas fa-exchange-alt"></i>
+                        <p>No transactions yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = transactions.map(t => `
+                <div class="transaction-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: ${t.type === 'deposit' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-${t.type === 'deposit' ? 'arrow-down' : 'arrow-up'}" style="color: ${t.type === 'deposit' ? '#10b981' : '#ef4444'};"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500;">${t.type.charAt(0).toUpperCase() + t.type.slice(1)}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">${t.userEmail || 'Unknown'}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">${formatCurrency(t.amount)}</div>
+                        <span class="badge badge-${t.status === 'approved' ? 'success' : t.status === 'rejected' ? 'danger' : 'warning'}" style="font-size: 10px;">${t.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentUsers(users) {
+            const container = document.getElementById('recentUsers');
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 30px;">
+                        <i class="fas fa-users"></i>
+                        <p>No users yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = users.map(u => `
+                <div class="user-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); display: flex; align-items: center; justify-content: center; margin-right: 12px; color: white;">
+                        ${u.name ? u.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500;">${u.name || 'Unknown'}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">${u.email}</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        ${formatDate(u.createdAt)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getDemoProducts() {
+            return [
+                { id: '1', name: 'Smart Watch Pro', price: 5000 },
+                { id: '2', name: 'Wireless Earbuds', price: 3000 },
+                { id: '3', name: 'Solar Power Bank', price: 2500 }
+            ];
+        }
+
+        // View Site Dropdown Toggle
+        function toggleViewSiteMenu() {
+            const menu = document.getElementById('viewSiteMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.view-site-dropdown');
+            const menu = document.getElementById('viewSiteMenu');
+            if (dropdown && menu && !dropdown.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>

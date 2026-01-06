@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#178582">
+    <title>Backup & Export - Admin - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>document.write(generateAdminLayout('backup'));</script>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <div class="content">
+            <div class="page-header">
+                <h1>Backup & Export</h1>
+                <p>Backup your data or export to different formats</p>
+            </div>
+
+            <!-- Export Options -->
+            <div class="backup-grid">
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-file-code"></i>
+                    </div>
+                    <h4>Export All Data (JSON)</h4>
+                    <p>Complete backup of all platform data in JSON format</p>
+                    <button class="btn btn-primary" onclick="exportAllJSON()">
+                        <i class="fas fa-download"></i> Export JSON
+                    </button>
+                </div>
+
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="fas fa-file-csv"></i>
+                    </div>
+                    <h4>Export Users (CSV)</h4>
+                    <p>Export all user data to CSV spreadsheet</p>
+                    <button class="btn btn-primary" onclick="exportUsersCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <h4>Export Transactions (CSV)</h4>
+                    <p>Export all transactions to CSV spreadsheet</p>
+                    <button class="btn btn-primary" onclick="exportTransactionsCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- More Export Options -->
+            <div class="backup-grid" style="margin-top: 20px;">
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Export Investments (CSV)</h4>
+                    <p>Export all investment records to CSV</p>
+                    <button class="btn btn-primary" onclick="exportInvestmentsCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h4>Export Products (CSV)</h4>
+                    <p>Export all product data to CSV</p>
+                    <button class="btn btn-primary" onclick="exportProductsCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+
+                <div class="backup-card">
+                    <div class="icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h4>Export Referrals (CSV)</h4>
+                    <p>Export all referral data to CSV</p>
+                    <button class="btn btn-primary" onclick="exportReferralsCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Import Section -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 30px; border: 1px solid var(--border-color); margin-top: 30px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-upload" style="color: var(--primary-color); margin-right: 10px;"></i>Import Data</h3>
+                
+                <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center;" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                    <p style="margin-bottom: 10px;">Drag and drop a JSON backup file here</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">or</p>
+                    <label class="btn btn-outline">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(this)">
+                    </label>
+                </div>
+
+                <div class="alert alert-warning" style="margin-top: 20px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning:</strong> Importing data will overwrite existing data. Make sure to backup your current data first.
+                </div>
+            </div>
+
+            <!-- Data Summary -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 30px; border: 1px solid var(--border-color); margin-top: 30px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-database" style="color: var(--primary-color); margin-right: 10px;"></i>Data Summary</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;" id="dataSummary">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="section" style="background: var(--bg-primary); border-radius: 16px; padding: 30px; border: 2px solid #ef4444; margin-top: 30px;">
+                <h3 style="margin-bottom: 20px; color: #ef4444;"><i class="fas fa-skull-crossbones" style="margin-right: 10px;"></i>Danger Zone</h3>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(239, 68, 68, 0.1); border-radius: 12px;">
+                    <div>
+                        <h4>Reset All Data</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">This will permanently delete all data. This action cannot be undone.</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="resetAllData()">
+                        <i class="fas fa-trash"></i> Reset Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Storage.get('currentUser');
+            if (!user || !user.isLoggedIn || user.role !== 'admin') {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = user.name || 'Admin';
+            loadDataSummary();
+            setupDropZone();
+        });
+
+        function loadDataSummary() {
+            const users = Storage.get('users') || [];
+            const products = Storage.get('products') || [];
+            const transactions = Storage.get('transactions') || [];
+            const investments = Storage.get('investments') || [];
+            const referrals = Storage.get('referrals') || [];
+
+            document.getElementById('dataSummary').innerHTML = `
+                <div style="text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">${users.filter(u => u.role !== 'admin').length}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Users</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">${products.length}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Products</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">${transactions.length}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Transactions</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">${investments.length}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Investments</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">${referrals.length}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Referrals</div>
+                </div>
+            `;
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('dropZone');
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--primary-color)';
+                dropZone.style.background = 'rgba(59, 130, 246, 0.05)';
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = 'var(--border-color)';
+                dropZone.style.background = 'transparent';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--border-color)';
+                dropZone.style.background = 'transparent';
+
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/json') {
+                    processImportFile(file);
+                } else {
+                    showToast('Please drop a valid JSON file', 'error');
+                }
+            });
+        }
+
+        function exportAllJSON() {
+            const data = {
+                exportDate: new Date().toISOString(),
+                version: '1.0',
+                users: Storage.get('users') || [],
+                products: Storage.get('products') || [],
+                transactions: Storage.get('transactions') || [],
+                investments: Storage.get('investments') || [],
+                referrals: Storage.get('referrals') || [],
+                sellProofs: Storage.get('sellProofs') || [],
+                settings: Storage.get('settings') || {}
+            };
+
+            exportToJSON(data, 'project_alpha_backup');
+            showToast('Full backup exported successfully', 'success');
+        }
+
+        function exportUsersCSV() {
+            const users = (Storage.get('users') || []).filter(u => u.role !== 'admin');
+            exportToCSV(users.map(u => ({
+                Name: u.name || '',
+                Email: u.email,
+                Phone: u.phone || '',
+                Balance: u.balance || 0,
+                bKash: u.bkashNumber || '',
+                Nagad: u.nagadNumber || '',
+                Status: u.status || 'active',
+                JoinedAt: u.createdAt
+            })), 'users');
+            showToast('Users exported to CSV', 'success');
+        }
+
+        function exportTransactionsCSV() {
+            const transactions = Storage.get('transactions') || [];
+            exportToCSV(transactions.map(t => ({
+                ID: t.id,
+                User: t.userEmail,
+                Type: t.type,
+                Method: t.method,
+                Amount: t.amount,
+                Account: t.accountNumber || '',
+                TransactionID: t.transactionId || '',
+                Status: t.status,
+                CreatedAt: t.createdAt
+            })), 'transactions');
+            showToast('Transactions exported to CSV', 'success');
+        }
+
+        function exportInvestmentsCSV() {
+            const investments = Storage.get('investments') || [];
+            exportToCSV(investments.map(i => ({
+                ID: i.id,
+                User: i.userId,
+                Product: i.productName,
+                Units: i.units,
+                UnitPrice: i.unitPrice,
+                TotalAmount: i.totalAmount,
+                ReturnRate: i.returnRate,
+                ExpectedReturn: i.expectedReturn,
+                SellMode: i.sellMode,
+                Status: i.status,
+                StartDate: i.startDate,
+                EndDate: i.endDate
+            })), 'investments');
+            showToast('Investments exported to CSV', 'success');
+        }
+
+        function exportProductsCSV() {
+            const products = Storage.get('products') || [];
+            exportToCSV(products.map(p => ({
+                ID: p.id,
+                Name: p.name,
+                Category: p.category,
+                Price: p.price,
+                ReturnRate: p.returnRate,
+                Duration: p.duration,
+                Stock: p.stock,
+                MinUnits: p.minUnits,
+                Active: p.active,
+                CreatedAt: p.createdAt
+            })), 'products');
+            showToast('Products exported to CSV', 'success');
+        }
+
+        function exportReferralsCSV() {
+            const referrals = Storage.get('referrals') || [];
+            exportToCSV(referrals.map(r => ({
+                ReferrerEmail: r.referrerId,
+                ReferrerName: r.referrerName || '',
+                ReferredEmail: r.referredId,
+                ReferredName: r.referredName || '',
+                Code: r.code,
+                Earnings: r.earnings || 0,
+                Status: r.status || 'active',
+                CreatedAt: r.createdAt
+            })), 'referrals');
+            showToast('Referrals exported to CSV', 'success');
+        }
+
+        function handleImport(input) {
+            const file = input.files[0];
+            if (file) {
+                processImportFile(file);
+            }
+        }
+
+        function processImportFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!confirm('This will overwrite all existing data. Are you sure you want to continue?')) {
+                        return;
+                    }
+
+                    // Import data
+                    if (data.users) Storage.set('users', data.users);
+                    if (data.products) Storage.set('products', data.products);
+                    if (data.transactions) Storage.set('transactions', data.transactions);
+                    if (data.investments) Storage.set('investments', data.investments);
+                    if (data.referrals) Storage.set('referrals', data.referrals);
+                    if (data.sellProofs) Storage.set('sellProofs', data.sellProofs);
+                    if (data.settings) Storage.set('settings', data.settings);
+
+                    showToast('Data imported successfully!', 'success');
+                    loadDataSummary();
+                } catch (err) {
+                    showToast('Invalid backup file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetAllData() {
+            if (!confirm('Are you ABSOLUTELY sure? This will delete ALL data permanently!')) {
+                return;
+            }
+
+            if (!confirm('Last warning: This action CANNOT be undone. Type "RESET" to confirm.')) {
+                return;
+            }
+
+            const confirmation = prompt('Type "RESET" to confirm:');
+            if (confirmation !== 'RESET') {
+                showToast('Reset cancelled', 'info');
+                return;
+            }
+
+            // Keep current admin user
+            const currentUser = Storage.get('currentUser');
+
+            // Clear all data
+            localStorage.clear();
+
+            // Restore admin session
+            Storage.set('currentUser', currentUser);
+            Storage.set('users', [{
+                email: currentUser.email,
+                name: currentUser.name,
+                password: 'admin123',
+                role: 'admin',
+                createdAt: new Date().toISOString()
+            }]);
+
+            showToast('All data has been reset', 'success');
+            loadDataSummary();
+        }
+
+        function logout() {
+            Storage.remove('currentUser');
+            window.location.href = '../login.html';
+        }
+    </script>
+</body>
+</html>
