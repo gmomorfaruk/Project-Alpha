@@ -266,10 +266,12 @@
     </div>
 
     <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
     <script src="../js/theme.js"></script>
     <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/dashboard.js"></script>
+    <script src="../js/financial-tracker.js"></script>
     <script>
         let currentProduct = null;
         let selectedSellMode = 'auto';
@@ -454,6 +456,16 @@
             user.balance = (user.balance || 0) - total;
             user.totalInvested = (user.totalInvested || 0) + total;
             Storage.set('currentUser', user);
+
+            // Record product sale in financial tracker for analytics
+            if (window.FinancialTracker) {
+                FinancialTracker.recordProductSale(
+                    user.email, 
+                    currentProduct.id, 
+                    currentProduct.name, 
+                    total
+                );
+            }
 
             Modal.close('investModal');
             showToast('Investment successful!', 'success');

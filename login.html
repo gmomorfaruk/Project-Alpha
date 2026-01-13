@@ -309,6 +309,7 @@
     </style>
 
     <script src="js/app-config.js"></script>
+    <script src="js/database-manager.js"></script>
     <script src="js/security.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/language.js"></script>
@@ -340,12 +341,13 @@
             }
         }
 
-        // Handle login form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // Handle login form submission - now async to support cloud database
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
+            const submitBtn = this.querySelector('button[type="submit"]');
             
             // Basic validation
             if (!email || !password) {
@@ -353,95 +355,135 @@
                 return;
             }
 
-            // Demo admin login
-            if (email === 'admin@demo.com' && password === 'admin123') {
-                const userData = {
-                    id: 'admin1',
-                    email: email,
-                    name: 'Admin User',
-                    role: 'admin',
-                    isLoggedIn: true,
-                    createdAt: new Date().toISOString()
-                };
-                
-                // Save demo admin to users list if not exists
-                const users = Storage.get('users') || [];
-                if (!users.find(u => u.id === 'admin1')) {
-                    users.push({...userData, isLoggedIn: false});
-                    Storage.set('users', users);
-                }
-                
-                Storage.set('currentUser', userData);
-                Security.createSession(userData);
-                Security.logSecurityEvent('login_success', { email: email, role: 'admin' });
-                showToast('Login successful! Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'admin/index.html';
-                }, 1000);
-                return;
-            }
-            
-            // Demo user login
-            if (email === 'user@demo.com' && password === 'demo123') {
-                const userData = {
-                    id: 'user1',
-                    email: email,
-                    name: 'Demo User',
-                    phone: '01700000000',
-                    role: 'user',
-                    isLoggedIn: true,
-                    balance: 5000,
-                    points: 100,
-                    membership: 'free',
-                    referralCode: 'DEMO1234',
-                    referrals: [],
-                    createdAt: new Date().toISOString()
-                };
-                
-                // Save demo user to users list if not exists
-                let users = Storage.get('users') || [];
-                
-                const existingUser = users.find(u => u.id === 'user1');
-                if (!existingUser) {
-                    const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
-                    users.push(userToSave);
-                    Storage.set('users', users);
-                }
-                
-                Storage.set('currentUser', userData);
-                Security.createSession(userData);
-                Security.logSecurityEvent('login_success', { email: email, role: 'user' });
-                showToast('Login successful! Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard/index.html';
-                }, 1000);
-                return;
-            }
-            
-            // Check registered users
-            const users = Storage.get('users') || [];
-            const user = users.find(u => u.email === email);
-            
-            if (user) {
-                if (user.password === password) {
+            // Show loading state
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            submitBtn.disabled = true;
+
+            try {
+                // Demo admin login
+                if (email === 'admin@demo.com' && password === 'admin123') {
                     const userData = {
-                        ...user,
-                        isLoggedIn: true
+                        id: 'admin1',
+                        email: email,
+                        name: 'Admin User',
+                        role: 'admin',
+                        isLoggedIn: true,
+                        createdAt: new Date().toISOString()
                     };
+                    
+                    // Save demo admin to users list if not exists
+                    const users = Storage.get('users') || [];
+                    if (!users.find(u => u.id === 'admin1')) {
+                        users.push({...userData, isLoggedIn: false, password: 'admin123'});
+                        Storage.set('users', users);
+                    }
+                    
                     Storage.set('currentUser', userData);
                     Security.createSession(userData);
-                    Security.logSecurityEvent('login_success', { email: email, role: user.role || 'user' });
+                    Security.logSecurityEvent('login_success', { email: email, role: 'admin' });
+                    showToast('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'admin/index.html';
+                    }, 1000);
+                    return;
+                }
+                
+                // Demo user login
+                if (email === 'user@demo.com' && password === 'demo123') {
+                    const userData = {
+                        id: 'user1',
+                        email: email,
+                        name: 'Demo User',
+                        phone: '01700000000',
+                        role: 'user',
+                        isLoggedIn: true,
+                        balance: 5000,
+                        points: 100,
+                        membership: 'free',
+                        referralCode: 'DEMO1234',
+                        referrals: [],
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    // Save demo user to users list if not exists
+                    let users = Storage.get('users') || [];
+                    
+                    const existingUser = users.find(u => u.id === 'user1');
+                    if (!existingUser) {
+                        const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
+                        users.push(userToSave);
+                        Storage.set('users', users);
+                    }
+                    
+                    Storage.set('currentUser', userData);
+                    Security.createSession(userData);
+                    Security.logSecurityEvent('login_success', { email: email, role: 'user' });
                     showToast('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard/index.html';
                     }, 1000);
-                } else {
-                    Security.logSecurityEvent('login_failed', { email: email, reason: 'wrong_password' });
-                    showToast('Incorrect password', 'error');
+                    return;
                 }
-            } else {
-                Security.logSecurityEvent('login_failed', { email: email, reason: 'user_not_found' });
-                showToast('No account found with this email', 'error');
+                
+                // Check registered users - use async method if cloud is connected
+                let users = [];
+                
+                // Check if cloud database is connected
+                const isCloudConnected = window.DatabaseManager && 
+                                        window.DatabaseManager.connected && 
+                                        window.DatabaseManager.type !== 'localStorage';
+                
+                if (isCloudConnected) {
+                    // Try to get users from cloud database
+                    try {
+                        console.log('Checking users from cloud database...');
+                        const cloudUsers = await window.DatabaseManager.read('users', { email: email });
+                        if (cloudUsers && cloudUsers.length > 0) {
+                            users = cloudUsers;
+                        } else {
+                            // Fallback to localStorage
+                            users = Storage.get('users') || [];
+                        }
+                    } catch (cloudError) {
+                        console.warn('Cloud database error, falling back to localStorage:', cloudError);
+                        users = Storage.get('users') || [];
+                    }
+                } else {
+                    // Use localStorage
+                    users = Storage.get('users') || [];
+                }
+                
+                const user = users.find(u => u.email === email);
+                
+                if (user) {
+                    if (user.password === password) {
+                        const userData = {
+                            ...user,
+                            isLoggedIn: true
+                        };
+                        Storage.set('currentUser', userData);
+                        Security.createSession(userData);
+                        Security.logSecurityEvent('login_success', { email: email, role: user.role || 'user' });
+                        showToast('Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = user.role === 'admin' ? 'admin/index.html' : 'dashboard/index.html';
+                        }, 1000);
+                    } else {
+                        Security.logSecurityEvent('login_failed', { email: email, reason: 'wrong_password' });
+                        showToast('Incorrect password', 'error');
+                    }
+                } else {
+                    Security.logSecurityEvent('login_failed', { email: email, reason: 'user_not_found' });
+                    showToast('No account found with this email', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Login failed. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalContent;
+                submitBtn.disabled = false;
             }
         });
     </script>

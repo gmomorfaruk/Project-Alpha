@@ -207,6 +207,7 @@
     </section>
 
     <script src="js/app-config.js"></script>
+    <script src="js/database-manager.js"></script>
     <script src="js/security.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/language.js"></script>
@@ -264,8 +265,8 @@
             }
         }
 
-        // Handle signup form submission
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
+        // Handle signup form submission - async for cloud database support
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const password = document.getElementById('password').value;
@@ -274,6 +275,7 @@
             const fullName = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const referralCodeInput = document.getElementById('referralCode').value.trim();
+            const submitBtn = this.querySelector('button[type="submit"]');
             
             // Basic validation
             if (!email || !fullName || !phone || !password) {
@@ -300,81 +302,105 @@
                 return;
             }
             
-            // Check if email already exists
-            const existingUsers = Storage.get('users') || [];
-            if (existingUsers.find(u => u.email === email)) {
-                showToast('An account with this email already exists', 'error');
-                return;
-            }
+            // Show loading state
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            submitBtn.disabled = true;
 
-            const formData = {
-                fullName: fullName,
-                name: fullName,
-                phone: phone,
-                email: email,
-                password: password,
-                referralCode: referralCodeInput,
-            };
-
-            // Create new user
-            const newUser = {
-                id: generateId(),
-                ...formData,
-                role: 'user',
-                isLoggedIn: true,
-                balance: 0,
-                points: 0,
-                totalInvested: 0,
-                totalProfit: 0,
-                referralEarnings: 0,
-                referralCode: generateReferralCode(),
-                referredBy: formData.referralCode || null,
-                referrals: [],
-                bkashNumber: '',
-                nagadNumber: '',
-                avatar: null,
-                createdAt: new Date().toISOString()
-            };
-
-            // Save to users list
-            const users = Storage.get('users') || [];
-            
-            // If user was referred, update the referrer's data
-            if (newUser.referredBy) {
-                const referrerIndex = users.findIndex(u => u.referralCode === newUser.referredBy);
-                if (referrerIndex !== -1) {
-                    // Initialize referrals array if not exists
-                    if (!users[referrerIndex].referrals) {
-                        users[referrerIndex].referrals = [];
+            try {
+                // Check if email already exists (check both local and cloud)
+                let existingUsers = Storage.get('users') || [];
+                
+                // Check cloud database if connected
+                const isCloudConnected = window.DatabaseManager && 
+                                        window.DatabaseManager.connected && 
+                                        window.DatabaseManager.type !== 'localStorage';
+                
+                if (isCloudConnected) {
+                    try {
+                        const cloudUsers = await window.DatabaseManager.read('users', { email: email });
+                        if (cloudUsers && cloudUsers.length > 0) {
+                            showToast('An account with this email already exists', 'error');
+                            return;
+                        }
+                    } catch (cloudError) {
+                        console.warn('Cloud check failed, using local:', cloudError);
                     }
-                    // Add this user to referrer's referrals
-                    users[referrerIndex].referrals.push({
-                        id: newUser.id,
-                        name: newUser.name,
-                        email: newUser.email,
-                        joinedAt: newUser.createdAt,
-                        earnings: 0
-                    });
-                    
-                    // Give referrer bonus points (optional)
-                    const referralBonus = 50; // Points for each referral
-                    users[referrerIndex].points = (users[referrerIndex].points || 0) + referralBonus;
-                    
-                    // Update referrer in storage
-                    Storage.set('users', users);
-                    
-                    // Also give new user signup bonus for using referral
-                    newUser.points = 25; // Welcome bonus for using referral code
                 }
-            }
-            
-            // Add new user to list
-            users.push(newUser);
-            Storage.set('users', users);
-            
-            // Save current user with secure session
-            Storage.set('currentUser', newUser);
-            Security.createSession(newUser);
+                
+                if (existingUsers.find(u => u.email === email)) {
+                    showToast('An account with this email already exists', 'error');
+                    return;
+                }
+
+                const formData = {
+                    fullName: fullName,
+                    name: fullName,
+                    phone: phone,
+                    email: email,
+                    password: password,
+                    referralCode: referralCodeInput,
+                };
+
+                // Create new user
+                const newUser = {
+                    id: generateId(),
+                    ...formData,
+                    role: 'user',
+                    isLoggedIn: true,
+                    balance: 0,
+                    points: 0,
+                    totalInvested: 0,
+                    totalProfit: 0,
+                    referralEarnings: 0,
+                    referralCode: generateReferralCode(),
+                    referredBy: formData.referralCode || null,
+                    referrals: [],
+                    bkashNumber: '',
+                    nagadNumber: '',
+                    avatar: null,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Save to users list
+                const users = Storage.get('users') || [];
+                
+                // If user was referred, update the referrer's data
+                if (newUser.referredBy) {
+                    const referrerIndex = users.findIndex(u => u.referralCode === newUser.referredBy);
+                    if (referrerIndex !== -1) {
+                        // Initialize referrals array if not exists
+                        if (!users[referrerIndex].referrals) {
+                            users[referrerIndex].referrals = [];
+                        }
+                        // Add this user to referrer's referrals
+                        users[referrerIndex].referrals.push({
+                            id: newUser.id,
+                            name: newUser.name,
+                            email: newUser.email,
+                            joinedAt: newUser.createdAt,
+                            earnings: 0
+                        });
+                        
+                        // Give referrer bonus points (optional)
+                        const referralBonus = 50; // Points for each referral
+                        users[referrerIndex].points = (users[referrerIndex].points || 0) + referralBonus;
+                        
+                        // Update referrer in storage
+                        Storage.set('users', users);
+                        
+                        // Also give new user signup bonus for using referral
+                        newUser.points = 25; // Welcome bonus for using referral code
+                    }
+                }
+                
+                // Add new user to list
+                users.push(newUser);
+                Storage.set('users', users);
+                
+                // Save current user with secure session
+                Storage.set('currentUser', newUser);
+                Security.createSession(newUser);
             
             // Log successful registration
             Security.logSecurityEvent('signup_success', { email: newUser.email, userId: newUser.id });
@@ -383,6 +409,14 @@
             setTimeout(() => {
                 window.location.href = 'dashboard/index.html';
             }, 1500);
+            } catch (error) {
+                console.error('Signup error:', error);
+                showToast('Signup failed. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalContent;
+                submitBtn.disabled = false;
+            }
         });
 
         // Check for referral code in URL

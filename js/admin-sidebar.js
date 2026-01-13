@@ -128,6 +128,7 @@ function generateAdminLayout(activePage = '') {
                 <a href="transactions.html" class="sidebar-item ${activePage === 'transactions' ? 'active' : ''}">
                     <i class="fas fa-exchange-alt"></i>
                     <span>Transactions</span>
+                    <span class="sidebar-badge" id="pendingTransBadge"></span>
                 </a>
                 <a href="investments.html" class="sidebar-item ${activePage === 'investments' ? 'active' : ''}">
                     <i class="fas fa-chart-line"></i>
@@ -294,6 +295,9 @@ function initAdminLayout() {
     // Load chat badge count
     updateChatBadge();
     
+    // Load pending transactions badge
+    updatePendingTransactionsBadge();
+    
     // Show body - page is ready
     document.body.classList.remove('admin-loading');
     document.body.classList.add('admin-ready');
@@ -313,8 +317,25 @@ function updateChatBadge() {
     }
 }
 
+// Update pending transactions badge in sidebar
+function updatePendingTransactionsBadge() {
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const membershipRequests = JSON.parse(localStorage.getItem('membershipRequests') || '[]');
+    
+    const pendingTrans = transactions.filter(t => t.status === 'pending').length;
+    const pendingMember = membershipRequests.filter(r => r.status === 'pending').length;
+    const totalPending = pendingTrans + pendingMember;
+    
+    const badge = document.getElementById('pendingTransBadge');
+    if (badge) {
+        badge.textContent = totalPending > 0 ? totalPending : '';
+        badge.style.background = totalPending > 0 ? '#ef4444' : '';
+    }
+}
+
 // Auto-refresh chat badge every 3 seconds
 setInterval(updateChatBadge, 3000);
+setInterval(updatePendingTransactionsBadge, 3000);
 
 // Handle window resize
 window.addEventListener('resize', function() {

@@ -663,7 +663,10 @@
     </div>
 
     <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
+    <script src="../js/database-manager.js"></script>
     <script src="../js/theme.js"></script>
+    <script src="../js/financial-tracker.js"></script>
     <script>
         // State
         let currentUser = null;
@@ -1027,6 +1030,16 @@
             currentUser.balance += reward;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             document.getElementById('userBalance').textContent = formatCurrency(currentUser.balance);
+
+            // Record earning in financial tracker for analytics
+            if (window.FinancialTracker) {
+                FinancialTracker.recordUserEarning(
+                    currentUser.email, 
+                    reward, 
+                    'task', 
+                    `${currentTask.category} task: ${currentTask.title || currentTask.id}`
+                );
+            }
 
             // Record transaction
             if (window.db) {

@@ -234,9 +234,14 @@
 
     <main class="admin-main-content">
         <div class="content">
-            <div class="page-header">
-                <h1><i class="fas fa-chart-line" style="color: var(--primary-color); margin-right: 10px;"></i>Financial Analytics</h1>
-                <p>Track all income, expenses, and profit/loss calculations</p>
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1><i class="fas fa-chart-line" style="color: var(--primary-color); margin-right: 10px;"></i>Financial Analytics</h1>
+                    <p>Track all income, expenses, and profit/loss calculations</p>
+                </div>
+                <button class="btn btn-outline" onclick="syncAndRefresh()" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sync-alt"></i> Sync All Data
+                </button>
             </div>
 
             <!-- Overall Summary Cards -->
@@ -402,6 +407,7 @@
     </main>
 
     <script src="../js/theme.js"></script>
+    <script src="../js/main.js"></script>
     <script src="../js/admin-common.js"></script>
     <script src="../js/financial-tracker.js"></script>
     <script>
@@ -411,6 +417,9 @@
                 window.location.href = '../login.html';
                 return;
             }
+            
+            // Sync existing data from approved transactions/memberships
+            FinancialTracker.syncExistingData();
             
             loadOverallTotals();
             loadInvestmentList();
@@ -577,6 +586,15 @@
             } else {
                 container.innerHTML = rows.join('');
             }
+        }
+        
+        function syncAndRefresh() {
+            FinancialTracker.syncExistingData();
+            loadOverallTotals();
+            loadInvestmentList();
+            loadBreakdown();
+            loadDailySummary();
+            showToast('Data synced successfully!', 'success');
         }
         
         function showToast(message, type = 'success') {

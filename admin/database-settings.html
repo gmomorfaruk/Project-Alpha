@@ -107,6 +107,38 @@
             background: rgba(79, 70, 229, 0.05);
         }
         
+        .db-option.recommended {
+            position: relative;
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .db-option.recommended:hover {
+            border-color: #059669;
+        }
+        
+        .badge-free {
+            background: #10b981;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .recommendation-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
         .db-option-icon {
             width: 60px;
             height: 60px;
@@ -265,7 +297,12 @@
             <div class="db-status-card">
                 <div class="db-status-header">
                     <h3><i class="fas fa-plug"></i> Current Connection</h3>
-                    <span class="status-badge demo" id="connectionStatus">Demo Mode</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="database-test.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-flask"></i> Test Database
+                        </a>
+                        <span class="status-badge demo" id="connectionStatus">Demo Mode</span>
+                    </div>
                 </div>
                 <div class="db-stats">
                     <div class="db-stat">
@@ -299,25 +336,26 @@
                             <h4>Local Storage</h4>
                             <span>Browser-based storage (Demo)</span>
                         </div>
-                        <div class="db-option" data-db="postgresql" onclick="selectDatabase('postgresql')">
-                            <div class="db-option-icon">🐘</div>
-                            <h4>PostgreSQL</h4>
-                            <span>Enterprise SQL database</span>
-                        </div>
-                        <div class="db-option" data-db="mysql" onclick="selectDatabase('mysql')">
-                            <div class="db-option-icon">🐬</div>
-                            <h4>MySQL</h4>
-                            <span>Popular SQL database</span>
-                        </div>
-                        <div class="db-option" data-db="mongodb" onclick="selectDatabase('mongodb')">
-                            <div class="db-option-icon">🍃</div>
-                            <h4>MongoDB</h4>
-                            <span>NoSQL document database</span>
+                        <div class="db-option recommended" data-db="supabase" onclick="selectDatabase('supabase')">
+                            <div class="db-option-icon">⚡</div>
+                            <h4>Supabase <span class="badge-free">FREE</span></h4>
+                            <span>PostgreSQL • Best for Students</span>
+                            <div class="recommendation-badge">✨ Recommended</div>
                         </div>
                         <div class="db-option" data-db="firebase" onclick="selectDatabase('firebase')">
                             <div class="db-option-icon">🔥</div>
                             <h4>Firebase</h4>
-                            <span>Google cloud database</span>
+                            <span>Google Firestore (NoSQL)</span>
+                        </div>
+                        <div class="db-option" data-db="postgresql" onclick="selectDatabase('postgresql')">
+                            <div class="db-option-icon">🐘</div>
+                            <h4>PostgreSQL</h4>
+                            <span>Direct connection (Advanced)</span>
+                        </div>
+                        <div class="db-option" data-db="mysql" onclick="selectDatabase('mysql')">
+                            <div class="db-option-icon">🐬</div>
+                            <h4>MySQL</h4>
+                            <span>Direct connection (Advanced)</span>
                         </div>
                     </div>
                 </div>
@@ -497,6 +535,88 @@
                 </div>
             </div>
 
+            <!-- Supabase Connection (RECOMMENDED) -->
+            <div class="settings-card connection-form" id="form-supabase">
+                <div class="settings-card-header">
+                    <h3>⚡ Supabase Configuration <span class="badge-free" style="margin-left: 10px;">FREE for Students</span></h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="supabase-info" style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px;"><i class="fas fa-star"></i> Why Supabase?</h4>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem;">
+                            <li>✅ <strong>FREE</strong> - 500MB storage, 50,000 rows</li>
+                            <li>✅ <strong>Fast</strong> - PostgreSQL database (industry standard)</li>
+                            <li>✅ <strong>Easy</strong> - No backend code needed</li>
+                            <li>✅ <strong>Secure</strong> - Built-in authentication & RLS</li>
+                        </ul>
+                        <a href="https://supabase.com" target="_blank" style="display: inline-block; margin-top: 15px; background: white; color: #10b981; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                            <i class="fas fa-external-link-alt"></i> Get Started at Supabase.com
+                        </a>
+                    </div>
+                    
+                    <div class="setup-steps" style="margin-bottom: 25px; padding: 20px; background: var(--bg-secondary); border-radius: 12px;">
+                        <h4 style="margin-bottom: 15px;"><i class="fas fa-list-ol"></i> Quick Setup (5 minutes)</h4>
+                        <ol style="padding-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+                            <li>Go to <a href="https://supabase.com" target="_blank">supabase.com</a> and create a free account</li>
+                            <li>Create a new project (choose any region)</li>
+                            <li>Wait 2 minutes for project to be ready</li>
+                            <li>Go to <strong>Settings → API</strong> in your Supabase dashboard</li>
+                            <li>Copy the <strong>Project URL</strong> and <strong>anon public</strong> key below</li>
+                            <li>Click <strong>"Create Tables"</strong> below to set up your database</li>
+                        </ol>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Project URL</label>
+                        <input type="text" class="form-control" id="supabase-url" placeholder="https://xxxxx.supabase.co">
+                        <span class="help-text">Found in Settings → API → Project URL</span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> Anon Public Key</label>
+                        <input type="text" class="form-control" id="supabase-anon-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                        <span class="help-text">Found in Settings → API → anon public (safe to use in browser)</span>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="testSupabaseConnection()">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                        <button class="btn btn-primary" onclick="connectToSupabase()">
+                            <i class="fas fa-save"></i> Save & Connect
+                        </button>
+                    </div>
+                    <div class="test-result" id="result-supabase"></div>
+                    
+                    <hr style="margin: 30px 0; border-color: var(--border-color);">
+                    
+                    <h4 style="margin-bottom: 15px;"><i class="fas fa-database"></i> Database Tables</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                        After connecting, create the required tables in your Supabase database.
+                    </p>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="showCreateTablesSQL()">
+                            <i class="fas fa-code"></i> Show SQL (Copy to Supabase)
+                        </button>
+                        <button class="btn btn-secondary" onclick="syncDataToCloud()">
+                            <i class="fas fa-cloud-upload-alt"></i> Sync Local Data to Cloud
+                        </button>
+                        <button class="btn btn-secondary" onclick="syncDataFromCloud()">
+                            <i class="fas fa-cloud-download-alt"></i> Sync Cloud Data to Local
+                        </button>
+                    </div>
+                    
+                    <div id="sql-output" style="display: none; margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong>Copy this SQL to Supabase SQL Editor:</strong>
+                            <button class="btn btn-secondary" onclick="copySQLToClipboard()" style="padding: 6px 12px;">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <pre id="sql-code" class="migration-log" style="max-height: 400px; white-space: pre-wrap;"></pre>
+                    </div>
+                </div>
+            </div>
+
             <!-- Data Migration -->
             <div class="settings-card">
                 <div class="settings-card-header">
@@ -566,15 +686,39 @@
     </main>
 
     <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
+    <script>
+        // Debug: Check if DatabaseManager loaded correctly
+        console.log('🔍 Checking DatabaseManager...');
+        console.log('window.DatabaseManager:', window.DatabaseManager);
+        console.log('typeof connect:', typeof (window.DatabaseManager && window.DatabaseManager.connect));
+        
+        if (!window.DatabaseManager || typeof window.DatabaseManager.connect !== 'function') {
+            console.error('❌ DatabaseManager not loaded properly!');
+            alert('Error: DatabaseManager not loaded. Please hard refresh (Ctrl+Shift+R)');
+        } else {
+            console.log('✅ DatabaseManager loaded successfully');
+        }
+    </script>
     <script src="../js/theme.js"></script>
     <script src="../js/admin-common.js"></script>
     <script>
         let selectedDB = 'localStorage';
 
+        // Helper function to get from localStorage
+        function getStorage(key) {
+            try {
+                const data = localStorage.getItem('projectAlpha_' + key);
+                return data ? JSON.parse(data) : null;
+            } catch(e) {
+                return null;
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Authentication check
-            const user = Storage.get('currentUser');
+            const user = getStorage('currentUser');
             if (!user || !user.isLoggedIn || user.role !== 'admin') {
                 window.location.href = '../login.html';
                 return;
@@ -890,6 +1034,260 @@
             if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.add('active'));
             if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.remove('active'));
         }
+
+        // ==================== SUPABASE FUNCTIONS ====================
+
+        async function testSupabaseConnection() {
+            const url = document.getElementById('supabase-url').value.trim();
+            const anonKey = document.getElementById('supabase-anon-key').value.trim();
+            const resultDiv = document.getElementById('result-supabase');
+
+            if (!url || !anonKey) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Please enter both URL and Anon Key';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing connection to Supabase...';
+            resultDiv.style.display = 'block';
+
+            try {
+                // Check if DatabaseManager is available
+                if (typeof window.DatabaseManager === 'undefined' || !window.DatabaseManager) {
+                    throw new Error('DatabaseManager not loaded. Please refresh the page.');
+                }
+                
+                if (typeof window.DatabaseManager.testConnection !== 'function') {
+                    throw new Error('DatabaseManager.testConnection not available. Please refresh the page.');
+                }
+
+                const result = await window.DatabaseManager.testConnection('supabase', {
+                    url: url,
+                    anonKey: anonKey
+                });
+
+                if (result.success) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> Connection successful! Supabase is ready.';
+                    showToast('Supabase connection test passed!', 'success');
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> ' + result.message;
+                    showToast('Connection failed: ' + result.message, 'error');
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Error: ' + error.message;
+                showToast('Connection error', 'error');
+            }
+        }
+
+        async function connectToSupabase() {
+            const url = document.getElementById('supabase-url').value.trim();
+            const anonKey = document.getElementById('supabase-anon-key').value.trim();
+            const resultDiv = document.getElementById('result-supabase');
+
+            if (!url || !anonKey) {
+                showToast('Please enter both URL and Anon Key', 'error');
+                return;
+            }
+
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to Supabase...';
+            resultDiv.style.display = 'block';
+
+            try {
+                // Check if DatabaseManager is available
+                if (typeof window.DatabaseManager === 'undefined' || !window.DatabaseManager) {
+                    throw new Error('DatabaseManager not loaded. Please refresh the page.');
+                }
+                
+                if (typeof window.DatabaseManager.connect !== 'function') {
+                    throw new Error('DatabaseManager.connect not available. Please refresh the page.');
+                }
+
+                const result = await window.DatabaseManager.connect('supabase', {
+                    url: url,
+                    anonKey: anonKey
+                });
+
+                if (result.success) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> Connected to Supabase! Your data will now sync to the cloud.';
+                    
+                    // Update status badge
+                    const statusBadge = document.getElementById('connectionStatus');
+                    statusBadge.textContent = 'Connected (Supabase)';
+                    statusBadge.className = 'status-badge connected';
+                    
+                    // Update config
+                    AppConfig.database.type = 'supabase';
+                    AppConfig.database.connected = true;
+                    if (typeof configManager !== 'undefined') configManager.saveConfig();
+                    
+                    showToast('Connected to Supabase successfully!', 'success');
+                    log('Connected to Supabase database');
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> ' + result.message;
+                    showToast('Connection failed', 'error');
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Error: ' + error.message;
+                showToast('Connection error', 'error');
+            }
+        }
+
+        function showCreateTablesSQL() {
+            const sqlOutput = document.getElementById('sql-output');
+            const sqlCode = document.getElementById('sql-code');
+            
+            if (!window.DatabaseManager || typeof window.DatabaseManager.generateCreateTableSQL !== 'function') {
+                showToast('DatabaseManager not loaded. Please refresh the page.', 'error');
+                return;
+            }
+            
+            const sql = window.DatabaseManager.generateCreateTableSQL();
+            sqlCode.textContent = sql;
+            sqlOutput.style.display = 'block';
+            
+            showToast('SQL generated! Copy and paste into Supabase SQL Editor', 'info');
+        }
+
+        function copySQLToClipboard() {
+            const sqlCode = document.getElementById('sql-code').textContent;
+            navigator.clipboard.writeText(sqlCode).then(() => {
+                showToast('SQL copied to clipboard!', 'success');
+            }).catch(err => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        async function syncDataToCloud() {
+            if (!window.DatabaseManager || window.DatabaseManager.type === 'localStorage') {
+                showToast('Please connect to a cloud database first', 'warning');
+                return;
+            }
+
+            const logDiv = document.getElementById('migrationLog');
+            const logContent = document.getElementById('logContent');
+            logDiv.style.display = 'block';
+            logContent.innerHTML = '';
+            
+            appendLog('Starting sync to cloud...');
+
+            try {
+                const result = await window.DatabaseManager.syncToCloud();
+                
+                if (result.success) {
+                    for (const table in result.synced) {
+                        appendLog(`✓ Synced ${result.synced[table]} records to ${table}`);
+                    }
+                    appendLog('Sync completed successfully!');
+                    showToast('Data synced to cloud!', 'success');
+                } else {
+                    for (const error of result.errors) {
+                        appendLog(`✗ Error in ${error.table}: ${error.error}`);
+                    }
+                    showToast('Sync completed with some errors', 'warning');
+                }
+            } catch (error) {
+                appendLog('✗ Error: ' + error.message);
+                showToast('Sync failed', 'error');
+            }
+        }
+
+        async function syncDataFromCloud() {
+            if (!window.DatabaseManager || window.DatabaseManager.type === 'localStorage') {
+                showToast('Please connect to a cloud database first', 'warning');
+                return;
+            }
+
+            const logDiv = document.getElementById('migrationLog');
+            const logContent = document.getElementById('logContent');
+            logDiv.style.display = 'block';
+            logContent.innerHTML = '';
+            
+            appendLog('Starting sync from cloud...');
+
+            try {
+                const result = await window.DatabaseManager.syncFromCloud();
+                
+                if (result.success) {
+                    for (const table in result.synced) {
+                        appendLog(`✓ Downloaded ${result.synced[table]} records from ${table}`);
+                    }
+                    appendLog('Sync completed successfully!');
+                    updateStats();
+                    showToast('Data synced from cloud!', 'success');
+                } else {
+                    for (const error of result.errors) {
+                        appendLog(`✗ Error in ${error.table}: ${error.error}`);
+                    }
+                    showToast('Sync completed with some errors', 'warning');
+                }
+            } catch (error) {
+                appendLog('✗ Error: ' + error.message);
+                showToast('Sync failed', 'error');
+            }
+        }
+
+        // Update stats with database manager
+        function updateStatsFromManager() {
+            if (!window.DatabaseManager || typeof window.DatabaseManager.getStats !== 'function') {
+                console.warn('DatabaseManager not ready, using localStorage directly');
+                updateStats();
+                return;
+            }
+            
+            const stats = window.DatabaseManager.getStats();
+            
+            document.getElementById('totalUsers').textContent = stats.tables.users || 0;
+            document.getElementById('totalTasks').textContent = stats.tables.tasks || 0;
+            document.getElementById('totalTransactions').textContent = stats.tables.transactions || 0;
+            document.getElementById('dbSize').textContent = stats.sizeKB;
+            
+            // Update status badge based on connection
+            const statusBadge = document.getElementById('connectionStatus');
+            if (stats.connected && stats.type !== 'localStorage') {
+                statusBadge.textContent = `Connected (${stats.type})`;
+                statusBadge.className = 'status-badge connected';
+            } else {
+                statusBadge.textContent = 'Demo Mode (localStorage)';
+                statusBadge.className = 'status-badge demo';
+            }
+        }
+
+        // Load saved Supabase config if exists
+        function loadSavedSupabaseConfig() {
+            const saved = localStorage.getItem('projectAlpha_dbConfig');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    if (config.type === 'supabase' && config.config) {
+                        document.getElementById('supabase-url').value = config.config.url || '';
+                        document.getElementById('supabase-anon-key').value = config.config.anonKey || '';
+                        
+                        // Update status
+                        if (window.DatabaseManager && window.DatabaseManager.connected) {
+                            const statusBadge = document.getElementById('connectionStatus');
+                            statusBadge.textContent = 'Connected (Supabase)';
+                            statusBadge.className = 'status-badge connected';
+                        }
+                    }
+                } catch(e) {
+                    console.error('Error loading saved config:', e);
+                }
+            }
+        }
+
+        // Call on page load
+        setTimeout(() => {
+            loadSavedSupabaseConfig();
+            updateStatsFromManager();
+        }, 500);
     </script>
 </body>
 </html>

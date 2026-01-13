@@ -241,6 +241,7 @@
     <script src="../js/main.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
     <script src="../js/financial-tracker.js"></script>
     <script>
         let transactions = [];
@@ -317,7 +318,7 @@
             const totalDeposits = deposits.reduce((sum, t) => sum + t.amount, 0);
             document.getElementById('totalDeposits').textContent = formatCurrency(totalDeposits);
 
-            const withdrawals = transactions.filter(t => t.type === 'withdrawal' && t.status === 'approved');
+            const withdrawals = transactions.filter(t => (t.type === 'withdrawal' || t.type === 'withdraw') && t.status === 'approved');
             const totalWithdrawals = withdrawals.reduce((sum, t) => sum + t.amount, 0);
             document.getElementById('totalWithdrawals').textContent = formatCurrency(totalWithdrawals);
 
@@ -466,23 +467,32 @@
             // Update transaction status
             t.status = 'approved';
             t.processedAt = new Date().toISOString();
+            
+            const userEmail = t.userEmail || t.userId;
 
             // Update user balance if deposit
             if (t.type === 'deposit') {
                 const users = Storage.get('users') || [];
-                const userIndex = users.findIndex(u => u.email === t.userEmail);
+                const userIndex = users.findIndex(u => u.email === userEmail || u.id === t.userId);
                 if (userIndex !== -1) {
                     users[userIndex].balance = (users[userIndex].balance || 0) + t.amount;
                     Storage.set('users', users);
+                    
+                    // Also update currentUser if same user
+                    const currentUser = Storage.get('currentUser');
+                    if (currentUser && (currentUser.email === userEmail || currentUser.id === t.userId)) {
+                        currentUser.balance = users[userIndex].balance;
+                        Storage.set('currentUser', currentUser);
+                    }
                 }
                 
                 // Record deposit in financial tracker
-                FinancialTracker.recordDeposit(t.userEmail, t.amount, t.method || 'manual');
+                FinancialTracker.recordDeposit(userEmail, t.amount, t.method || 'manual');
             }
             
-            // Record withdrawal in financial tracker
-            if (t.type === 'withdrawal') {
-                FinancialTracker.recordWithdrawal(t.userEmail, t.amount, t.method || 'manual');
+            // Record withdrawal in financial tracker (balance already deducted on request)
+            if (t.type === 'withdrawal' || t.type === 'withdraw') {
+                FinancialTracker.recordWithdrawal(userEmail, t.amount, t.method || 'manual');
             }
 
             Storage.set('transactions', transactions);
@@ -495,12 +505,20 @@
             if (!t) return;
 
             // If withdrawal, refund the amount
-            if (t.type === 'withdrawal') {
+            if (t.type === 'withdrawal' || t.type === 'withdraw') {
                 const users = Storage.get('users') || [];
-                const userIndex = users.findIndex(u => u.email === t.userEmail);
+                const userEmail = t.userEmail || t.userId;
+                const userIndex = users.findIndex(u => u.email === userEmail || u.id === t.userId);
                 if (userIndex !== -1) {
                     users[userIndex].balance = (users[userIndex].balance || 0) + t.amount;
                     Storage.set('users', users);
+                    
+                    // Also update currentUser if same user
+                    const currentUser = Storage.get('currentUser');
+                    if (currentUser && (currentUser.email === userEmail || currentUser.id === t.userId)) {
+                        currentUser.balance = users[userIndex].balance;
+                        Storage.set('currentUser', currentUser);
+                    }
                 }
             }
 
@@ -508,7 +526,7 @@
             t.processedAt = new Date().toISOString();
 
             Storage.set('transactions', transactions);
-            showToast('Transaction rejected', 'success');
+            showToast('Transaction rejected - Balance refunded', 'success');
             loadAllData();
         }
 

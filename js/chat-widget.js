@@ -1,9 +1,26 @@
 /**
  * Lightweight Chat Widget
  * - Predefined auto-replies for common questions
- * - Stores messages in localStorage
+ * - Stores messages in localStorage/cloud database
  * - Admin can reply from admin panel
  */
+
+// Helper to get Storage (fallback to localStorage if not available)
+function getChatStorage() {
+    if (typeof Storage !== 'undefined' && typeof Storage.get === 'function') {
+        return Storage;
+    }
+    // Fallback implementation
+    return {
+        get: (key) => {
+            const item = localStorage.getItem('projectAlpha_' + key);
+            return item ? JSON.parse(item) : null;
+        },
+        set: (key, value) => {
+            localStorage.setItem('projectAlpha_' + key, JSON.stringify(value));
+        }
+    };
+}
 
 const ChatWidget = {
     isOpen: false,
@@ -69,8 +86,8 @@ const ChatWidget = {
     
     // Register user in global chat list so admin can see them
     registerUser() {
-        const allChats = JSON.parse(localStorage.getItem('allChatUsers') || '{}');
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const allChats = getChatStorage().get('allChatUsers') || {};
+        const currentUser = getChatStorage().get('currentUser') || {};
         
         if (!allChats[this.userId]) {
             allChats[this.userId] = {
@@ -82,20 +99,20 @@ const ChatWidget = {
                 unreadCount: 0,
                 totalMessages: 0
             };
-            localStorage.setItem('allChatUsers', JSON.stringify(allChats));
+            getChatStorage().set('allChatUsers', allChats);
         }
     },
     
     // Get or create user ID
     getUserId() {
-        let id = localStorage.getItem('chatUserId');
+        let id = getChatStorage().get('chatUserId');
         if (!id) {
             id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('chatUserId', id);
+            getChatStorage().set('chatUserId', id);
         }
         
         // If logged in, use actual user ID
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUser = getChatStorage().get('currentUser') || {};
         if (currentUser.id) {
             return currentUser.id;
         }

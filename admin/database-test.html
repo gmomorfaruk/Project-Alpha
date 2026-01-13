@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Functionality Test - Project Alpha</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-header {
+            background: linear-gradient(135deg, var(--primary-color), #0d5a58);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .test-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+        .test-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        .db-status {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .status-item {
+            background: rgba(255,255,255,0.15);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-item i {
+            font-size: 1.2rem;
+        }
+        .test-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .test-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        .test-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .test-btn.danger {
+            background: #ef4444;
+            color: white;
+        }
+        .test-btn.success {
+            background: #10b981;
+            color: white;
+        }
+        .test-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .table-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-card-header {
+            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .table-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .table-card-body {
+            padding: 15px 20px;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .test-result:last-child {
+            border-bottom: none;
+        }
+        .test-result.success i { color: #10b981; }
+        .test-result.error i { color: #ef4444; }
+        .test-result.warning i { color: #f59e0b; }
+        .test-result.pending i { color: #6b7280; }
+        .test-result span {
+            flex: 1;
+        }
+        .test-result .time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .log-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .log-header {
+            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .log-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .log-body {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px 20px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-entry.success { color: #10b981; }
+        .log-entry.error { color: #ef4444; }
+        .log-entry.info { color: #3b82f6; }
+        .log-entry.warning { color: #f59e0b; }
+        .summary-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .summary-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #10b981);
+            transition: width 0.3s;
+            border-radius: 4px;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background: var(--bg-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <a href="database-settings.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Database Settings
+        </a>
+
+        <div class="test-header">
+            <h1><i class="fas fa-flask"></i> Database Functionality Test</h1>
+            <p>Comprehensive testing of all database tables and CRUD operations</p>
+            
+            <div class="db-status">
+                <div class="status-item">
+                    <i class="fas fa-database"></i>
+                    <span id="dbType">Loading...</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-plug"></i>
+                    <span id="dbStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-table"></i>
+                    <span id="tableCount">0 Tables</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card" id="summaryCard" style="display: none;">
+            <h3 style="margin: 0 0 20px 0;"><i class="fas fa-chart-pie"></i> Test Summary</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value" id="totalTests">0</div>
+                    <div class="summary-label">Total Tests</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" style="color: #10b981;" id="passedTests">0</div>
+                    <div class="summary-label">Passed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" style="color: #ef4444;" id="failedTests">0</div>
+                    <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" style="color: #f59e0b;" id="warningTests">0</div>
+                    <div class="summary-label">Warnings</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="test-actions">
+            <button class="test-btn primary" onclick="runAllTests()" id="runAllBtn">
+                <i class="fas fa-play"></i> Run All Tests
+            </button>
+            <button class="test-btn secondary" onclick="testConnection()">
+                <i class="fas fa-plug"></i> Test Connection
+            </button>
+            <button class="test-btn secondary" onclick="checkAllTables()">
+                <i class="fas fa-table"></i> Check Tables
+            </button>
+            <button class="test-btn success" onclick="testCRUDOperations()">
+                <i class="fas fa-cogs"></i> Test CRUD
+            </button>
+            <button class="test-btn secondary" onclick="clearLogs()">
+                <i class="fas fa-eraser"></i> Clear Logs
+            </button>
+        </div>
+
+        <!-- Tables Grid -->
+        <div class="tables-grid" id="tablesGrid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Test Log -->
+        <div class="log-container">
+            <div class="log-header">
+                <h3><i class="fas fa-terminal"></i> Test Log</h3>
+                <span id="logCount">0 entries</span>
+            </div>
+            <div class="log-body" id="logBody">
+                <div class="log-entry info">Waiting to start tests...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        // All tables that should exist in the database
+        const requiredTables = [
+            { name: 'users', description: 'User accounts and profiles', icon: 'fa-users' },
+            { name: 'tasks', description: 'Available tasks for users', icon: 'fa-tasks' },
+            { name: 'transactions', description: 'Financial transactions', icon: 'fa-exchange-alt' },
+            { name: 'investments', description: 'User investments', icon: 'fa-chart-line' },
+            { name: 'products', description: 'Investment products', icon: 'fa-box' },
+            { name: 'announcements', description: 'System announcements', icon: 'fa-bullhorn' },
+            { name: 'activity_logs', description: 'User activity tracking', icon: 'fa-history' },
+            { name: 'task_completions', description: 'Completed tasks by users', icon: 'fa-check-circle' },
+            { name: 'referrals', description: 'Referral relationships', icon: 'fa-user-plus' },
+            { name: 'memberships', description: 'User memberships', icon: 'fa-crown' },
+            { name: 'proofs', description: 'Sell proofs and verifications', icon: 'fa-receipt' },
+            { name: 'deposits', description: 'Deposit requests', icon: 'fa-arrow-down' },
+            { name: 'withdrawals', description: 'Withdrawal requests', icon: 'fa-arrow-up' },
+            { name: 'settings', description: 'System settings', icon: 'fa-cog' },
+            { name: 'chatMessages', description: 'Chat messages', icon: 'fa-comments' }
+        ];
+
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            warnings: 0
+        };
+
+        let logs = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            const user = Storage.get('currentUser');
+            if (!user || user.role !== 'admin') {
+                // Allow testing anyway but show warning
+                log('Warning: Not logged in as admin. Some tests may fail.', 'warning');
+            }
+            
+            await updateDBStatus();
+            renderTablesGrid();
+        });
+
+        // Update database status display
+        async function updateDBStatus() {
+            const db = window.DatabaseManager;
+            
+            document.getElementById('dbType').textContent = db.type.toUpperCase();
+            document.getElementById('dbStatus').textContent = db.connected ? 'Connected' : 'Disconnected';
+            document.getElementById('tableCount').textContent = `${requiredTables.length} Tables`;
+        }
+
+        // Render the tables grid
+        function renderTablesGrid() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = requiredTables.map(table => `
+                <div class="table-card" id="table-${table.name}">
+                    <div class="table-card-header">
+                        <div class="table-name">
+                            <i class="fas ${table.icon}"></i>
+                            ${table.name}
+                        </div>
+                        <span class="table-count" id="count-${table.name}">-</span>
+                    </div>
+                    <div class="table-card-body">
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 15px 0;">
+                            ${table.description}
+                        </p>
+                        <div id="results-${table.name}">
+                            <div class="test-result pending">
+                                <i class="fas fa-circle"></i>
+                                <span>Waiting for test...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Log function
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            logs.unshift({ message, type, time });
+            
+            const logBody = document.getElementById('logBody');
+            logBody.innerHTML = logs.map(l => 
+                `<div class="log-entry ${l.type}">[${l.time}] ${l.message}</div>`
+            ).join('');
+            
+            document.getElementById('logCount').textContent = `${logs.length} entries`;
+        }
+
+        // Clear logs
+        function clearLogs() {
+            logs = [];
+            document.getElementById('logBody').innerHTML = '<div class="log-entry info">Logs cleared. Ready for new tests...</div>';
+            document.getElementById('logCount').textContent = '0 entries';
+            testResults = { total: 0, passed: 0, failed: 0, warnings: 0 };
+            updateSummary();
+            renderTablesGrid();
+        }
+
+        // Update summary card
+        function updateSummary() {
+            const summary = document.getElementById('summaryCard');
+            summary.style.display = 'block';
+            
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            document.getElementById('warningTests').textContent = testResults.warnings;
+            
+            const percent = testResults.total > 0 ? (testResults.passed / testResults.total) * 100 : 0;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // Test database connection
+        async function testConnection() {
+            log('Testing database connection...', 'info');
+            
+            const db = window.DatabaseManager;
+            
+            if (!db) {
+                log('ERROR: DatabaseManager not found!', 'error');
+                testResults.failed++;
+                testResults.total++;
+                updateSummary();
+                return false;
+            }
+            
+            try {
+                if (db.type === 'localStorage') {
+                    const test = await db.adapters.localStorage.testConnection();
+                    if (test.success) {
+                        log('✓ localStorage connection OK', 'success');
+                        testResults.passed++;
+                    } else {
+                        log('✗ localStorage test failed: ' + test.message, 'error');
+                        testResults.failed++;
+                    }
+                } else {
+                    const test = await db.currentAdapter.testConnection();
+                    if (test.success) {
+                        log(`✓ ${db.type} connection OK`, 'success');
+                        testResults.passed++;
+                    } else {
+                        log(`✗ ${db.type} test failed: ${test.message}`, 'error');
+                        testResults.failed++;
+                    }
+                }
+            } catch (error) {
+                log(`✗ Connection test error: ${error.message}`, 'error');
+                testResults.failed++;
+            }
+            
+            testResults.total++;
+            updateSummary();
+            return true;
+        }
+
+        // Check all tables exist and have data
+        async function checkAllTables() {
+            log('Checking all tables...', 'info');
+            
+            const db = window.DatabaseManager;
+            
+            for (const table of requiredTables) {
+                try {
+                    const data = await db.read(table.name);
+                    const count = Array.isArray(data) ? data.length : 0;
+                    
+                    document.getElementById(`count-${table.name}`).textContent = count;
+                    
+                    const resultsDiv = document.getElementById(`results-${table.name}`);
+                    
+                    if (count > 0) {
+                        resultsDiv.innerHTML = `
+                            <div class="test-result success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Table exists with ${count} records</span>
+                            </div>
+                        `;
+                        log(`✓ ${table.name}: ${count} records found`, 'success');
+                        testResults.passed++;
+                    } else {
+                        resultsDiv.innerHTML = `
+                            <div class="test-result warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Table exists but empty</span>
+                            </div>
+                        `;
+                        log(`⚠ ${table.name}: Table empty (0 records)`, 'warning');
+                        testResults.warnings++;
+                    }
+                } catch (error) {
+                    document.getElementById(`count-${table.name}`).textContent = 'ERR';
+                    document.getElementById(`results-${table.name}`).innerHTML = `
+                        <div class="test-result error">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Error: ${error.message}</span>
+                        </div>
+                    `;
+                    log(`✗ ${table.name}: ${error.message}`, 'error');
+                    testResults.failed++;
+                }
+                
+                testResults.total++;
+            }
+            
+            updateSummary();
+        }
+
+        // Test CRUD operations on a test table
+        async function testCRUDOperations() {
+            log('Testing CRUD operations...', 'info');
+            
+            const db = window.DatabaseManager;
+            const testTable = 'settings';
+            const testId = 'test_crud_' + Date.now();
+            
+            // Test CREATE
+            try {
+                log('Testing CREATE operation...', 'info');
+                const createResult = await db.create(testTable, {
+                    id: testId,
+                    key: 'test_key',
+                    value: { test: true, timestamp: new Date().toISOString() }
+                });
+                
+                if (createResult.success) {
+                    log('✓ CREATE: Successfully created test record', 'success');
+                    testResults.passed++;
+                } else {
+                    log(`✗ CREATE failed: ${createResult.error}`, 'error');
+                    testResults.failed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                log(`✗ CREATE error: ${error.message}`, 'error');
+                testResults.failed++;
+                testResults.total++;
+            }
+            
+            // Test READ
+            try {
+                log('Testing READ operation...', 'info');
+                const readResult = await db.readOne(testTable, testId);
+                
+                if (readResult && readResult.id === testId) {
+                    log('✓ READ: Successfully read test record', 'success');
+                    testResults.passed++;
+                } else {
+                    log('✗ READ failed: Record not found', 'error');
+                    testResults.failed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                log(`✗ READ error: ${error.message}`, 'error');
+                testResults.failed++;
+                testResults.total++;
+            }
+            
+            // Test UPDATE
+            try {
+                log('Testing UPDATE operation...', 'info');
+                const updateResult = await db.update(testTable, testId, {
+                    value: { test: true, updated: true, timestamp: new Date().toISOString() }
+                });
+                
+                if (updateResult.success) {
+                    log('✓ UPDATE: Successfully updated test record', 'success');
+                    testResults.passed++;
+                } else {
+                    log(`✗ UPDATE failed: ${updateResult.error}`, 'error');
+                    testResults.failed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                log(`✗ UPDATE error: ${error.message}`, 'error');
+                testResults.failed++;
+                testResults.total++;
+            }
+            
+            // Test DELETE
+            try {
+                log('Testing DELETE operation...', 'info');
+                const deleteResult = await db.delete(testTable, testId);
+                
+                if (deleteResult.success) {
+                    log('✓ DELETE: Successfully deleted test record', 'success');
+                    testResults.passed++;
+                } else {
+                    log(`✗ DELETE failed: ${deleteResult.error}`, 'error');
+                    testResults.failed++;
+                }
+                testResults.total++;
+            } catch (error) {
+                log(`✗ DELETE error: ${error.message}`, 'error');
+                testResults.failed++;
+                testResults.total++;
+            }
+            
+            // Verify deletion
+            try {
+                const verifyDelete = await db.readOne(testTable, testId);
+                if (!verifyDelete) {
+                    log('✓ VERIFY: Deletion confirmed', 'success');
+                    testResults.passed++;
+                } else {
+                    log('⚠ VERIFY: Record still exists after delete', 'warning');
+                    testResults.warnings++;
+                }
+                testResults.total++;
+            } catch (error) {
+                log(`✗ VERIFY error: ${error.message}`, 'error');
+                testResults.failed++;
+                testResults.total++;
+            }
+            
+            updateSummary();
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            const btn = document.getElementById('runAllBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner spinner"></i> Running...';
+            
+            // Reset results
+            testResults = { total: 0, passed: 0, failed: 0, warnings: 0 };
+            logs = [];
+            renderTablesGrid();
+            
+            log('========== STARTING COMPREHENSIVE TESTS ==========', 'info');
+            log(`Database Type: ${window.DatabaseManager.type}`, 'info');
+            log(`Timestamp: ${new Date().toISOString()}`, 'info');
+            log('', 'info');
+            
+            // 1. Connection test
+            log('--- Connection Test ---', 'info');
+            await testConnection();
+            
+            // 2. Table check
+            log('', 'info');
+            log('--- Table Check ---', 'info');
+            await checkAllTables();
+            
+            // 3. CRUD operations
+            log('', 'info');
+            log('--- CRUD Operations Test ---', 'info');
+            await testCRUDOperations();
+            
+            // 4. Query test
+            log('', 'info');
+            log('--- Query Test ---', 'info');
+            await testQueries();
+            
+            // 5. localStorage sync check
+            log('', 'info');
+            log('--- LocalStorage Check ---', 'info');
+            await testLocalStorageData();
+            
+            // Final summary
+            log('', 'info');
+            log('========== TEST COMPLETE ==========', 'info');
+            log(`Total: ${testResults.total} | Passed: ${testResults.passed} | Failed: ${testResults.failed} | Warnings: ${testResults.warnings}`, 'info');
+            
+            const successRate = testResults.total > 0 ? ((testResults.passed / testResults.total) * 100).toFixed(1) : 0;
+            log(`Success Rate: ${successRate}%`, successRate >= 80 ? 'success' : 'warning');
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play"></i> Run All Tests';
+        }
+
+        // Test query operations
+        async function testQueries() {
+            const db = window.DatabaseManager;
+            
+            // Test query with filter
+            try {
+                log('Testing query with filter...', 'info');
+                const users = await db.query('users', { limit: 5 });
+                
+                if (Array.isArray(users)) {
+                    log(`✓ QUERY: Retrieved ${users.length} users (limit 5)`, 'success');
+                    testResults.passed++;
+                } else {
+                    log('✗ QUERY: Unexpected result format', 'error');
+                    testResults.failed++;
+                }
+            } catch (error) {
+                log(`✗ QUERY error: ${error.message}`, 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            // Test query with orderBy
+            try {
+                log('Testing query with ordering...', 'info');
+                const transactions = await db.query('transactions', { 
+                    orderBy: 'createdAt:desc',
+                    limit: 10
+                });
+                
+                if (Array.isArray(transactions)) {
+                    log(`✓ QUERY ORDER: Retrieved ${transactions.length} transactions (desc order)`, 'success');
+                    testResults.passed++;
+                } else {
+                    log('✗ QUERY ORDER: Unexpected result format', 'error');
+                    testResults.failed++;
+                }
+            } catch (error) {
+                log(`✗ QUERY ORDER error: ${error.message}`, 'error');
+                testResults.failed++;
+            }
+            testResults.total++;
+            
+            updateSummary();
+        }
+
+        // Test localStorage data
+        async function testLocalStorageData() {
+            const storageKeys = [
+                'currentUser',
+                'users',
+                'transactions',
+                'tasks',
+                'investments',
+                'products',
+                'announcements',
+                'membershipLevels',
+                'membershipRequests',
+                'paymentAccounts'
+            ];
+            
+            let foundCount = 0;
+            let missingKeys = [];
+            
+            for (const key of storageKeys) {
+                const data = Storage.get(key);
+                if (data !== null) {
+                    foundCount++;
+                    log(`✓ Storage key '${key}' exists`, 'success');
+                } else {
+                    missingKeys.push(key);
+                    log(`⚠ Storage key '${key}' not found`, 'warning');
+                }
+            }
+            
+            if (missingKeys.length === 0) {
+                testResults.passed++;
+                log('✓ All critical localStorage keys present', 'success');
+            } else if (missingKeys.length <= 3) {
+                testResults.warnings++;
+                log(`⚠ Some optional storage keys missing: ${missingKeys.join(', ')}`, 'warning');
+            } else {
+                testResults.failed++;
+                log(`✗ Many storage keys missing: ${missingKeys.join(', ')}`, 'error');
+            }
+            testResults.total++;
+            
+            // Check storage size
+            let totalSize = 0;
+            for (const key in localStorage) {
+                if (key.startsWith('projectAlpha_')) {
+                    totalSize += (localStorage[key] || '').length;
+                }
+            }
+            const sizeKB = (totalSize / 1024).toFixed(2);
+            log(`Storage usage: ${sizeKB} KB`, 'info');
+            
+            updateSummary();
+        }
+    </script>
+</body>
+</html>

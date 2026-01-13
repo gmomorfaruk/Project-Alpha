@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Withdraw - Project Alpha</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container" style="max-width:400px;margin:40px auto;">
+        <h2>Withdraw</h2>
+        <form id="withdrawForm">
+            <div class="form-group">
+                <label>Withdraw To</label>
+                <input type="text" id="withdrawNumber" readonly>
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="amount" min="100" required>
+            </div>
+            <div class="form-group">
+                <label>Password (PIN)</label>
+                <input type="password" id="withdrawalPassword" maxlength="4" required placeholder="Enter PIN">
+            </div>
+            <button type="submit" class="btn btn-primary">Withdraw</button>
+        </form>
+    </div>
+    <script src="../js/app-config.js"></script>
+    <script>
+        window.onload = function() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) {
+                alert('Please create your profile first.');
+                window.location.href = 'profile.html';
+                return;
+            }
+            document.getElementById('withdrawNumber').value = user.withdrawalNumber;
+        };
+        document.getElementById('withdrawForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const amount = parseInt(document.getElementById('amount').value);
+            const pin = document.getElementById('withdrawalPassword').value.trim();
+            if (pin !== user.withdrawalPassword) {
+                alert('Invalid password/PIN');
+                return;
+            }
+            if (amount < 100) {
+                alert('Minimum withdrawal is 100');
+                return;
+            }
+            // ...process withdrawal logic here...
+            alert('Withdrawal request submitted!');
+            window.location.href = 'wallet.html';
+        });
+    </script>
+</body>
+</html>

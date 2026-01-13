@@ -217,10 +217,42 @@ function validatePassword(password) {
 }
 
 // ===== LOCAL STORAGE HELPERS =====
+// Enhanced to auto-sync with connected cloud database
 
 const APP_PREFIX = 'projectAlpha_';
 
+// Tables that should sync to cloud database - ALL app data
+const SYNC_TABLES = [
+    // Core user data
+    'users', 'currentUser', 'session',
+    // Tasks and completions
+    'tasks', 'task_completions', 
+    // Financial data
+    'transactions', 'investments', 'deposits', 'withdrawals',
+    'adminInvestments', 'membershipRecords', 'productSaleRecords',
+    'depositRecords', 'userEarningRecords', 'withdrawalRecords',
+    'dailySummaries',
+    // Products and memberships
+    'products', 'memberships', 'membershipRequests',
+    // User engagement
+    'announcements', 'proofs', 'referrals',
+    // Communication
+    'allChatUsers', 'chatMessages',
+    // Logs
+    'activity_logs', 'securityLogs', 'logs',
+    // Config
+    'config', 'settings'
+];
+
 const Storage = {
+    // Check if cloud database is connected
+    isCloudConnected() {
+        return window.DatabaseManager && 
+               window.DatabaseManager.connected && 
+               window.DatabaseManager.type !== 'localStorage';
+    },
+
+    // Get data - from cloud if connected, otherwise localStorage
     get(key) {
         try {
             const item = localStorage.getItem(APP_PREFIX + key);
@@ -232,13 +264,125 @@ const Storage = {
         }
     },
 
+    // Async get from cloud database
+    async getAsync(key) {
+        try {
+            // If cloud connected and this is a syncable table
+            if (this.isCloudConnected() && SYNC_TABLES.includes(key)) {
+                const cloudData = await window.DatabaseManager.read(key);
+                if (cloudData && cloudData.length > 0) {
+                    // Update local cache
+                    localStorage.setItem(APP_PREFIX + key, JSON.stringify(cloudData));
+                    return cloudData;
+                }
+            }
+            // Fallback to localStorage
+            return this.get(key);
+        } catch (e) {
+            console.error('Error reading from cloud:', e);
+            return this.get(key);
+        }
+    },
+
+    // Set data - to both localStorage AND cloud if connected
     set(key, value) {
         try {
+            // Always save to localStorage first (for offline backup)
             localStorage.setItem(APP_PREFIX + key, JSON.stringify(value));
+            
+            // If cloud connected and this is a syncable table, sync to cloud
+            if (this.isCloudConnected() && SYNC_TABLES.includes(key)) {
+                this.syncToCloud(key, value);
+            }
+            
             return true;
         } catch (e) {
             console.error('Error writing to localStorage:', e);
             return false;
+        }
+    },
+
+    // Async set with cloud sync
+    async setAsync(key, value) {
+        try {
+            // Save to localStorage
+            localStorage.setItem(APP_PREFIX + key, JSON.stringify(value));
+            
+            // If cloud connected, sync to cloud
+            if (this.isCloudConnected() && SYNC_TABLES.includes(key)) {
+                await this.syncToCloudAsync(key, value);
+            }
+            
+            return true;
+        } catch (e) {
+            console.error('Error in setAsync:', e);
+            return false;
+        }
+    },
+
+    // Background sync to cloud (non-blocking)
+    syncToCloud(key, value) {
+        if (!this.isCloudConnected()) return;
+        
+        // Use setTimeout to make it non-blocking
+        setTimeout(async () => {
+            try {
+                if (Array.isArray(value)) {
+                    // For arrays (like users list), sync each item
+                    for (const item of value) {
+                        if (item.id) {
+                            const existing = await window.DatabaseManager.readOne(key, item.id);
+                            if (existing) {
+                                await window.DatabaseManager.update(key, item.id, item);
+                            } else {
+                                await window.DatabaseManager.create(key, item);
+                            }
+                        }
+                    }
+                } else if (value && typeof value === 'object' && value.id) {
+                    // For single objects with ID
+                    const existing = await window.DatabaseManager.readOne(key, value.id);
+                    if (existing) {
+                        await window.DatabaseManager.update(key, value.id, value);
+                    } else {
+                        await window.DatabaseManager.create(key, value);
+                    }
+                }
+                console.log(`✅ Synced ${key} to cloud`);
+            } catch (e) {
+                console.error(`❌ Failed to sync ${key} to cloud:`, e);
+            }
+        }, 100);
+    },
+
+    // Async sync to cloud (blocking, returns promise)
+    async syncToCloudAsync(key, value) {
+        if (!this.isCloudConnected()) return;
+        
+        try {
+            if (Array.isArray(value)) {
+                for (const item of value) {
+                    if (item.id) {
+                        const existing = await window.DatabaseManager.readOne(key, item.id);
+                        if (existing) {
+                            await window.DatabaseManager.update(key, item.id, item);
+                        } else {
+                            await window.DatabaseManager.create(key, item);
+                        }
+                    }
+                }
+            } else if (value && typeof value === 'object' && value.id) {
+                const existing = await window.DatabaseManager.readOne(key, value.id);
+                if (existing) {
+                    await window.DatabaseManager.update(key, value.id, value);
+                } else {
+                    await window.DatabaseManager.create(key, value);
+                }
+            }
+            console.log(`✅ Synced ${key} to cloud`);
+        } catch (e) {
+            console.error(`❌ Failed to sync ${key} to cloud:`, e);
+            throw e;
         }
     },
 
@@ -268,8 +412,60 @@ const Storage = {
             console.error('Error clearing localStorage:', e);
             return false;
         }
+    },
+
+    // Sync all local data to cloud
+    async syncAllToCloud() {
+        if (!this.isCloudConnected()) {
+            console.log('No cloud database connected');
+            return { success: false, error: 'No cloud database connected' };
+        }
+
+        const results = { success: true, synced: {} };
+        
+        for (const table of SYNC_TABLES) {
+            const data = this.get(table);
+            if (data && Array.isArray(data) && data.length > 0) {
+                try {
+                    await this.syncToCloudAsync(table, data);
+                    results.synced[table] = data.length;
+                } catch (e) {
+                    results.success = false;
+                    results.synced[table] = `Error: ${e.message}`;
+                }
+            }
+        }
+        
+        return results;
+    },
+
+    // Sync all cloud data to local
+    async syncAllFromCloud() {
+        if (!this.isCloudConnected()) {
+            return { success: false, error: 'No cloud database connected' };
+        }
+
+        const results = { success: true, synced: {} };
+        
+        for (const table of SYNC_TABLES) {
+            try {
+                const cloudData = await window.DatabaseManager.read(table);
+                if (cloudData && cloudData.length > 0) {
+                    localStorage.setItem(APP_PREFIX + table, JSON.stringify(cloudData));
+                    results.synced[table] = cloudData.length;
+                }
+            } catch (e) {
+                results.success = false;
+                results.synced[table] = `Error: ${e.message}`;
+            }
+        }
+        
+        return results;
     }
 };
+
+// Make Storage globally available
+window.Storage = Storage;
 
 // ===== INITIALIZE APP DATA =====
 // This ensures demo users and essential data exist in localStorage

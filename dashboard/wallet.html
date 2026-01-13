@@ -12,87 +12,213 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Deposit Purpose Selector */
-        .purpose-selector {
+        .wallet-page {
+            min-height: 100vh;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-top: 100px;
         }
-        .purpose-btn {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-secondary);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .wallet-container {
+            width: 100%;
+            max-width: 500px;
+        }
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color), #0d5a58);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(23, 133, 130, 0.3);
+        }
+        .balance-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-            color: var(--text-primary);
+            margin: 0 auto 20px;
         }
-        .purpose-btn:hover {
-            border-color: var(--primary-color);
-            background: rgba(23, 133, 130, 0.05);
+        .balance-icon i {
+            font-size: 2rem;
         }
-        .purpose-btn.active {
-            border-color: var(--primary-color);
-            background: rgba(23, 133, 130, 0.1);
-            color: var(--primary-color);
-        }
-        .purpose-btn i {
+        .balance-label {
             font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
         }
-        
-        /* Membership Tier Selector */
-        #membershipTierSelect {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 1rem;
-            background: var(--bg-secondary);
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-        #membershipTierSelect:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        .tier-details {
-            margin-top: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(23, 133, 130, 0.1), rgba(23, 133, 130, 0.05));
-            border: 2px solid var(--primary-color);
-            border-radius: 12px;
-            text-align: center;
-        }
-        .tier-price {
-            font-size: 1.8rem;
+        .balance-value {
+            font-size: 3rem;
             font-weight: 700;
-            color: var(--primary-color);
         }
-        .tier-benefits {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        
-        /* Pending Badge */
-        .pending-membership-badge {
-            display: inline-flex;
+        .action-btn {
+            flex: 1;
+            padding: 25px 20px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            color: #f59e0b;
+            gap: 12px;
+            transition: all 0.3s;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .action-btn i {
+            font-size: 2rem;
+        }
+        .action-btn.deposit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        .action-btn.deposit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+        }
+        .action-btn.withdraw {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        .action-btn.withdraw:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+        }
+        .transactions-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .transactions-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transactions-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-tab {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
             font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        .transactions-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .transaction-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        .transaction-row:last-child {
+            border-bottom: none;
+        }
+        .transaction-row:hover {
+            background: var(--bg-secondary);
+        }
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .transaction-icon.deposit {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        .transaction-icon.withdrawal {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        .transaction-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .transaction-type {
             font-weight: 600;
-            margin-top: 10px;
+            margin-bottom: 3px;
+        }
+        .transaction-id {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .transaction-amount.positive {
+            color: #10b981;
+        }
+        .transaction-amount.negative {
+            color: #ef4444;
+        }
+        .transaction-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .transaction-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .transaction-status.approved {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        .transaction-status.rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -104,17 +230,13 @@
             <span>Project Alpha</span>
         </a>
 
-        <!-- Main Navigation Menu -->
         <div class="navbar-menu">
-            <!-- Dashboard -->
             <div class="navbar-item">
                 <a href="index.html" class="navbar-link">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
             </div>
-
-            <!-- Tasks Dropdown -->
             <div class="navbar-item">
                 <button class="navbar-link">
                     <i class="fas fa-tasks"></i>
@@ -136,8 +258,6 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Profile Dropdown -->
             <div class="navbar-item">
                 <button class="navbar-link">
                     <i class="fas fa-user"></i>
@@ -153,52 +273,16 @@
                         <i class="fas fa-wallet" style="color: #10b981;"></i>
                         <span>Wallet</span>
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="investments.html" class="dropdown-item">
-                        <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
-                        <span>My Investments</span>
-                    </a>
-                    <a href="products.html" class="dropdown-item">
-                        <i class="fas fa-box" style="color: #f59e0b;"></i>
-                        <span>Products</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Other Dropdown -->
-            <div class="navbar-item">
-                <button class="navbar-link">
-                    <i class="fas fa-ellipsis-h"></i>
-                    <span>Other</span>
-                    <i class="fas fa-chevron-down dropdown-arrow"></i>
-                </button>
-                <div class="navbar-dropdown">
-                    <a href="sell-proofs.html" class="dropdown-item">
-                        <i class="fas fa-receipt" style="color: #BFA181;"></i>
-                        <span>Sell Proofs</span>
-                    </a>
-                    <a href="referrals.html" class="dropdown-item">
-                        <i class="fas fa-users" style="color: #ec4899;"></i>
-                        <span>Referrals</span>
-                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Right Section -->
         <div class="navbar-right">
             <button class="navbar-icon-btn" id="themeToggle" title="Toggle Theme">
                 <i class="fas fa-moon"></i>
             </button>
-            <button class="navbar-icon-btn" id="langToggle" title="Toggle Language">
-                <span style="font-size: 12px; font-weight: 600;">EN</span>
-            </button>
-            <button class="navbar-icon-btn" id="notificationBtn" onclick="toggleNotificationPanel()" title="Notifications">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge" id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center;">0</span>
-            </button>
             <div class="navbar-user" onclick="window.location.href='profile.html'">
-                <div class="navbar-user-avatar" id="userAvatar">
+                <div class="navbar-user-avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <span class="navbar-user-name" id="userName">User</span>
@@ -206,225 +290,103 @@
             <button class="navbar-icon-btn logout-btn" onclick="logout()" title="Logout" style="color: #ef4444;">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
-            <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-title">Main</div>
-            <a href="index.html" class="mobile-menu-item">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="wallet.html" class="mobile-menu-item active">
-                <i class="fas fa-wallet"></i>
-                <span>Wallet</span>
-            </a>
-        </div>
-        
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-title">Earn Points</div>
-            <a href="tasks.html" class="mobile-menu-item">
-                <i class="fas fa-tasks"></i>
-                <span>All Tasks</span>
-            </a>
-            <a href="youtube-tasks.html" class="mobile-menu-item">
-                <i class="fab fa-youtube"></i>
-                <span>YouTube Tasks</span>
-            </a>
-            <a href="social-tasks.html" class="mobile-menu-item">
-                <i class="fas fa-share-alt"></i>
-                <span>Social Tasks</span>
-            </a>
-        </div>
-        
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-title">Account</div>
-            <a href="profile.html" class="mobile-menu-item">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-            <a href="investments.html" class="mobile-menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Investments</span>
-            </a>
-            <a href="products.html" class="mobile-menu-item">
-                <i class="fas fa-box"></i>
-                <span>Products</span>
-            </a>
-        </div>
-        
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-title">Other</div>
-            <a href="sell-proofs.html" class="mobile-menu-item">
-                <i class="fas fa-receipt"></i>
-                <span>Sell Proofs</span>
-            </a>
-            <a href="referrals.html" class="mobile-menu-item">
-                <i class="fas fa-users"></i>
-                <span>Referrals</span>
-            </a>
-        </div>
-        
-        <div class="mobile-menu-footer">
-            <button class="mobile-menu-item" onclick="logout()" style="color: var(--danger-color); width: 100%;">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </button>
-        </div>
-    </div>
-
     <!-- Main Content -->
-    <main class="main-content">
-
-        <!-- Wallet Content -->
-        <div class="content">
-            <div class="page-header">
-                <h1 data-en="Wallet" data-bn="ওয়ালেট">Wallet</h1>
-                <p data-en="Manage your funds - deposit and withdraw" data-bn="আপনার তহবিল পরিচালনা করুন - জমা এবং উত্তোলন">Manage your funds - deposit and withdraw</p>
-            </div>
-
+    <main class="wallet-page">
+        <div class="wallet-container">
             <!-- Balance Card -->
-            <div class="stat-card" style="margin-bottom: 30px; max-width: 400px;">
-                <div class="stat-icon wallet">
+            <div class="balance-card">
+                <div class="balance-icon">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <div class="stat-info">
-                    <span class="stat-label" data-en="Available Balance" data-bn="উপলব্ধ ব্যালেন্স">Available Balance</span>
-                    <span class="stat-value" id="walletBalance">৳0</span>
-                </div>
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-value" id="walletBalance">৳0</div>
             </div>
 
-            <!-- Deposit & Withdraw Cards -->
-            <div class="wallet-actions">
-                <!-- Deposit Card -->
-                <div class="wallet-action-card">
-                    <h3>
-                        <i class="fas fa-plus"></i>
-                        <span data-en="Deposit Funds" data-bn="তহবিল জমা করুন">Deposit Funds</span>
-                    </h3>
-                    
-                    <div class="method-selector">
-                        <button class="method-btn active" data-method="bkash" onclick="selectDepositMethod('bkash')">
-                            <span style="color: #E2136E; font-weight: 700;">bKash</span>
-                        </button>
-                        <button class="method-btn" data-method="nagad" onclick="selectDepositMethod('nagad')">
-                            <span style="color: #F6921E; font-weight: 700;">Nagad</span>
-                        </button>
-                    </div>
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="deposit.html" class="action-btn deposit">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Deposit</span>
+                </a>
+                <a href="withdraw.html" class="action-btn withdraw">
+                    <i class="fas fa-minus-circle"></i>
+                    <span>Withdraw</span>
+                </a>
+            </div>
 
-                    <div class="deposit-info" style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 10px;" data-en="Send money to:" data-bn="টাকা পাঠান:">Send money to:</p>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span id="depositNumber" style="font-size: 20px; font-weight: 700; color: var(--text-primary);">01XXXXXXXXX</span>
-                            <button class="copy-btn" onclick="copyToClipboard(document.getElementById('depositNumber').textContent)" style="background: var(--primary-color);">
-                                <i class="fas fa-copy" style="color: white;"></i>
-                            </button>
-                        </div>
-                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;" id="depositType" data-en="(Personal)" data-bn="(পার্সোনাল)">(Personal)</p>
-                    </div>
-
-                    <form id="depositForm">
-                        <!-- Deposit Purpose Selector -->
-                        <div class="form-group">
-                            <label><i class="fas fa-bullseye"></i> Deposit Purpose</label>
-                            <div class="purpose-selector" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                <button type="button" class="purpose-btn active" data-purpose="balance" onclick="selectDepositPurpose('balance')">
-                                    <i class="fas fa-wallet"></i> Add Balance
-                                </button>
-                                <button type="button" class="purpose-btn" data-purpose="membership" onclick="selectDepositPurpose('membership')">
-                                    <i class="fas fa-crown"></i> Upgrade Membership
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Membership Tier Selection (hidden by default) -->
-                        <div class="form-group membership-tier-group" id="membershipTierGroup" style="display: none;">
-                            <label><i class="fas fa-medal"></i> Select Membership Tier</label>
-                            <select id="membershipTierSelect" class="form-control" onchange="onMembershipTierChange()">
-                                <option value="">-- Choose Tier --</option>
-                            </select>
-                            <div id="tierDetails" class="tier-details" style="display: none;">
-                                <div class="tier-price">৳<span id="tierPrice">0</span></div>
-                                <div class="tier-benefits" id="tierBenefits"></div>
-                            </div>
-                        </div>
-
-                        <div class="form-group" id="amountGroup">
-                            <label data-en="Amount (৳)" data-bn="পরিমাণ (৳)">Amount (৳)</label>
-                            <input type="number" id="depositAmount" min="500" placeholder="Minimum ৳500" required>
-                        </div>
-                        <div class="form-group">
-                            <label data-en="Transaction ID" data-bn="লেনদেন আইডি">Transaction ID</label>
-                            <input type="text" id="depositTxnId" placeholder="Enter bKash/Nagad Transaction ID" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-check"></i>
-                            <span data-en="Submit Deposit" data-bn="জমা দিন" id="depositBtnText">Submit Deposit</span>
-                        </button>
-                    </form>
+            <!-- Withdrawal Setup Section -->
+            <section id="withdraw-setup-section" class="transactions-card" style="margin-bottom: 24px;">
+                <div class="transactions-header">
+                    <h3><i class="fas fa-cog"></i> Withdrawal Setup</h3>
                 </div>
+                <div class="transactions-body">
+                    <form id="withdrawSetupForm">
+                        <div class="form-group">
+                            <label for="withdrawMethod">Select Method</label>
+                            <select id="withdrawMethod" required>
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="withdrawNumber">Account Number</label>
+                            <input type="text" id="withdrawNumber" required placeholder="Enter bKash/Nagad number">
+                        </div>
+                        <div class="form-group">
+                            <label for="withdrawPassword">Set Withdrawal Password</label>
+                            <input type="password" id="withdrawPassword" required placeholder="Set a password (min 6 chars)">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Withdrawal Info</button>
+                    </form>
+                    <div id="withdrawSetupStatus"></div>
+                </div>
+            </section>
 
-                <!-- Withdraw Card -->
-                <div class="wallet-action-card">
-                    <h3>
-                        <i class="fas fa-minus"></i>
-                        <span data-en="Withdraw Funds" data-bn="তহবিল উত্তোলন করুন">Withdraw Funds</span>
-                    </h3>
-
-                    <!-- Withdrawal Time Notice -->
-                    <div id="withdrawalTimeNotice" class="withdrawal-notice" style="padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
-                        <!-- Will be populated by JS based on withdrawal window status -->
-                    </div>
-
-                    <div class="method-selector">
-                        <button class="method-btn active" data-method="bkash" onclick="selectWithdrawMethod('bkash')">
-                            <span style="color: #E2136E; font-weight: 700;">bKash</span>
-                        </button>
-                        <button class="method-btn" data-method="nagad" onclick="selectWithdrawMethod('nagad')">
-                            <span style="color: #F6921E; font-weight: 700;">Nagad</span>
-                        </button>
-                        <button class="method-btn" data-method="rocket" onclick="selectWithdrawMethod('rocket')">
-                            <span style="color: #8b24aa; font-weight: 700;">Rocket</span>
-                        </button>
-                    </div>
-
+            <!-- Withdrawal Form Section -->
+            <section id="withdraw-section" class="transactions-card" style="margin-bottom: 24px;">
+                <div class="transactions-header">
+                    <h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3>
+                </div>
+                <div class="transactions-body">
                     <form id="withdrawForm">
                         <div class="form-group">
-                            <label data-en="Amount (৳)" data-bn="পরিমাণ (৳)">Amount (৳)</label>
-                            <input type="number" id="withdrawAmount" min="500" placeholder="Minimum ৳500" required>
-                            <span class="form-hint" data-en="Available: " data-bn="উপলব্ধ: ">Available: <span id="availableBalance">৳0</span></span>
+                            <label>Method</label>
+                            <input type="text" id="savedWithdrawMethod" readonly>
                         </div>
                         <div class="form-group">
-                            <label id="withdrawNumberLabel" data-en="bKash Number" data-bn="বিকাশ নম্বর">bKash Number</label>
-                            <input type="tel" id="withdrawNumber" placeholder="01XXXXXXXXX" required>
+                            <label>Account Number</label>
+                            <input type="text" id="savedWithdrawNumber" readonly>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-paper-plane"></i>
-                            <span data-en="Request Withdrawal" data-bn="উত্তোলনের অনুরোধ করুন">Request Withdrawal</span>
-                        </button>
+                        <div class="form-group">
+                            <label for="withdrawAmount">Amount</label>
+                            <input type="number" id="withdrawAmount" min="100" required placeholder="Enter amount (min ৳100)">
+                        </div>
+                        <div class="form-group">
+                            <label for="withdrawPasswordInput">Withdrawal Password</label>
+                            <input type="password" id="withdrawPasswordInput" required placeholder="Enter withdrawal password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Withdrawal</button>
                     </form>
+                    <div id="withdrawStatus"></div>
                 </div>
-            </div>
-
+            </section>
             <!-- Transaction History -->
-            <div class="transactions-section">
+            <div class="transactions-card">
                 <div class="transactions-header">
-                    <h3 data-en="Transaction History" data-bn="লেনদেনের ইতিহাস">Transaction History</h3>
+                    <h3><i class="fas fa-history"></i> Transaction History</h3>
                     <div class="filter-tabs">
                         <button class="filter-tab active" data-filter="all" onclick="filterTransactions('all')">All</button>
                         <button class="filter-tab" data-filter="deposit" onclick="filterTransactions('deposit')">Deposits</button>
-                        <button class="filter-tab" data-filter="withdraw" onclick="filterTransactions('withdraw')">Withdrawals</button>
+                        <button class="filter-tab" data-filter="withdrawal" onclick="filterTransactions('withdrawal')">Withdrawals</button>
                     </div>
                 </div>
-                <div id="transactionsList">
+                <div class="transactions-body" id="transactionsList">
                     <div class="empty-state">
                         <i class="fas fa-exchange-alt"></i>
-                        <p data-en="No transactions yet" data-bn="এখনও কোন লেনদেন নেই">No transactions yet</p>
+                        <p>No transactions yet</p>
                     </div>
                 </div>
             </div>
@@ -432,597 +394,150 @@
     </main>
 
     <script src="../js/app-config.js"></script>
-    <script src="../js/security.js"></script>
+    <script src="../js/database-manager.js"></script>
     <script src="../js/theme.js"></script>
-    <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/dashboard.js"></script>
     <script>
-        let selectedDepositMethod = 'bkash';
-        let selectedWithdrawMethod = 'bkash';
-        let withdrawalEnabled = true;
-        let depositPurpose = 'balance';
-        let selectedMembershipTier = null;
-
-        // Get payment accounts from storage or config
-        function getPaymentAccounts() {
-            return Storage.get('paymentAccounts') || AppConfig.paymentAccounts;
-        }
-
-        // Payment details (loaded from config)
-        let paymentDetails = {
-            bkash: { number: '01712345678', type: 'Personal' },
-            nagad: { number: '01898765432', type: 'Personal' }
-        };
-
-        // Check authentication
         document.addEventListener('DOMContentLoaded', function() {
             const user = Storage.get('currentUser');
             if (!user || !user.isLoggedIn || user.role !== 'user') {
                 window.location.href = '../login.html';
                 return;
             }
-            
-            // Load payment accounts from config
-            const accounts = getPaymentAccounts();
-            if (accounts.bkash) {
-                paymentDetails.bkash = { number: accounts.bkash.number, type: accounts.bkash.type };
-            }
-            if (accounts.nagad) {
-                paymentDetails.nagad = { number: accounts.nagad.number, type: accounts.nagad.type };
-            }
-            
-            // Update deposit number display with correct payment account
-            document.getElementById('depositNumber').textContent = paymentDetails.bkash.number;
-            document.getElementById('depositType').textContent = `(${paymentDetails.bkash.type})`;
 
             document.getElementById('userName').textContent = user.name || 'User';
             document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
-            document.getElementById('availableBalance').textContent = formatCurrency(user.balance || 0);
-
-            // Check for permanent withdrawal account
-            setupWithdrawalAccount(user);
-
-            // Pre-fill withdraw number
-            if (user.bkashNumber) {
-                document.getElementById('withdrawNumber').value = user.bkashNumber;
-            }
-
+            
             loadTransactions();
-            checkWithdrawalWindow();
-            populateMembershipTiers(user);
-            
-            // Update withdrawal status every minute
-            setInterval(checkWithdrawalWindow, 60000);
-        });
 
-        // Populate membership tier dropdown using new level system
-        function populateMembershipTiers(user) {
-            const tierSelect = document.getElementById('membershipTierSelect');
-            if (!tierSelect) {
-                console.error('Tier select element not found');
-                return;
-            }
-            tierSelect.innerHTML = '<option value="">-- Choose Level --</option>';
-            
-            // Get levels from storage with proper fallback
-            let levels = Storage.get('membershipLevels');
-            if (!levels || !Array.isArray(levels) || levels.length === 0) {
-                levels = getDefaultLevels();
-                // Save defaults to storage
-                Storage.set('membershipLevels', levels);
-            }
-            
-            console.log('Loading membership levels:', levels);
-            
-            // Get pending requests
-            const pendingRequests = Storage.get('membershipRequests') || [];
-            const userPendingRequest = pendingRequests.find(r => 
-                r.userId === user.email && r.status === 'pending'
-            );
-            
-            levels.forEach(level => {
-                if (!level.enabled) return; // Skip disabled levels
-                
-                const isCurrentMembership = user.membershipLevel === level.id;
-                const hasPending = userPendingRequest?.membershipId === level.id;
-                
-                const option = document.createElement('option');
-                option.value = level.id;
-                option.textContent = `${level.name} - ৳${level.price.toLocaleString()} (${level.taskLimit} tasks)`;
-                option.dataset.price = level.price;
-                option.dataset.taskLimit = level.taskLimit;
-                option.dataset.name = level.name;
-                
-                if (isCurrentMembership) {
-                    option.disabled = true;
-                    option.textContent += ' ✓ Current';
-                } else if (hasPending) {
-                    option.disabled = true;
-                    option.textContent += ' ⏳ Pending';
-                }
-                
-                tierSelect.appendChild(option);
-            });
-            
-            console.log('Populated tiers, total options:', tierSelect.options.length);
-            
-            // Show pending badge if any
-            if (userPendingRequest) {
-                const tierGroup = document.getElementById('membershipTierGroup');
-                const existingBadge = tierGroup.querySelector('.pending-membership-badge');
-                if (!existingBadge) {
-                    const badge = document.createElement('div');
-                    badge.className = 'pending-membership-badge';
-                    badge.innerHTML = `<i class="fas fa-clock"></i> Pending: ${userPendingRequest.membershipName}`;
-                    tierGroup.appendChild(badge);
+            // Withdrawal Setup Logic
+            const withdrawSetupForm = document.getElementById('withdrawSetupForm');
+            const withdrawForm = document.getElementById('withdrawForm');
+            const withdrawSetupSection = document.getElementById('withdraw-setup-section');
+            const withdrawSection = document.getElementById('withdraw-section');
+            const withdrawSetupStatus = document.getElementById('withdrawSetupStatus');
+            const withdrawStatus = document.getElementById('withdrawStatus');
+            const savedWithdrawMethod = document.getElementById('savedWithdrawMethod');
+            const savedWithdrawNumber = document.getElementById('savedWithdrawNumber');
+
+            // Load saved withdrawal info
+            let withdrawInfo = Storage.get('withdrawInfo_' + user.id);
+            function updateWithdrawFormFields() {
+                if (withdrawInfo) {
+                    savedWithdrawMethod.value = withdrawInfo.method;
+                    savedWithdrawNumber.value = withdrawInfo.number;
+                    withdrawSection.style.display = '';
+                    withdrawSetupSection.style.display = 'none';
+                } else {
+                    withdrawSection.style.display = 'none';
+                    withdrawSetupSection.style.display = '';
                 }
             }
-        }
-        
-        // Get default levels (fallback)
-        function getDefaultLevels() {
-            return [
-                { id: 'level1', name: 'Level 1', price: 1000, taskLimit: 5, enabled: true },
-                { id: 'level2', name: 'Level 2', price: 2000, taskLimit: 8, enabled: true },
-                { id: 'level3', name: 'Level 3', price: 3000, taskLimit: 12, enabled: true },
-                { id: 'level4', name: 'Level 4', price: 4000, taskLimit: 15, enabled: true },
-                { id: 'level5', name: 'Level 5', price: 5000, taskLimit: 20, enabled: true }
-            ];
-        }
-        
-        // Select deposit purpose
-        function selectDepositPurpose(purpose) {
-            depositPurpose = purpose;
-            
-            document.querySelectorAll('.purpose-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.purpose === purpose);
-            });
-            
-            const membershipGroup = document.getElementById('membershipTierGroup');
-            const amountGroup = document.getElementById('amountGroup');
-            const amountInput = document.getElementById('depositAmount');
-            const btnText = document.getElementById('depositBtnText');
-            
-            if (purpose === 'membership') {
-                membershipGroup.style.display = 'block';
-                amountGroup.style.display = 'none';
-                amountInput.removeAttribute('required');
-                btnText.textContent = 'Submit Membership Request';
-                // Re-populate tiers when switching to membership mode
-                const user = Storage.get('currentUser');
-                if (user) populateMembershipTiers(user);
-            } else {
-                membershipGroup.style.display = 'none';
-                amountGroup.style.display = 'block';
-                amountInput.setAttribute('required', 'required');
-                btnText.textContent = 'Submit Deposit';
-                selectedMembershipTier = null;
-            }
-        }
-        
-        // Handle membership tier change
-        function onMembershipTierChange() {
-            const tierSelect = document.getElementById('tierSelect') || document.getElementById('membershipTierSelect');
-            const selectedOption = tierSelect.options[tierSelect.selectedIndex];
-            const selectedTier = tierSelect.value;
-            const tierDetails = document.getElementById('tierDetails');
-            
-            if (!selectedTier || !selectedOption.dataset.price) {
-                tierDetails.style.display = 'none';
-                selectedMembershipTier = null;
-                return;
-            }
-            
-            // Get level from storage
-            const levels = Storage.get('membershipLevels') || getDefaultLevels();
-            const level = levels.find(l => l.id === selectedTier);
-            
-            if (!level) {
-                tierDetails.style.display = 'none';
-                selectedMembershipTier = null;
-                return;
-            }
-            
-            selectedMembershipTier = level;
-            tierDetails.style.display = 'block';
-            
-            document.getElementById('tierPrice').textContent = level.price.toLocaleString();
-            document.getElementById('tierBenefits').innerHTML = `
-                ${level.taskLimit} tasks available after purchase
-            `;
-        }
+            updateWithdrawFormFields();
 
-        // Check if withdrawal is currently allowed
-        function checkWithdrawalWindow() {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinutes = now.getMinutes();
-            const currentDay = now.getDay(); // 0=Sun, 1=Mon, ...
-
-            // Get config from AppConfig or use defaults
-            const config = window.AppConfig?.withdrawal || {
-                startTime: '10:00',
-                endTime: '16:00',
-                allowedDays: [0, 1, 3, 5] // Sun, Mon, Wed, Fri
-            };
-
-            const [startHour, startMin] = config.startTime.split(':').map(Number);
-            const [endHour, endMin] = config.endTime.split(':').map(Number);
-            
-            const currentTimeInMinutes = currentHour * 60 + currentMinutes;
-            const startTimeInMinutes = startHour * 60 + startMin;
-            const endTimeInMinutes = endHour * 60 + endMin;
-
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const dayNamesBn = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
-            const allowedDayNames = config.allowedDays.map(d => dayNames[d]).join(', ');
-
-            const isDayAllowed = config.allowedDays.includes(currentDay);
-            const isTimeAllowed = currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
-            
-            withdrawalEnabled = isDayAllowed && isTimeAllowed;
-
-            const noticeEl = document.getElementById('withdrawalTimeNotice');
-            const withdrawBtn = document.querySelector('#withdrawForm button[type="submit"]');
-
-            if (withdrawalEnabled) {
-                noticeEl.style.background = 'rgba(16, 185, 129, 0.1)';
-                noticeEl.style.border = '2px solid rgba(16, 185, 129, 0.3)';
-                noticeEl.innerHTML = `
-                    <div style="width: 40px; height: 40px; background: #10b981; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <i class="fas fa-check-circle" style="color: white; font-size: 18px;"></i>
-                    </div>
-                    <div>
-                        <strong style="color: #10b981;">Withdrawals Open Now!</strong>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 3px;">
-                            Available: ${config.startTime} - ${config.endTime} on ${allowedDayNames}
-                        </p>
-                    </div>
-                `;
-                if (withdrawBtn) {
-                    withdrawBtn.disabled = false;
-                    withdrawBtn.style.opacity = '1';
-                }
-            } else {
-                const nextWindow = getNextWithdrawalWindow(config, dayNames);
-                noticeEl.style.background = 'rgba(239, 68, 68, 0.1)';
-                noticeEl.style.border = '2px solid rgba(239, 68, 68, 0.3)';
-                noticeEl.innerHTML = `
-                    <div style="width: 40px; height: 40px; background: #ef4444; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <i class="fas fa-clock" style="color: white; font-size: 18px;"></i>
-                    </div>
-                    <div>
-                        <strong style="color: #ef4444;">Withdrawals Currently Closed</strong>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 3px;">
-                            Next window: ${nextWindow}<br>
-                            <span style="font-size: 0.8rem;">Hours: ${config.startTime} - ${config.endTime}</span>
-                        </p>
-                    </div>
-                `;
-                if (withdrawBtn) {
-                    withdrawBtn.disabled = true;
-                    withdrawBtn.style.opacity = '0.5';
-                }
-            }
-        }
-
-        function getNextWithdrawalWindow(config, dayNames) {
-            const now = new Date();
-            const currentDay = now.getDay();
-            const currentHour = now.getHours();
-            const [startHour] = config.startTime.split(':').map(Number);
-
-            // Check if today is an allowed day and withdrawal hasn't started yet
-            if (config.allowedDays.includes(currentDay) && currentHour < startHour) {
-                return `Today at ${config.startTime}`;
-            }
-
-            // Find next allowed day
-            for (let i = 1; i <= 7; i++) {
-                const nextDay = (currentDay + i) % 7;
-                if (config.allowedDays.includes(nextDay)) {
-                    return `${dayNames[nextDay]} at ${config.startTime}`;
-                }
-            }
-
-            return 'Check schedule';
-        }
-
-        function selectDepositMethod(method) {
-            selectedDepositMethod = method;
-            document.querySelectorAll('.wallet-action-card:first-child .method-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.method === method);
-            });
-            
-            document.getElementById('depositNumber').textContent = paymentDetails[method].number;
-            document.getElementById('depositType').textContent = `(${paymentDetails[method].type})`;
-        }
-
-        function selectWithdrawMethod(method) {
-            selectedWithdrawMethod = method;
-            document.querySelectorAll('.wallet-action-card:last-child .method-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.method === method);
-            });
-
-            const label = document.getElementById('withdrawNumberLabel');
-            label.textContent = method === 'bkash' ? 'bKash Number' : 'Nagad Number';
-            label.setAttribute('data-en', method === 'bkash' ? 'bKash Number' : 'Nagad Number');
-            label.setAttribute('data-bn', method === 'bkash' ? 'বিকাশ নম্বর' : 'নগদ নম্বর');
-
-            // Update with saved number
-            const user = Storage.get('currentUser');
-            const number = method === 'bkash' ? user.bkashNumber : user.nagadNumber;
-            if (number) {
-                document.getElementById('withdrawNumber').value = number;
-            }
-        }
-
-        // Handle deposit form
-        document.getElementById('depositForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Rate limiting for deposits
-            const rateCheck = Security.isRateLimited('deposit', 10, 60000);
-            if (rateCheck.limited) {
-                showToast(`Too many requests. Please wait ${rateCheck.remainingTime} seconds.`, 'error');
-                return;
-            }
-
-            const txnId = Security.sanitizeHTML(document.getElementById('depositTxnId').value.trim());
-            
-            // Validate transaction ID format
-            if (txnId.length < 5 || txnId.length > 30) {
-                showToast('Please enter a valid Transaction ID', 'error');
-                return;
-            }
-
-            // Check if this is a membership upgrade request
-            if (depositPurpose === 'membership') {
-                handleMembershipRequest(txnId);
-                return;
-            }
-
-            const amountInput = document.getElementById('depositAmount').value;
-
-            // Validate amount
-            const amountValidation = Security.validateAmount(amountInput);
-            if (!amountValidation.isValid) {
-                showToast('Please enter a valid amount', 'error');
-                return;
-            }
-            const amount = amountValidation.value;
-
-            if (amount < 500) {
-                showToast('Minimum deposit is ৳500', 'error');
-                return;
-            }
-
-            const transaction = {
-                id: generateId(),
-                type: 'deposit',
-                method: selectedDepositMethod,
-                amount: amount,
-                txnId: txnId,
-                status: 'pending',
-                userId: Storage.get('currentUser')?.id,
-                createdAt: new Date().toISOString()
-            };
-
-            // Save transaction
-            const transactions = Storage.get('transactions') || [];
-            transactions.unshift(transaction);
-            Storage.set('transactions', transactions);
-
-            // Log the deposit request
-            Security.logSecurityEvent('deposit_request', { amount, method: selectedDepositMethod });
-
-            showToast('Deposit request submitted! Waiting for admin approval.', 'success');
-            this.reset();
-            loadTransactions();
-        });
-        
-        // Handle membership upgrade request
-        function handleMembershipRequest(txnId) {
-            const tierSelect = document.getElementById('membershipTierSelect');
-            const selectedTier = tierSelect.value;
-            
-            if (!selectedTier || !selectedMembershipTier) {
-                showToast('Please select a membership tier', 'error');
-                return;
-            }
-            
-            const user = Storage.get('currentUser');
-            
-            // Check if TrxID already exists
-            const existingRequests = Storage.get('membershipRequests') || [];
-            if (existingRequests.some(r => r.transactionId === txnId)) {
-                showToast('This Transaction ID has already been submitted', 'error');
-                return;
-            }
-            
-            // Check for pending request
-            if (existingRequests.some(r => r.userId === user.email && r.status === 'pending')) {
-                showToast('You already have a pending membership request', 'error');
-                return;
-            }
-            
-            // Create membership request
-            const requestId = 'MR' + Date.now().toString(36).toUpperCase();
-            const accounts = getPaymentAccounts();
-            const method = accounts[selectedDepositMethod];
-            
-            const request = {
-                id: requestId,
-                userId: user.email,
-                userName: user.name,
-                userPhone: user.phone,
-                membershipId: selectedTier,
-                membershipName: selectedMembershipTier.name,
-                taskLimit: selectedMembershipTier.taskLimit,
-                amount: selectedMembershipTier.price,
-                paymentMethod: selectedDepositMethod,
-                paymentMethodName: method?.name || selectedDepositMethod,
-                transactionId: txnId,
-                senderNumber: '',
-                note: '',
-                status: 'pending',
-                createdAt: new Date().toISOString()
-            };
-            
-            existingRequests.unshift(request);
-            Storage.set('membershipRequests', existingRequests);
-            
-            showToast(`Membership request submitted! Request ID: ${requestId}`, 'success');
-            
-            // Reset form
-            document.getElementById('depositForm').reset();
-            selectDepositPurpose('balance');
-            
-            // Refresh tier dropdown
-            populateMembershipTiers(user);
-        }
-
-        // Handle withdraw form
-        document.getElementById('withdrawForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Check if withdrawal is currently allowed
-            if (!withdrawalEnabled) {
-                showToast('Withdrawals are currently closed. Please try during operating hours.', 'error');
-                return;
-            }
-
-            // Rate limiting for withdrawals (stricter)
-            const rateCheck = Security.isRateLimited('withdraw', 5, 60000);
-            if (rateCheck.limited) {
-                showToast(`Too many requests. Please wait ${rateCheck.remainingTime} seconds.`, 'error');
-                return;
-            }
-
-            const user = Storage.get('currentUser');
-            const amountInput = document.getElementById('withdrawAmount').value;
-            const number = Security.sanitizeHTML(document.getElementById('withdrawNumber').value.trim());
-
-            // Validate amount with Security module
-            const amountValidation = Security.validateAmount(amountInput);
-            if (!amountValidation.isValid) {
-                showToast('Please enter a valid amount', 'error');
-                return;
-            }
-            const amount = amountValidation.value;
-
-            // Get withdrawal limits from config
-            const config = window.AppConfig?.withdrawal || {
-                minAmount: 100,
-                maxAmount: 50000
-            };
-
-            if (amount < (config.minAmount || 100)) {
-                showToast(`Minimum withdrawal is ৳${config.minAmount || 100}`, 'error');
-                return;
-            }
-
-            if (amount > (config.maxAmount || 50000)) {
-                showToast(`Maximum withdrawal is ৳${config.maxAmount || 50000}`, 'error');
-                return;
-            }
-
-            if (amount > (user.balance || 0)) {
-                showToast('Insufficient balance', 'error');
-                return;
-            }
-
-            // Validate phone number using Security module
-            if (!Security.isValidPhone(number)) {
-                showToast('Please enter a valid phone number', 'error');
-                return;
-            }
-
-            // ============ PERMANENT WITHDRAWAL ACCOUNT CHECK ============
-            // If user already has a permanent account, verify it matches
-            if (user.permanentWithdrawAccount) {
-                if (number !== user.permanentWithdrawAccount.number) {
-                    showToast('You can only withdraw to your registered account: ' + user.permanentWithdrawAccount.number, 'error');
+            // Setup form submit
+            withdrawSetupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const method = document.getElementById('withdrawMethod').value;
+                const number = document.getElementById('withdrawNumber').value.trim();
+                const password = document.getElementById('withdrawPassword').value;
+                if (!/^((\+880|880|0)?1[3-9]\d{8})$/.test(number)) {
+                    withdrawSetupStatus.textContent = 'Please enter a valid bKash/Nagad number.';
+                    withdrawSetupStatus.style.color = 'red';
                     return;
                 }
-                if (selectedWithdrawMethod !== user.permanentWithdrawAccount.method) {
-                    showToast('You can only withdraw via ' + user.permanentWithdrawAccount.method.toUpperCase(), 'error');
+                if (password.length < 6) {
+                    withdrawSetupStatus.textContent = 'Password must be at least 6 characters.';
+                    withdrawSetupStatus.style.color = 'red';
                     return;
                 }
-            } else {
-                // First withdrawal - confirm and lock the account
-                const confirmLock = confirm(
-                    '⚠️ IMPORTANT SECURITY NOTICE ⚠️\n\n' +
-                    'You are about to set your PERMANENT withdrawal account:\n\n' +
-                    '📱 Number: ' + number + '\n' +
-                    '💳 Method: ' + selectedWithdrawMethod.toUpperCase() + '\n\n' +
-                    'This CANNOT be changed later for security reasons.\n\n' +
-                    'Are you sure this is correct?'
-                );
-                
-                if (!confirmLock) {
-                    showToast('Withdrawal cancelled. Please verify your account number.', 'warning');
+                withdrawInfo = { method, number, password };
+                Storage.set('withdrawInfo_' + user.id, withdrawInfo);
+                withdrawSetupStatus.textContent = 'Withdrawal info saved!';
+                withdrawSetupStatus.style.color = 'green';
+                updateWithdrawFormFields();
+            });
+
+            // Withdraw form submit
+            withdrawForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!withdrawInfo) {
+                    withdrawStatus.textContent = 'Please set withdrawal info first.';
+                    withdrawStatus.style.color = 'red';
                     return;
                 }
-                
-                // Lock the account permanently
-                lockWithdrawalAccount(user, number, selectedWithdrawMethod);
-                showToast('Your withdrawal account has been permanently set!', 'success');
-            }
-
-            const transaction = {
-                id: generateId(),
-                type: 'withdraw',
-                method: selectedWithdrawMethod,
-                amount: amount,
-                toNumber: number,
-                status: 'pending',
-                userId: user.id,
-                createdAt: new Date().toISOString()
-            };
-
-            // Save transaction
-            const transactions = Storage.get('transactions') || [];
-            transactions.unshift(transaction);
-            Storage.set('transactions', transactions);
-
-            // Log the withdrawal request
-            Security.logSecurityEvent('withdrawal_request', { amount, method: selectedWithdrawMethod, toNumber: number });
-
-            showToast('Withdrawal request submitted! Waiting for admin approval.', 'success');
-            this.reset();
-            
-            // Reload page to show locked account UI
-            if (!user.permanentWithdrawAccount) {
-                setTimeout(() => location.reload(), 1500);
-            } else {
+                const amount = Number(document.getElementById('withdrawAmount').value);
+                const passwordInput = document.getElementById('withdrawPasswordInput').value;
+                if (amount < 100) {
+                    withdrawStatus.textContent = 'Minimum withdrawal is ৳100.';
+                    withdrawStatus.style.color = 'red';
+                    return;
+                }
+                if (passwordInput !== withdrawInfo.password) {
+                    withdrawStatus.textContent = 'Incorrect withdrawal password.';
+                    withdrawStatus.style.color = 'red';
+                    return;
+                }
+                if (amount > (user.balance || 0)) {
+                    withdrawStatus.textContent = 'Insufficient balance.';
+                    withdrawStatus.style.color = 'red';
+                    return;
+                }
+                // Save withdrawal transaction
+                const transaction = {
+                    id: generateId(),
+                    type: 'withdrawal',
+                    method: withdrawInfo.method,
+                    amount: amount,
+                    toNumber: withdrawInfo.number,
+                    status: 'pending',
+                    userId: user.id,
+                    userEmail: user.email,
+                    userName: user.name,
+                    createdAt: new Date().toISOString()
+                };
+                // Deduct balance
+                user.balance = (user.balance || 0) - amount;
+                Storage.set('currentUser', user);
+                // Update users array
+                const users = Storage.get('users') || [];
+                const userIndex = users.findIndex(u => u.id === user.id);
+                if (userIndex !== -1) {
+                    users[userIndex].balance = user.balance;
+                    Storage.set('users', users);
+                }
+                // Save transaction
+                const transactions = Storage.get('transactions') || [];
+                transactions.unshift(transaction);
+                Storage.set('transactions', transactions);
+                withdrawStatus.textContent = 'Withdrawal request submitted! Waiting for admin approval.';
+                withdrawStatus.style.color = 'green';
+                withdrawForm.reset();
+                document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
                 loadTransactions();
-            }
+            });
         });
 
         function loadTransactions() {
             const transactions = Storage.get('transactions') || [];
             const user = Storage.get('currentUser');
-            
-            // Filter user's transactions (in real app, this would be from database)
-            const userTransactions = transactions.filter(t => true); // Show all for demo
-
+            const userTransactions = transactions.filter(t => t.userEmail === user.email);
             renderTransactions(userTransactions);
         }
 
         function renderTransactions(transactions, filter = 'all') {
             const container = document.getElementById('transactionsList');
-
-            const filtered = filter === 'all' 
-                ? transactions 
-                : transactions.filter(t => t.type === filter);
+            
+            let filtered = transactions;
+            if (filter !== 'all') {
+                filtered = transactions.filter(t => t.type === filter);
+            }
 
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exchange-alt"></i>
-                        <p data-en="No transactions found" data-bn="কোন লেনদেন পাওয়া যায়নি">No transactions found</p>
+                        <p>No transactions found</p>
                     </div>
                 `;
                 return;
@@ -1037,11 +552,10 @@
                         <div class="transaction-type">${t.type === 'deposit' ? 'Deposit' : 'Withdrawal'} via ${t.method}</div>
                         <div class="transaction-id">${t.type === 'deposit' ? 'TxnID: ' + t.txnId : 'To: ' + t.toNumber}</div>
                     </div>
-                    <div class="transaction-date">${formatDateTime(t.createdAt)}</div>
                     <div class="transaction-amount ${t.type === 'deposit' ? 'positive' : 'negative'}">
                         ${t.type === 'deposit' ? '+' : '-'}${formatCurrency(t.amount)}
                     </div>
-                    <span class="transaction-status ${t.status}">${t.status.charAt(0).toUpperCase() + t.status.slice(1)}</span>
+                    <span class="transaction-status ${t.status}">${t.status}</span>
                 </div>
             `).join('');
         }
@@ -1050,131 +564,17 @@
             document.querySelectorAll('.filter-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.filter === filter);
             });
-
+            
             const transactions = Storage.get('transactions') || [];
-            renderTransactions(transactions, filter);
-        }
-
-        // ============ PERMANENT WITHDRAWAL ACCOUNT SYSTEM ============
-        // Once a user sets their withdrawal account, it cannot be changed
-        
-        function setupWithdrawalAccount(user) {
-            const withdrawInput = document.getElementById('withdrawNumber');
-            
-            // Check if user has a permanent withdrawal account set
-            if (user.permanentWithdrawAccount) {
-                // Lock the input field
-                withdrawInput.value = user.permanentWithdrawAccount.number;
-                withdrawInput.readOnly = true;
-                withdrawInput.style.backgroundColor = 'var(--bg-tertiary)';
-                withdrawInput.style.cursor = 'not-allowed';
-                
-                // Add locked indicator
-                const label = document.getElementById('withdrawNumberLabel');
-                if (label && !label.querySelector('.locked-badge')) {
-                    label.innerHTML += ' <span class="locked-badge" style="background: #10b981; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px;"><i class="fas fa-lock"></i> Permanent</span>';
-                }
-                
-                // Hide method selector since account is locked to one method
-                const methodSelector = document.querySelector('#withdrawForm .method-selector');
-                if (methodSelector) {
-                    // Auto-select the locked method
-                    selectWithdrawMethod(user.permanentWithdrawAccount.method);
-                    // Disable method switching
-                    methodSelector.querySelectorAll('.method-btn').forEach(btn => {
-                        if (btn.dataset.method !== user.permanentWithdrawAccount.method) {
-                            btn.disabled = true;
-                            btn.style.opacity = '0.5';
-                            btn.style.cursor = 'not-allowed';
-                        }
-                    });
-                }
-                
-                // Add info message
-                const form = document.getElementById('withdrawForm');
-                if (form && !document.getElementById('permanentAccountNotice')) {
-                    const notice = document.createElement('div');
-                    notice.id = 'permanentAccountNotice';
-                    notice.style.cssText = 'background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 13px; color: #10b981;';
-                    notice.innerHTML = '<i class="fas fa-shield-alt"></i> Your withdrawal account is permanently set to <strong>' + user.permanentWithdrawAccount.number + '</strong> (' + user.permanentWithdrawAccount.method.toUpperCase() + '). This cannot be changed for security.';
-                    form.insertBefore(notice, form.firstChild);
-                }
-            } else {
-                // First time - show warning that this will be permanent
-                const form = document.getElementById('withdrawForm');
-                if (form && !document.getElementById('firstTimeWarning')) {
-                    const warning = document.createElement('div');
-                    warning.id = 'firstTimeWarning';
-                    warning.style.cssText = 'background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 13px; color: #f59e0b;';
-                    warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> The first withdrawal number you use will become your PERMANENT withdrawal account. You cannot change it later. Please enter carefully!';
-                    form.insertBefore(warning, form.firstChild);
-                }
-            }
-        }
-        
-        function lockWithdrawalAccount(user, number, method) {
-            // Set permanent withdrawal account
-            user.permanentWithdrawAccount = {
-                number: number,
-                method: method,
-                setAt: new Date().toISOString()
-            };
-            
-            // Update current user
-            Storage.set('currentUser', user);
-            
-            // Also update in users list
-            const users = Storage.get('users') || [];
-            const userIndex = users.findIndex(u => u.id === user.id);
-            if (userIndex !== -1) {
-                users[userIndex].permanentWithdrawAccount = user.permanentWithdrawAccount;
-                Storage.set('users', users);
-            }
-            
-            // Log this security event
-            if (typeof Security !== 'undefined') {
-                Security.logSecurityEvent('withdrawal_account_locked', { 
-                    userId: user.id, 
-                    number: number, 
-                    method: method 
-                });
-            }
+            const user = Storage.get('currentUser');
+            const userTransactions = transactions.filter(t => t.userEmail === user.email);
+            renderTransactions(userTransactions, filter);
         }
 
         function logout() {
             Storage.remove('currentUser');
-            showToast('Logged out successfully', 'success');
-            setTimeout(() => {
-                window.location.href = '../login.html';
-            }, 500);
+            window.location.href = '../login.html';
         }
-
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const isOpen = mobileMenu.classList.toggle('active');
-            
-            if (isOpen) {
-                hamburgerBtn.innerHTML = '<i class="fas fa-times"></i>';
-                document.body.style.overflow = 'hidden';
-            } else {
-                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            
-            if (mobileMenu && mobileMenu.classList.contains('active')) {
-                if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-                    toggleMobileMenu();
-                }
-            }
-        });
 
         // Desktop dropdown handling
         document.querySelectorAll('.navbar-item').forEach(item => {
@@ -1192,7 +592,6 @@
         });
     </script>
     
-    <!-- Chat Widget -->
     <script src="../js/chat-widget.js"></script>
 </body>
 </html>

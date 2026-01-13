@@ -681,40 +681,29 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <div class="content">
-            <!-- Profile Header -->
-            <div class="profile-header-card">
-                <div class="profile-avatar-section">
-                    <div class="profile-avatar" id="profileAvatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <label class="avatar-upload-btn">
-                        <i class="fas fa-camera"></i>
-                        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="updateAvatar(this)">
-                    </label>
+        <div class="container" style="max-width:400px;margin:40px auto;">
+            <h2>Payment Method Setup</h2>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>Choose Method</label>
+                    <select id="method" required>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                    </select>
                 </div>
-                <div class="profile-info">
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <h1 id="profileName" style="margin: 0;">User Name</h1>
-                        <span id="membershipBadge" class="membership-level-badge" style="display: none;"></span>
-                    </div>
-                    <p id="profileEmail">user@example.com</p>
-                    <span class="member-badge"><i class="fas fa-calendar-alt"></i> Member since <span id="memberSince">Jan 2024</span></span>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="text" id="number" pattern="01[3-9][0-9]{8}" required placeholder="01XXXXXXXXX">
                 </div>
-                <div class="profile-actions">
-                    <button class="btn btn-primary" onclick="openWithdrawModal()">
-                        <i class="fas fa-money-bill-wave"></i> Withdraw
-                    </button>
-                    <button class="btn btn-outline" onclick="openEditModal()">
-                        <i class="fas fa-edit"></i> Edit Profile
-                    </button>
+                <div class="form-group">
+                    <label>Set Withdrawal Password (PIN)</label>
+                    <input type="password" id="withdrawalPassword" maxlength="4" pattern="\d{4}" required placeholder="4-digit PIN">
                 </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="profile-stats-grid">
+                <button type="submit" class="btn btn-primary">Save Payment Method</button>
+            </form>
+        </div>
+    </main>
                 <div class="profile-stat-card points">
                     <div class="stat-icon"><i class="fas fa-coins"></i></div>
                     <div class="stat-content">
@@ -758,6 +747,10 @@
                 <button class="quick-action-btn" onclick="openPasswordModal()">
                     <i class="fas fa-key"></i>
                     <span>Change Password</span>
+                </button>
+                <button class="quick-action-btn" onclick="openWithdrawalPinModal()">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Withdrawal PIN</span>
                 </button>
                 <button class="quick-action-btn" onclick="openPaymentModal()">
                     <i class="fas fa-credit-card"></i>
@@ -1072,7 +1065,58 @@
         </div>
     </div>
 
+    <!-- Withdrawal PIN Modal -->
+    <div class="form-modal" id="withdrawalPinModal">
+        <div class="form-modal-content">
+            <div class="form-modal-header">
+                <h3><i class="fas fa-shield-alt" style="margin-right: 10px;"></i>Withdrawal PIN</h3>
+                <button class="form-modal-close" onclick="closeModal('withdrawalPinModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <div id="pinSetupSection" style="display: none;">
+                    <p style="margin-bottom: 15px; color: var(--text-light);">
+                        <i class="fas fa-info-circle"></i> You haven't set a withdrawal PIN yet. Set one to secure your withdrawals.
+                    </p>
+                    <form id="setupPinForm">
+                        <div class="form-group">
+                            <label>Set 4-Digit PIN</label>
+                            <input type="password" id="newPin" placeholder="Enter 4-digit PIN" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm PIN</label>
+                            <input type="password" id="confirmNewPin" placeholder="Confirm 4-digit PIN" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                    </form>
+                </div>
+                <div id="pinChangeSection" style="display: none;">
+                    <p style="margin-bottom: 15px; color: var(--text-light);">
+                        <i class="fas fa-lock"></i> Change your withdrawal PIN for security.
+                    </p>
+                    <form id="changePinForm">
+                        <div class="form-group">
+                            <label>Current PIN</label>
+                            <input type="password" id="currentPin" placeholder="Current 4-digit PIN" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New PIN</label>
+                            <input type="password" id="changeNewPin" placeholder="New 4-digit PIN" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New PIN</label>
+                            <input type="password" id="confirmChangePin" placeholder="Confirm new PIN" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('withdrawalPinModal')">Cancel</button>
+                <button class="btn btn-primary" id="savePinBtn" onclick="saveWithdrawalPin()"><i class="fas fa-check"></i> Save PIN</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
     <script src="../js/theme.js"></script>
     <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
@@ -1080,30 +1124,30 @@
     <script>
         let currentUser = null;
         let currentFilter = 'all';
-
-        document.addEventListener('DOMContentLoaded', function() {
-            currentUser = Storage.get('currentUser');
-            if (!currentUser || !currentUser.isLoggedIn) {
-                window.location.href = '../login.html';
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const method = document.getElementById('method').value;
+            const number = document.getElementById('number').value.trim();
+            const withdrawalPassword = document.getElementById('withdrawalPassword').value.trim();
+            if (!/^01[3-9]\d{8}$/.test(number)) {
+                alert('Enter a valid mobile number');
                 return;
             }
-
-            loadProfileData();
-            loadWithdrawalHistory();
+            if (!/^\d{4}$/.test(withdrawalPassword)) {
+                alert('PIN must be 4 digits');
+                return;
+            }
+            const user = {
+                method,
+                withdrawalNumber: number,
+                withdrawalPassword
+            };
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            alert('Payment method saved!');
+            window.location.href = 'wallet.html';
         });
-
-        function loadProfileData() {
-            const users = Storage.get('users') || [];
-            const user = users.find(u => u.email === currentUser.email) || currentUser;
-
-            // Header info
-            document.getElementById('userName').textContent = user.name || 'User';
-            document.getElementById('profileName').textContent = user.name || 'User';
-            document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('memberSince').textContent = formatDate(user.createdAt || new Date().toISOString());
-            
-            // Membership badge
-            const membershipBadge = document.getElementById('membershipBadge');
+    </script>
             if (user.membershipLevel && user.membershipName) {
                 membershipBadge.innerHTML = `<i class="fas fa-crown"></i> ${user.membershipName}`;
                 membershipBadge.style.display = 'inline-flex';
@@ -1532,6 +1576,85 @@
 
             closeModal('passwordModal');
             showToast('Password changed successfully!', 'success');
+        }
+
+        function openWithdrawalPinModal() {
+            const user = Storage.get('currentUser');
+            const pinSetupSection = document.getElementById('pinSetupSection');
+            const pinChangeSection = document.getElementById('pinChangeSection');
+            
+            if (user.withdrawalPassword) {
+                // User has PIN, show change section
+                pinSetupSection.style.display = 'none';
+                pinChangeSection.style.display = 'block';
+                document.getElementById('currentPin').value = '';
+                document.getElementById('changeNewPin').value = '';
+                document.getElementById('confirmChangePin').value = '';
+            } else {
+                // User needs to set PIN
+                pinSetupSection.style.display = 'block';
+                pinChangeSection.style.display = 'none';
+                document.getElementById('newPin').value = '';
+                document.getElementById('confirmNewPin').value = '';
+            }
+            
+            document.getElementById('withdrawalPinModal').classList.add('active');
+        }
+
+        function saveWithdrawalPin() {
+            const user = Storage.get('currentUser');
+            const users = Storage.get('users') || [];
+            const userIndex = users.findIndex(u => u.email === user.email);
+            
+            if (user.withdrawalPassword) {
+                // Changing existing PIN
+                const currentPin = document.getElementById('currentPin').value;
+                const newPin = document.getElementById('changeNewPin').value;
+                const confirmPin = document.getElementById('confirmChangePin').value;
+                
+                if (!/^\d{4}$/.test(currentPin) || !/^\d{4}$/.test(newPin)) {
+                    showToast('PIN must be exactly 4 digits', 'error');
+                    return;
+                }
+                
+                if (currentPin !== user.withdrawalPassword) {
+                    showToast('Current PIN is incorrect', 'error');
+                    return;
+                }
+                
+                if (newPin !== confirmPin) {
+                    showToast('New PINs do not match', 'error');
+                    return;
+                }
+                
+                // Update PIN
+                user.withdrawalPassword = newPin;
+                users[userIndex].withdrawalPassword = newPin;
+                
+            } else {
+                // Setting new PIN
+                const newPin = document.getElementById('newPin').value;
+                const confirmPin = document.getElementById('confirmNewPin').value;
+                
+                if (!/^\d{4}$/.test(newPin)) {
+                    showToast('PIN must be exactly 4 digits', 'error');
+                    return;
+                }
+                
+                if (newPin !== confirmPin) {
+                    showToast('PINs do not match', 'error');
+                    return;
+                }
+                
+                // Set PIN
+                user.withdrawalPassword = newPin;
+                users[userIndex].withdrawalPassword = newPin;
+            }
+            
+            Storage.set('currentUser', user);
+            Storage.set('users', users);
+            closeModal('withdrawalPinModal');
+            showToast('Withdrawal PIN saved successfully!', 'success');
         }
 
         function formatDate(dateStr) {

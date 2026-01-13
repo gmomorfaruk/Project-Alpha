@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - Project Alpha</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="top-navbar">
+        <a href="index.html" class="navbar-brand">
+            <i class="fas fa-rocket"></i>
+            <span>Project Alpha</span>
+        </a>
+    </nav>
+    <main class="container">
+        <h2>Deposit Funds</h2>
+        <form id="depositForm" class="wallet-action-card">
+            <div class="form-group">
+                <label for="depositAmount">Amount</label>
+                <input type="number" id="depositAmount" min="500" required placeholder="Enter amount (min ৳500)">
+            </div>
+            <div class="form-group">
+                <label for="depositTxnId">Transaction ID</label>
+                <input type="text" id="depositTxnId" required placeholder="Enter Transaction ID">
+            </div>
+            <div class="form-group">
+                <label>Payment Method</label>
+                <div class="method-selector">
+                    <button type="button" class="method-btn active" data-method="bkash" onclick="selectDepositMethod('bkash')">bKash</button>
+                    <button type="button" class="method-btn" data-method="nagad" onclick="selectDepositMethod('nagad')">Nagad</button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Deposit</button>
+        </form>
+        <div id="depositStatus"></div>
+    </main>
+    <script src="../js/app-config.js"></script>
+    <script src="../js/database-manager.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        let selectedDepositMethod = 'bkash';
+        function selectDepositMethod(method) {
+            selectedDepositMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.method === method);
+            });
+        }
+        document.getElementById('depositForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const amountInput = document.getElementById('depositAmount').value;
+            const txnId = document.getElementById('depositTxnId').value.trim();
+            if (amountInput < 500) {
+                showToast('Minimum deposit is ৳500', 'error');
+                return;
+            }
+            if (txnId.length < 5) {
+                showToast('Please enter a valid Transaction ID', 'error');
+                return;
+            }
+            const user = Storage.get('currentUser');
+            if (!user) {
+                showToast('User not logged in', 'error');
+                return;
+            }
+            const transaction = {
+                id: generateId(),
+                type: 'deposit',
+                method: selectedDepositMethod,
+                amount: Number(amountInput),
+                txnId: txnId,
+                status: 'pending',
+                userId: user.id,
+                userEmail: user.email,
+                userName: user.name,
+                createdAt: new Date().toISOString()
+            };
+            const transactions = Storage.get('transactions') || [];
+            transactions.unshift(transaction);
+            Storage.set('transactions', transactions);
+            showToast('Deposit request submitted! Waiting for admin approval.', 'success');
+            this.reset();
+        });
+    </script>
+    <script src="../js/chat-widget.js"></script>
+</body>
+</html>

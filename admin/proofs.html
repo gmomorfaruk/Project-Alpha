@@ -136,6 +136,7 @@
     <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/dashboard.js"></script>
+    <script src="../js/financial-tracker.js"></script>
     <script>
         let proofs = [];
 
@@ -367,6 +368,16 @@
                         currentUser.balance = users[userIndex].balance;
                         currentUser.points = users[userIndex].points;
                         Storage.set('currentUser', currentUser);
+                    }
+                    
+                    // Record this payout in financial tracker for analytics
+                    if (window.FinancialTracker) {
+                        FinancialTracker.recordUserEarning(
+                            inv.userId, 
+                            totalReturn, 
+                            'product_sale', 
+                            `Sell proof approved: ${proof.productName} (${proof.unitsSold} units)`
+                        );
                     }
                 }
             }
