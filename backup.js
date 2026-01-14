@@ -40,9 +40,7 @@ async function backupAllTables() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   try {
     const tables = await getTableNames(client);
-    for (const table of tables) {
-      await backupTable(client, table, timestamp);
-    }
+    await Promise.all(tables.map(table => backupTable(client, table, timestamp)));
     console.log('Backup completed successfully.');
   } catch (err) {
     console.error('Backup failed:', err);
