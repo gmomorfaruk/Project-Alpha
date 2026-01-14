@@ -296,13 +296,36 @@
     <!-- Main Content -->
     <main class="wallet-page">
         <div class="wallet-container">
-            <!-- Balance Card -->
-            <div class="balance-card">
-                <div class="balance-icon">
-                    <i class="fas fa-wallet"></i>
+            <!-- Stats Grid -->
+            <div class="profile-stats-grid">
+                <div class="profile-stat-card balance">
+                    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="totalBalance">৳0</span>
+                        <span class="stat-label">Balance</span>
+                    </div>
                 </div>
-                <div class="balance-label">Available Balance</div>
-                <div class="balance-value" id="walletBalance">৳0</div>
+                <div class="profile-stat-card points">
+                    <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="totalPoints">0</span>
+                        <span class="stat-label">Points</span>
+                    </div>
+                </div>
+                <div class="profile-stat-card withdrawn">
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="totalWithdrawn">৳0</span>
+                        <span class="stat-label">Withdrawn</span>
+                    </div>
+                </div>
+                <div class="profile-stat-card pending">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="pendingWithdraw">৳0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Action Buttons -->
@@ -311,68 +334,12 @@
                     <i class="fas fa-plus-circle"></i>
                     <span>Deposit</span>
                 </a>
-                <a href="withdraw.html" class="action-btn withdraw">
+                <button class="action-btn withdraw" onclick="openWithdrawModal()">
                     <i class="fas fa-minus-circle"></i>
                     <span>Withdraw</span>
-                </a>
+                </button>
             </div>
 
-            <!-- Withdrawal Setup Section -->
-            <section id="withdraw-setup-section" class="transactions-card" style="margin-bottom: 24px;">
-                <div class="transactions-header">
-                    <h3><i class="fas fa-cog"></i> Withdrawal Setup</h3>
-                </div>
-                <div class="transactions-body">
-                    <form id="withdrawSetupForm">
-                        <div class="form-group">
-                            <label for="withdrawMethod">Select Method</label>
-                            <select id="withdrawMethod" required>
-                                <option value="bkash">bKash</option>
-                                <option value="nagad">Nagad</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="withdrawNumber">Account Number</label>
-                            <input type="text" id="withdrawNumber" required placeholder="Enter bKash/Nagad number">
-                        </div>
-                        <div class="form-group">
-                            <label for="withdrawPassword">Set Withdrawal Password</label>
-                            <input type="password" id="withdrawPassword" required placeholder="Set a password (min 6 chars)">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Withdrawal Info</button>
-                    </form>
-                    <div id="withdrawSetupStatus"></div>
-                </div>
-            </section>
-
-            <!-- Withdrawal Form Section -->
-            <section id="withdraw-section" class="transactions-card" style="margin-bottom: 24px;">
-                <div class="transactions-header">
-                    <h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3>
-                </div>
-                <div class="transactions-body">
-                    <form id="withdrawForm">
-                        <div class="form-group">
-                            <label>Method</label>
-                            <input type="text" id="savedWithdrawMethod" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Account Number</label>
-                            <input type="text" id="savedWithdrawNumber" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="withdrawAmount">Amount</label>
-                            <input type="number" id="withdrawAmount" min="100" required placeholder="Enter amount (min ৳100)">
-                        </div>
-                        <div class="form-group">
-                            <label for="withdrawPasswordInput">Withdrawal Password</label>
-                            <input type="password" id="withdrawPasswordInput" required placeholder="Enter withdrawal password">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit Withdrawal</button>
-                    </form>
-                    <div id="withdrawStatus"></div>
-                </div>
-            </section>
             <!-- Transaction History -->
             <div class="transactions-card">
                 <div class="transactions-header">
@@ -393,6 +360,75 @@
         </div>
     </main>
 
+    <!-- Withdraw Modal -->
+    <div class="form-modal" id="withdrawModal">
+        <div class="form-modal-content" style="max-width: 450px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <h3><i class="fas fa-money-bill-wave" style="margin-right: 10px;"></i>Withdraw Funds</h3>
+                <button class="form-modal-close" onclick="closeModal('withdrawModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <div class="balance-display">
+                    <span>Available Balance</span>
+                    <strong id="availableBalance">৳0</strong>
+                </div>
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label>Amount (৳)</label>
+                        <input type="number" id="withdrawAmount" placeholder="Enter amount" min="100" required>
+                        <small style="color: var(--text-muted);">Minimum: ৳100</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select id="withdrawMethod" required>
+                            <option value="">Select method</option>
+                            <option value="bkash">bKash</option>
+                            <option value="nagad">Nagad</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="accountNumberGroup">
+                        <label>Account Number</label>
+                        <input type="tel" id="withdrawAccount" placeholder="01XXXXXXXXX" required>
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('withdrawModal')">Cancel</button>
+                <button class="btn btn-success" onclick="submitWithdraw()"><i class="fas fa-paper-plane"></i> Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Methods Modal -->
+    <div class="form-modal" id="paymentModal">
+        <div class="form-modal-content" style="max-width: 550px;">
+            <div class="form-modal-header" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                <h3><i class="fas fa-credit-card" style="margin-right: 10px;"></i>Payment Methods</h3>
+                <button class="form-modal-close" onclick="closeModal('paymentModal')" style="color: white;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-modal-body">
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <label>bKash Number</label>
+                        <input type="tel" id="paymentBkash" placeholder="01XXXXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label>Nagad Number</label>
+                        <input type="tel" id="paymentNagad" placeholder="01XXXXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label>Rocket Number</label>
+                        <input type="tel" id="paymentRocket" placeholder="01XXXXXXXXX">
+                    </div>
+                </form>
+            </div>
+            <div class="form-modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('paymentModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="savePaymentMethods()"><i class="fas fa-save"></i> Save Methods</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/app-config.js"></script>
     <script src="../js/database-manager.js"></script>
     <script src="../js/theme.js"></script>
@@ -400,129 +436,26 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const user = Storage.get('currentUser');
-            if (!user || !user.isLoggedIn || user.role !== 'user') {
-                window.location.href = '../login.html';
-                return;
-            }
+            if (!user) { window.location.href = '../login.html'; return; }
 
             document.getElementById('userName').textContent = user.name || 'User';
-            document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
-            
-            loadTransactions();
-
-            // Withdrawal Setup Logic
-            const withdrawSetupForm = document.getElementById('withdrawSetupForm');
-            const withdrawForm = document.getElementById('withdrawForm');
-            const withdrawSetupSection = document.getElementById('withdraw-setup-section');
-            const withdrawSection = document.getElementById('withdraw-section');
-            const withdrawSetupStatus = document.getElementById('withdrawSetupStatus');
-            const withdrawStatus = document.getElementById('withdrawStatus');
-            const savedWithdrawMethod = document.getElementById('savedWithdrawMethod');
-            const savedWithdrawNumber = document.getElementById('savedWithdrawNumber');
-
-            // Load saved withdrawal info
-            let withdrawInfo = Storage.get('withdrawInfo_' + user.id);
-            function updateWithdrawFormFields() {
-                if (withdrawInfo) {
-                    savedWithdrawMethod.value = withdrawInfo.method;
-                    savedWithdrawNumber.value = withdrawInfo.number;
-                    withdrawSection.style.display = '';
-                    withdrawSetupSection.style.display = 'none';
-                } else {
-                    withdrawSection.style.display = 'none';
-                    withdrawSetupSection.style.display = '';
-                }
-            }
-            updateWithdrawFormFields();
-
-            // Setup form submit
-            withdrawSetupForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const method = document.getElementById('withdrawMethod').value;
-                const number = document.getElementById('withdrawNumber').value.trim();
-                const password = document.getElementById('withdrawPassword').value;
-                if (!/^((\+880|880|0)?1[3-9]\d{8})$/.test(number)) {
-                    withdrawSetupStatus.textContent = 'Please enter a valid bKash/Nagad number.';
-                    withdrawSetupStatus.style.color = 'red';
-                    return;
-                }
-                if (password.length < 6) {
-                    withdrawSetupStatus.textContent = 'Password must be at least 6 characters.';
-                    withdrawSetupStatus.style.color = 'red';
-                    return;
-                }
-                withdrawInfo = { method, number, password };
-                Storage.set('withdrawInfo_' + user.id, withdrawInfo);
-                withdrawSetupStatus.textContent = 'Withdrawal info saved!';
-                withdrawSetupStatus.style.color = 'green';
-                updateWithdrawFormFields();
-            });
-
-            // Withdraw form submit
-            withdrawForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (!withdrawInfo) {
-                    withdrawStatus.textContent = 'Please set withdrawal info first.';
-                    withdrawStatus.style.color = 'red';
-                    return;
-                }
-                const amount = Number(document.getElementById('withdrawAmount').value);
-                const passwordInput = document.getElementById('withdrawPasswordInput').value;
-                if (amount < 100) {
-                    withdrawStatus.textContent = 'Minimum withdrawal is ৳100.';
-                    withdrawStatus.style.color = 'red';
-                    return;
-                }
-                if (passwordInput !== withdrawInfo.password) {
-                    withdrawStatus.textContent = 'Incorrect withdrawal password.';
-                    withdrawStatus.style.color = 'red';
-                    return;
-                }
-                if (amount > (user.balance || 0)) {
-                    withdrawStatus.textContent = 'Insufficient balance.';
-                    withdrawStatus.style.color = 'red';
-                    return;
-                }
-                // Save withdrawal transaction
-                const transaction = {
-                    id: generateId(),
-                    type: 'withdrawal',
-                    method: withdrawInfo.method,
-                    amount: amount,
-                    toNumber: withdrawInfo.number,
-                    status: 'pending',
-                    userId: user.id,
-                    userEmail: user.email,
-                    userName: user.name,
-                    createdAt: new Date().toISOString()
-                };
-                // Deduct balance
-                user.balance = (user.balance || 0) - amount;
-                Storage.set('currentUser', user);
-                // Update users array
-                const users = Storage.get('users') || [];
-                const userIndex = users.findIndex(u => u.id === user.id);
-                if (userIndex !== -1) {
-                    users[userIndex].balance = user.balance;
-                    Storage.set('users', users);
-                }
-                // Save transaction
-                const transactions = Storage.get('transactions') || [];
-                transactions.unshift(transaction);
-                Storage.set('transactions', transactions);
-                withdrawStatus.textContent = 'Withdrawal request submitted! Waiting for admin approval.';
-                withdrawStatus.style.color = 'green';
-                withdrawForm.reset();
-                document.getElementById('walletBalance').textContent = formatCurrency(user.balance || 0);
-                loadTransactions();
-            });
+            loadWalletData();
         });
 
-        function loadTransactions() {
-            const transactions = Storage.get('transactions') || [];
+        function loadWalletData() {
             const user = Storage.get('currentUser');
-            const userTransactions = transactions.filter(t => t.userEmail === user.email);
-            renderTransactions(userTransactions);
+            const withdrawals = Storage.get('withdrawals') || [];
+            const userWithdrawals = withdrawals.filter(w => w.userId === user.email);
+
+            const totalWithdrawn = userWithdrawals.filter(w => w.status === 'completed').reduce((sum, w) => sum + w.amount, 0);
+            const pendingWithdraw = userWithdrawals.filter(w => w.status === 'pending').reduce((sum, w) => sum + w.amount, 0);
+
+            document.getElementById('totalBalance').textContent = '৳' + (user.balance || 0).toLocaleString();
+            document.getElementById('totalPoints').textContent = (user.points || 0).toLocaleString();
+            document.getElementById('totalWithdrawn').textContent = '৳' + totalWithdrawn.toLocaleString();
+            document.getElementById('pendingWithdraw').textContent = '৳' + pendingWithdraw.toLocaleString();
+
+            renderTransactions(userWithdrawals);
         }
 
         function renderTransactions(transactions, filter = 'all') {
