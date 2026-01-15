@@ -338,7 +338,7 @@
                     name: fullName,
                     phone: phone,
                     email: email,
-                    password: password,
+                    password: Security.hashPassword(password),
                     referralCode: referralCodeInput,
                 };
 
