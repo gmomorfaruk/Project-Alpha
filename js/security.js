@@ -148,26 +148,25 @@ const Security = {
     // ==================== AUTHENTICATION SECURITY ====================
     
     /**
-     * Hash password (simple client-side hash - in production use bcrypt on server)
-     * This is NOT cryptographically secure - just obfuscation for localStorage
+     * Hash password securely using SHA-256 (Client-Side)
+     * Note: In a real production app, hashing should also happen on the server.
+     * Since this is a static site/demo, we use Web Crypto API for better security than plain text.
      */
-    hashPassword(password) {
-        let hash = 0;
-        const salt = 'PA_2026_SECURE';
-        const salted = salt + password + salt;
-        for (let i = 0; i < salted.length; i++) {
-            const char = salted.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        return 'h_' + Math.abs(hash).toString(36) + '_' + password.length;
+    async hashPassword(password) {
+        if (!password) return '';
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
     },
     
     /**
      * Verify password against hash
      */
-    verifyPassword(password, hash) {
-        return this.hashPassword(password) === hash;
+    async verifyPassword(password, hash) {
+        const computedHash = await this.hashPassword(password);
+        return computedHash === hash;
     },
     
     /**

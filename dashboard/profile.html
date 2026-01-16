@@ -1117,6 +1117,7 @@
 
     <script src="../js/app-config.js"></script>
     <script src="../js/database-manager.js"></script>
+    <script src="../js/security.js"></script>
     <script src="../js/theme.js"></script>
     <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
@@ -1547,7 +1548,7 @@
             document.getElementById('passwordModal').classList.add('active');
         }
 
-        function changePassword() {
+        async function changePassword() {
             const current = document.getElementById('currentPassword').value;
             const newPass = document.getElementById('newPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
@@ -1555,7 +1556,7 @@
             const users = Storage.get('users') || [];
             const user = users.find(u => u.email === currentUser.email);
 
-            if (!user || user.password !== current) {
+            if (!user || !await Security.verifyPassword(current, user.password)) {
                 showToast('Current password is incorrect', 'error');
                 return;
             }
@@ -1571,7 +1572,7 @@
             }
 
             const userIndex = users.findIndex(u => u.email === currentUser.email);
-            users[userIndex].password = newPass;
+            users[userIndex].password = await Security.hashPassword(newPass);
             Storage.set('users', users);
 
             closeModal('passwordModal');

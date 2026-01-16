@@ -490,7 +490,7 @@ function initializeAppData() {
             name: 'Admin User',
             phone: '01700000001',
             role: 'admin',
-            password: 'admin123',
+            password: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', // SHA-256 for admin123
             balance: 0,
             points: 0,
             isLoggedIn: false,
@@ -502,7 +502,7 @@ function initializeAppData() {
             name: 'Demo User',
             phone: '01700000000',
             role: 'user',
-            password: 'demo123',
+            password: 'd3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791', // SHA-256 for demo123
             balance: 5000,
             points: 100,
             membership: 'free',
