@@ -334,6 +334,7 @@
 
     <script src="../js/theme.js"></script>
     <script src="../js/admin-common.js"></script>
+    <script src="../js/security.js"></script>
     <script src="../js/language.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/dashboard.js"></script>
@@ -623,7 +624,7 @@
                 name: name,
                 email: email,
                 phone: phone,
-                password: password,
+                password: Security.hashPassword(password),
                 role: role,
                 balance: balance,
                 status: 'active',
@@ -699,7 +700,7 @@
 
             const newPassword = document.getElementById('editUserPassword').value;
             if (newPassword) {
-                allUsers[userIndex].password = newPassword;
+                allUsers[userIndex].password = Security.hashPassword(newPassword);
             }
 
             Storage.set('users', allUsers);
