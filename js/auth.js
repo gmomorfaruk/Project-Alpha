@@ -128,7 +128,7 @@ function resetPassword() {
         return;
     }
     
-    users[userIndex].password = newPassword;
+    users[userIndex].password = Security.hashPassword(newPassword);
     Storage.set('users', users);
     
     showToast('Password reset successfully! You can now login', 'success');

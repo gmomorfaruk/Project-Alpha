@@ -490,7 +490,7 @@ function initializeAppData() {
             name: 'Admin User',
             phone: '01700000001',
             role: 'admin',
-            password: 'admin123',
+            password: 'h_6yrnpr_8', // Hash of 'admin123'
             balance: 0,
             points: 0,
             isLoggedIn: false,
@@ -502,7 +502,7 @@ function initializeAppData() {
             name: 'Demo User',
             phone: '01700000000',
             role: 'user',
-            password: 'demo123',
+            password: 'h_5kgg0h_7', // Hash of 'demo123'
             balance: 5000,
             points: 100,
             membership: 'free',
@@ -527,6 +527,18 @@ function initializeAppData() {
             users.push(defaultUser);
             dataUpdated = true;
             console.log(`Added default user: ${defaultUser.email}`);
+        } else if (existsByEmail) {
+            // Check if existing user has plaintext password and update it if it matches known default
+            const userIndex = users.findIndex(u => u.email === defaultUser.email);
+            if (userIndex !== -1) {
+                // If password is 'admin123' or 'demo123' (plaintext), update to hash
+                const currentPass = users[userIndex].password;
+                if (currentPass === 'admin123' || currentPass === 'demo123') {
+                    users[userIndex].password = defaultUser.password;
+                    dataUpdated = true;
+                    console.log(`Updated password hash for: ${defaultUser.email}`);
+                }
+            }
         }
     });
     

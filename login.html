@@ -361,71 +361,6 @@
             submitBtn.disabled = true;
 
             try {
-                // Demo admin login
-                if (email === 'admin@demo.com' && password === 'admin123') {
-                    const userData = {
-                        id: 'admin1',
-                        email: email,
-                        name: 'Admin User',
-                        role: 'admin',
-                        isLoggedIn: true,
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    // Save demo admin to users list if not exists
-                    const users = Storage.get('users') || [];
-                    if (!users.find(u => u.id === 'admin1')) {
-                        users.push({...userData, isLoggedIn: false, password: 'admin123'});
-                        Storage.set('users', users);
-                    }
-                    
-                    Storage.set('currentUser', userData);
-                    Security.createSession(userData);
-                    Security.logSecurityEvent('login_success', { email: email, role: 'admin' });
-                    showToast('Login successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'admin/index.html';
-                    }, 1000);
-                    return;
-                }
-                
-                // Demo user login
-                if (email === 'user@demo.com' && password === 'demo123') {
-                    const userData = {
-                        id: 'user1',
-                        email: email,
-                        name: 'Demo User',
-                        phone: '01700000000',
-                        role: 'user',
-                        isLoggedIn: true,
-                        balance: 5000,
-                        points: 100,
-                        membership: 'free',
-                        referralCode: 'DEMO1234',
-                        referrals: [],
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    // Save demo user to users list if not exists
-                    let users = Storage.get('users') || [];
-                    
-                    const existingUser = users.find(u => u.id === 'user1');
-                    if (!existingUser) {
-                        const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
-                        users.push(userToSave);
-                        Storage.set('users', users);
-                    }
-                    
-                    Storage.set('currentUser', userData);
-                    Security.createSession(userData);
-                    Security.logSecurityEvent('login_success', { email: email, role: 'user' });
-                    showToast('Login successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard/index.html';
-                    }, 1000);
-                    return;
-                }
-                
                 // Check registered users - use async method if cloud is connected
                 let users = [];
                 
@@ -454,10 +389,38 @@
                     users = Storage.get('users') || [];
                 }
                 
+                // Find user by email
                 const user = users.find(u => u.email === email);
                 
                 if (user) {
-                    if (user.password === password) {
+                    // Verify password (check hash first, then fallback to legacy plaintext)
+                    let isMatch = false;
+                    let needsMigration = false;
+
+                    if (Security.verifyPassword(password, user.password)) {
+                        isMatch = true;
+                    } else if (user.password === password) {
+                        // Legacy plaintext match
+                        isMatch = true;
+                        needsMigration = true;
+                    }
+
+                    if (isMatch) {
+                        // Migrate legacy password to hash if needed
+                        if (needsMigration) {
+                            user.password = Security.hashPassword(password);
+                            // Update user in storage
+                            if (isCloudConnected) {
+                                await window.DatabaseManager.update('users', user.id, user);
+                            }
+                            // Also update local storage to be sure
+                            const userIndex = users.findIndex(u => u.id === user.id);
+                            if (userIndex !== -1) {
+                                users[userIndex] = user;
+                                Storage.set('users', users);
+                            }
+                        }
+
                         const userData = {
                             ...user,
                             isLoggedIn: true

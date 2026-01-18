@@ -1555,7 +1555,21 @@
             const users = Storage.get('users') || [];
             const user = users.find(u => u.email === currentUser.email);
 
-            if (!user || user.password !== current) {
+            // Verify current password (check hash first, then legacy plaintext)
+            let isCurrentCorrect = false;
+            if (user) {
+                if (window.Security && window.Security.verifyPassword) {
+                    if (window.Security.verifyPassword(current, user.password)) {
+                        isCurrentCorrect = true;
+                    } else if (user.password === current) {
+                        isCurrentCorrect = true;
+                    }
+                } else if (user.password === current) {
+                    isCurrentCorrect = true;
+                }
+            }
+
+            if (!isCurrentCorrect) {
                 showToast('Current password is incorrect', 'error');
                 return;
             }
@@ -1571,7 +1585,12 @@
             }
 
             const userIndex = users.findIndex(u => u.email === currentUser.email);
-            users[userIndex].password = newPass;
+            // Hash the new password
+            if (window.Security && window.Security.hashPassword) {
+                users[userIndex].password = window.Security.hashPassword(newPass);
+            } else {
+                users[userIndex].password = newPass; // Fallback if Security not loaded
+            }
             Storage.set('users', users);
 
             closeModal('passwordModal');
