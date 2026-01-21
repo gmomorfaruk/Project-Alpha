@@ -5,6 +5,7 @@ const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
+const crypto = require('crypto');
 
 // === CONFIGURATION ===
 const dbConfig = {
@@ -15,11 +16,12 @@ const dbConfig = {
   port: process.env.PGPORT || 5432,
 };
 
-const BACKUP_DIR = path.join(__dirname, 'backups');
+// Use a hidden directory for backups to reduce visibility
+const BACKUP_DIR = path.join(__dirname, '.backups');
 
-// Ensure backup directory exists
+// Ensure backup directory exists with secure permissions (0700)
 if (!fs.existsSync(BACKUP_DIR)) {
-  fs.mkdirSync(BACKUP_DIR);
+  fs.mkdirSync(BACKUP_DIR, { mode: 0o700 });
 }
 
 async function getTableNames(client) {
@@ -29,8 +31,12 @@ async function getTableNames(client) {
 
 async function backupTable(client, tableName, timestamp) {
   const res = await client.query(`SELECT * FROM "${tableName}"`);
-  const filePath = path.join(BACKUP_DIR, `${tableName}_${timestamp}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2));
+  // Add a random suffix to prevent filename enumeration/guessing
+  const randomSuffix = crypto.randomBytes(8).toString('hex');
+  const filePath = path.join(BACKUP_DIR, `${tableName}_${timestamp}_${randomSuffix}.json`);
+
+  // Write file with restricted permissions (0600 - read/write only by owner)
+  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2), { mode: 0o600 });
   console.log(`Backed up ${tableName} to ${filePath}`);
 }
 
@@ -51,13 +57,20 @@ async function backupAllTables() {
   }
 }
 
-// Schedule backup: every day at 2:00 AM
-cron.schedule('0 2 * * *', () => {
-  console.log('Starting scheduled backup...');
-  backupAllTables();
-});
-
-// Allow manual run
+// Only run schedule if executed directly
 if (require.main === module) {
+  // Schedule backup: every day at 2:00 AM
+  cron.schedule('0 2 * * *', () => {
+    console.log('Starting scheduled backup...');
+    backupAllTables();
+  });
+
+  console.log('Backup service started. Running initial backup...');
   backupAllTables();
 }
+
+// Export functions for testing
+module.exports = {
+  backupTable,
+  BACKUP_DIR
+};
