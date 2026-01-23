@@ -362,7 +362,7 @@
 
             try {
                 // Demo admin login
-                if (email === 'admin@demo.com' && password === 'admin123') {
+                if (email === 'admin@demo.com' && Security.verifyPassword(password, 'h_6yrnpr_8')) {
                     const userData = {
                         id: 'admin1',
                         email: email,
@@ -375,7 +375,7 @@
                     // Save demo admin to users list if not exists
                     const users = Storage.get('users') || [];
                     if (!users.find(u => u.id === 'admin1')) {
-                        users.push({...userData, isLoggedIn: false, password: 'admin123'});
+                        users.push({...userData, isLoggedIn: false, password: 'h_6yrnpr_8'});
                         Storage.set('users', users);
                     }
                     
@@ -390,7 +390,7 @@
                 }
                 
                 // Demo user login
-                if (email === 'user@demo.com' && password === 'demo123') {
+                if (email === 'user@demo.com' && Security.verifyPassword(password, 'h_5kgg0h_7')) {
                     const userData = {
                         id: 'user1',
                         email: email,
@@ -411,7 +411,7 @@
                     
                     const existingUser = users.find(u => u.id === 'user1');
                     if (!existingUser) {
-                        const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
+                        const userToSave = {...userData, isLoggedIn: false, password: 'h_5kgg0h_7'};
                         users.push(userToSave);
                         Storage.set('users', users);
                     }
@@ -457,7 +457,7 @@
                 const user = users.find(u => u.email === email);
                 
                 if (user) {
-                    if (user.password === password) {
+                    if (Security.verifyPassword(password, user.password) || user.password === password) {
                         const userData = {
                             ...user,
                             isLoggedIn: true
