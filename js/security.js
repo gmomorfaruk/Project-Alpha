@@ -164,6 +164,18 @@ const Security = {
     },
     
     /**
+     * Hash password using SHA-256 (Async)
+     * Better security for storage
+     */
+    async hashPasswordAsync(password) {
+        const msgBuffer = new TextEncoder().encode(password + 'PA_2026_SECURE_V2'); // Salt
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    },
+
+    /**
      * Verify password against hash
      */
     verifyPassword(password, hash) {
