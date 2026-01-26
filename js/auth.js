@@ -88,7 +88,7 @@ function verifyPhone() {
 }
 
 // Step 3: Reset password
-function resetPassword() {
+async function resetPassword() {
     const newPassword = document.getElementById('newPassword').value;
     const confirmNewPassword = document.getElementById('confirmNewPassword').value;
     const email = document.getElementById('forgotPasswordForm').dataset.email;
@@ -128,7 +128,7 @@ function resetPassword() {
         return;
     }
     
-    users[userIndex].password = newPassword;
+    users[userIndex].password = await Security.hashPasswordAsync(newPassword);
     Storage.set('users', users);
     
     showToast('Password reset successfully! You can now login', 'success');

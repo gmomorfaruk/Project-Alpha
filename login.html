@@ -457,7 +457,32 @@
                 const user = users.find(u => u.email === email);
                 
                 if (user) {
-                    if (user.password === password) {
+                    const hashedPassword = await Security.hashPasswordAsync(password);
+                    let loginSuccess = false;
+
+                    if (user.password === hashedPassword) {
+                        loginSuccess = true;
+                    } else if (user.password === password) {
+                        // Legacy Plaintext Match - Migrate to Hash
+                        loginSuccess = true;
+
+                        // Update password in memory
+                        user.password = hashedPassword;
+
+                        // Update storage securely
+                        const allUsers = Storage.get('users') || [];
+                        const uIndex = allUsers.findIndex(u => u.id === user.id);
+
+                        if (uIndex !== -1) {
+                            allUsers[uIndex].password = hashedPassword;
+                            Storage.set('users', allUsers); // Updates local & syncs to cloud
+                        } else if (window.DatabaseManager && window.DatabaseManager.connected) {
+                            // If only in cloud, update there
+                            await window.DatabaseManager.update('users', user.id, { password: hashedPassword });
+                        }
+                    }
+
+                    if (loginSuccess) {
                         const userData = {
                             ...user,
                             isLoggedIn: true

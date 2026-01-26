@@ -338,7 +338,7 @@
                     name: fullName,
                     phone: phone,
                     email: email,
-                    password: password,
+                    password: await Security.hashPasswordAsync(password),
                     referralCode: referralCodeInput,
                 };
 
