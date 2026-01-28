@@ -19,7 +19,8 @@ const BACKUP_DIR = path.join(__dirname, 'backups');
 
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {
-  fs.mkdirSync(BACKUP_DIR);
+  // 🛡️ Sentinel: Set restricted permissions (700) so only owner can access backups
+  fs.mkdirSync(BACKUP_DIR, { mode: 0o700 });
 }
 
 async function getTableNames(client) {
@@ -30,7 +31,8 @@ async function getTableNames(client) {
 async function backupTable(client, tableName, timestamp) {
   const res = await client.query(`SELECT * FROM "${tableName}"`);
   const filePath = path.join(BACKUP_DIR, `${tableName}_${timestamp}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2));
+  // 🛡️ Sentinel: Set restricted permissions (600) so only owner can read file
+  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2), { mode: 0o600 });
   console.log(`Backed up ${tableName} to ${filePath}`);
 }
 
@@ -51,13 +53,19 @@ async function backupAllTables() {
   }
 }
 
-// Schedule backup: every day at 2:00 AM
-cron.schedule('0 2 * * *', () => {
-  console.log('Starting scheduled backup...');
-  backupAllTables();
-});
-
-// Allow manual run
+// Allow manual run and scheduling
 if (require.main === module) {
+  // Schedule backup: every day at 2:00 AM
+  cron.schedule('0 2 * * *', () => {
+    console.log('Starting scheduled backup...');
+    backupAllTables();
+  });
+
   backupAllTables();
 }
+
+module.exports = {
+  backupTable,
+  backupAllTables,
+  getTableNames
+};
