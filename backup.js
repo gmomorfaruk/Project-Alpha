@@ -19,7 +19,7 @@ const BACKUP_DIR = path.join(__dirname, 'backups');
 
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {
-  fs.mkdirSync(BACKUP_DIR);
+  fs.mkdirSync(BACKUP_DIR, { mode: 0o700 });
 }
 
 async function getTableNames(client) {
@@ -30,7 +30,7 @@ async function getTableNames(client) {
 async function backupTable(client, tableName, timestamp) {
   const res = await client.query(`SELECT * FROM "${tableName}"`);
   const filePath = path.join(BACKUP_DIR, `${tableName}_${timestamp}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(res.rows, null, 2), { mode: 0o600 });
   console.log(`Backed up ${tableName} to ${filePath}`);
 }
 
