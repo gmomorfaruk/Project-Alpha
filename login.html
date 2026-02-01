@@ -375,7 +375,7 @@
                     // Save demo admin to users list if not exists
                     const users = Storage.get('users') || [];
                     if (!users.find(u => u.id === 'admin1')) {
-                        users.push({...userData, isLoggedIn: false, password: 'admin123'});
+                        users.push({...userData, isLoggedIn: false, password: Security.hashPassword('admin123')});
                         Storage.set('users', users);
                     }
                     
@@ -411,7 +411,7 @@
                     
                     const existingUser = users.find(u => u.id === 'user1');
                     if (!existingUser) {
-                        const userToSave = {...userData, isLoggedIn: false, password: 'demo123'};
+                        const userToSave = {...userData, isLoggedIn: false, password: Security.hashPassword('demo123')};
                         users.push(userToSave);
                         Storage.set('users', users);
                     }
@@ -457,7 +457,30 @@
                 const user = users.find(u => u.email === email);
                 
                 if (user) {
-                    if (user.password === password) {
+                    let isMatch = false;
+                    let shouldMigrate = false;
+
+                    if (user.password && user.password.startsWith('h_')) {
+                        // Use secure verification for hashed passwords
+                        isMatch = Security.verifyPassword(password, user.password);
+                    } else {
+                        // Legacy plaintext check
+                        isMatch = (user.password === password);
+                        if (isMatch) shouldMigrate = true;
+                    }
+
+                    if (isMatch) {
+                        // Migrate legacy password to hash if needed
+                        if (shouldMigrate) {
+                            user.password = Security.hashPassword(password);
+                            // Update user in the list
+                            const userIndex = users.findIndex(u => u.email === email);
+                            if (userIndex !== -1) {
+                                users[userIndex] = user;
+                                Storage.set('users', users);
+                            }
+                        }
+
                         const userData = {
                             ...user,
                             isLoggedIn: true
