@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #10b981; color: white; border: none; cursor: pointer; }
+        button:hover { background: #059669; }
+        #result { padding: 20px; margin-top: 20px; border-radius: 8px; white-space: pre-wrap; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #e0e7ff; color: #3730a3; }
+        h1 { color: #1f2937; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Supabase Connection Test</h1>
+    
+    <p>This page tests your Supabase connection directly.</p>
+    
+    <label>Supabase Project URL:</label>
+    <input type="text" id="url" placeholder="https://xxxxx.supabase.co">
+    
+    <label>Anon Public Key:</label>
+    <input type="text" id="key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+    
+    <button onclick="testConnection()">🔌 Test Connection</button>
+    
+    <div id="result" class="info">Enter your Supabase credentials above and click Test Connection.</div>
+
+    <script>
+        async function testConnection() {
+            const url = document.getElementById('url').value.trim().replace(/\/$/, '');
+            const key = document.getElementById('key').value.trim();
+            const result = document.getElementById('result');
+            
+            if (!url || !key) {
+                result.className = 'error';
+                result.textContent = '❌ Please enter both URL and Key';
+                return;
+            }
+            
+            result.className = 'info';
+            result.textContent = '⏳ Testing connection...\n\n';
+            
+            const log = (msg) => { result.textContent += msg + '\n'; };
+            
+            // Step 1: Validate URL format
+            log('Step 1: Checking URL format...');
+            try {
+                const urlObj = new URL(url);
+                if (!urlObj.protocol.startsWith('http')) {
+                    result.className = 'error';
+                    log('❌ Invalid URL format. Must start with http:// or https://');
+                    return;
+                }
+                log(`✅ URL format looks correct (${urlObj.hostname})`);
+            } catch (e) {
+                result.className = 'error';
+                log('❌ Invalid URL format. Should be: https://xxxxx.supabase.co');
+                return;
+            }
+            
+            // Step 2: Validate key format
+            log('\nStep 2: Checking key format...');
+            if (!key.startsWith('eyJ') && !key.startsWith('sb_')) {
+                result.className = 'error';
+                log('❌ Invalid key format. Key should start with "eyJ..." or "sb_publishable_..."');
+                return;
+            }
+            log('✅ Key format looks correct');
+            
+            // Step 3: Test REST API endpoint
+            log('\nStep 3: Testing REST API connection...');
+            try {
+                const restUrl = `${url}/rest/v1/`;
+                log(`   Fetching: ${restUrl}`);
+                
+                const response = await fetch(restUrl, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': key,
+                        'Authorization': `Bearer ${key}`
+                    }
+                });
+                
+                log(`   Status: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    log('✅ REST API connection successful!');
+                } else {
+                    const text = await response.text();
+                    log(`❌ REST API failed: ${text}`);
+                    result.className = 'error';
+                    return;
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`);
+                result.className = 'error';
+                return;
+            }
+            
+            // Step 4: Load Supabase library
+            log('\nStep 4: Loading Supabase client library...');
+            try {
+                if (!window.supabase) {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                    await new Promise(r => setTimeout(r, 500));
+                }
+                
+                if (window.supabase && window.supabase.createClient) {
+                    log('✅ Supabase library loaded');
+                } else {
+                    log('❌ Failed to load Supabase library');
+                    result.className = 'error';
+                    return;
+                }
+            } catch (error) {
+                log(`❌ Library load error: ${error.message}`);
+                result.className = 'error';
+                return;
+            }
+            
+            // Step 5: Create client and test
+            log('\nStep 5: Creating Supabase client...');
+            try {
+                const client = window.supabase.createClient(url, key);
+                log('✅ Client created');
+                
+                // Try a simple query
+                log('\nStep 6: Testing database query...');
+                const { data, error } = await client.from('users').select('id').limit(1);
+                
+                if (error) {
+                    // Check for various error types
+                    if (error.message.includes('does not exist') || 
+                        error.message.includes('relation') ||
+                        error.code === '42P01') {
+                        log('⚠️ Table "users" does not exist (this is OK - you need to create tables first)');
+                        log('\n✅ CONNECTION SUCCESSFUL! Tables just need to be created.');
+                        result.className = 'success';
+                    } else if (error.message.includes('permission denied') || 
+                               error.code === '42501') {
+                        log('⚠️ Permission denied - Row Level Security (RLS) may be enabled');
+                        log('   Go to Supabase → Authentication → Policies and add policies, or disable RLS');
+                        log('\n✅ CONNECTION SUCCESSFUL! RLS just needs to be configured.');
+                        result.className = 'success';
+                    } else if (error.message.includes('JWT') || 
+                               error.message.includes('Invalid API') ||
+                               error.message.includes('Unauthorized')) {
+                        log(`❌ Authentication error: ${error.message}`);
+                        log('   Make sure you copied the full anon key from Settings → API');
+                        result.className = 'error';
+                    } else {
+                        log(`❌ Query error: ${error.message}`);
+                        log(`   Error code: ${error.code || 'N/A'}`);
+                        result.className = 'error';
+                    }
+                } else {
+                    log('✅ Query successful!');
+                    log(`   Data returned: ${JSON.stringify(data)}`);
+                    log('\n🎉 FULLY CONNECTED! Database is ready.');
+                    result.className = 'success';
+                }
+                
+                // Show next steps
+                if (result.className === 'success') {
+                    log('\n--- NEXT STEPS ---');
+                    log('1. Save these credentials in Admin → Database Settings');
+                    log('2. Click "Show SQL" to get the table creation script');
+                    log('3. Run the SQL in your Supabase SQL Editor');
+                    log('4. Click "Sync Local Data to Cloud" to upload existing data');
+                }
+            } catch (error) {
+                log(`❌ Client error: ${error.message}`);
+                result.className = 'error';
+            }
+        }
+    </script>
+</body>
+</html>
