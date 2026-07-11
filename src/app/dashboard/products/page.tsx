@@ -7,28 +7,7 @@ import { useToast } from '@/context/ToastContext';
 import Storage from '@/lib/storage';
 import db from '@/lib/database';
 
-interface Product {
-    id: string;
-    name: string;
-    category: string;
-    price: number;
-    returnRate: number;
-    duration: number;
-    stock: number;
-    icon?: string;
-    active?: boolean;
-    image?: string;
-    description?: string;
-}
-
-const defaultProducts: Product[] = [
-    { id: '1', name: 'Smartphone Package', category: 'mobile', price: 5000, returnRate: 12, duration: 30, stock: 50, icon: 'fa-mobile-alt', active: true },
-    { id: '2', name: 'Laptop Package', category: 'computer', price: 15000, returnRate: 18, duration: 45, stock: 25, icon: 'fa-laptop', active: true },
-    { id: '3', name: 'Electronics Package', category: 'electronics', price: 10000, returnRate: 15, duration: 30, stock: 40, icon: 'fa-tv', active: true },
-    { id: '4', name: 'Smart Watch Bundle', category: 'accessories', price: 3000, returnRate: 10, duration: 20, stock: 100, icon: 'fa-clock', active: true },
-    { id: '5', name: 'Gaming Console Pack', category: 'electronics', price: 20000, returnRate: 20, duration: 60, stock: 15, icon: 'fa-gamepad', active: true },
-    { id: '6', name: 'Tablet Package', category: 'mobile', price: 8000, returnRate: 14, duration: 35, stock: 30, icon: 'fa-tablet-alt', active: true }
-];
+import { Product, defaultProducts } from '@/lib/products';
 
 export default function ClientProductsPage() {
     const { user, updateUserBalance } = useAuth();
@@ -43,12 +22,85 @@ export default function ClientProductsPage() {
     // Form inputs state
     const [units, setUnits] = useState(1);
     const [sellMode, setSellMode] = useState<'auto' | 'self'>('auto');
+    const [selectedColor, setSelectedColor] = useState<string>('');
     const [confirming, setConfirming] = useState(false);
 
     // Summary calculations
     const [totalInvestment, setTotalInvestment] = useState(0);
     const [expectedProfit, setExpectedProfit] = useState(0);
     const [totalReturn, setTotalReturn] = useState(0);
+
+    const triggerFlyAnimation = (startEl: HTMLElement, endEl: HTMLElement, iconClass: string) => {
+        const startRect = startEl.getBoundingClientRect();
+        const endRect = endEl.getBoundingClientRect();
+
+        const flyer = document.createElement('div');
+        flyer.className = 'flyer-animation';
+        flyer.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        
+        Object.assign(flyer.style, {
+            position: 'fixed',
+            left: `${startRect.left + startRect.width / 2 - 20}px`,
+            top: `${startRect.top + startRect.height / 2 - 20}px`,
+            width: '40px',
+            height: '40px',
+            background: 'var(--primary-color, #10b981)',
+            color: 'white',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            zIndex: '9999',
+            boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
+            transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
+            pointerEvents: 'none'
+        });
+
+        document.body.appendChild(flyer);
+
+        flyer.getBoundingClientRect();
+
+        Object.assign(flyer.style, {
+            left: `${endRect.left + endRect.width / 2 - 20}px`,
+            top: `${endRect.top + endRect.height / 2 - 20}px`,
+            transform: 'scale(0.3)',
+            opacity: '0.1'
+        });
+
+        setTimeout(() => {
+            flyer.remove();
+            
+            const burst = document.createElement('div');
+            burst.className = 'burst-animation';
+            Object.assign(burst.style, {
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '100%',
+                height: '100%',
+                border: '2px solid #10b981',
+                borderRadius: 'inherit',
+                pointerEvents: 'none',
+                animation: 'burst-expand 0.5s ease-out forwards',
+                zIndex: '9999'
+            });
+            
+            const originalPosition = endEl.style.position;
+            if (!originalPosition || originalPosition === 'static') {
+                endEl.style.position = 'relative';
+            }
+            endEl.appendChild(burst);
+            
+            setTimeout(() => {
+                burst.remove();
+                if (!originalPosition || originalPosition === 'static') {
+                    endEl.style.position = originalPosition;
+                }
+            }, 600);
+        }, 800);
+    };
 
     // Load products on mount
     useEffect(() => {
@@ -95,6 +147,7 @@ export default function ClientProductsPage() {
         setSelectedProduct(product);
         setUnits(1);
         setSellMode('auto');
+        setSelectedColor(product.colors && product.colors.length > 0 ? product.colors[0] : '');
         setInvestModalOpen(true);
     };
 
@@ -149,7 +202,7 @@ export default function ClientProductsPage() {
                 id: db.generateId(),
                 userId: user.id,
                 productId: selectedProduct.id,
-                productName: selectedProduct.name,
+                productName: `${selectedProduct.name}${selectedColor ? ` (${selectedColor})` : ''}`,
                 amount: totalInvestment,
                 units: units,
                 sellMode: sellMode,
@@ -183,14 +236,23 @@ export default function ClientProductsPage() {
                 type: 'investment',
                 amount: totalInvestment,
                 status: 'completed',
-                description: `Invested in ${selectedProduct.name} (${units} units)`,
+                description: `Invested in ${selectedProduct.name} (${units} units)${selectedColor ? ` [Color: ${selectedColor}]` : ''}`,
                 createdAt: new Date().toISOString()
             };
             transactions.push(newTx);
             Storage.set('transactions', transactions);
 
+            // Trigger flying animation
+            const startBtn = document.getElementById('modal-confirm-btn');
+            const endWallet = document.querySelector('a[href="/dashboard/wallet"]') || document.querySelector('.dashboard-container');
+            if (startBtn && endWallet) {
+                triggerFlyAnimation(startBtn as HTMLElement, endWallet as HTMLElement, selectedProduct.image || 'fa-box');
+            }
+
             showToast('Investment confirmed successfully!', 'success');
-            closeInvestModal();
+            setTimeout(() => {
+                closeInvestModal();
+            }, 600);
         } catch (err) {
             showToast('An error occurred during verification', 'error');
         } finally {
@@ -314,6 +376,18 @@ export default function ClientProductsPage() {
                     border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
                     font-size: 14px;
                 }
+                @keyframes burst-expand {
+                    0% {
+                        width: 10px;
+                        height: 10px;
+                        opacity: 1;
+                    }
+                    100% {
+                        width: 120px;
+                        height: 120px;
+                        opacity: 0;
+                    }
+                }
             `}</style>
 
             <div className="page-header">
@@ -331,32 +405,89 @@ export default function ClientProductsPage() {
                     </div>
                 ) : (
                     activeProducts.map((product) => {
-                        const icon = product.icon || getCategoryIcon(product.category);
+                        const icon = product.image || getCategoryIcon(product.category);
                         const returnRate = product.returnRate || 10;
+                        const hasDiscount = product.previousPrice && product.previousPrice > product.price;
+                        const discountPercentage = hasDiscount 
+                            ? Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)
+                            : 0;
+                        const discountSavings = hasDiscount 
+                            ? product.previousPrice! - product.price 
+                            : 0;
+
                         return (
-                            <div key={product.id} className="product-card" style={{ background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                            <div key={product.id} className="product-card" style={{ background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ height: '120px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                    {product.image ? (
+                                    {product.image && product.image.startsWith('http') ? (
                                         <img src={product.image} alt={product.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'cover' }} />
                                     ) : (
-                                        <i className={`fas ${icon}`} style={{ fontSize: '50px', color: 'var(--primary-color)' }}></i>
+                                        <i className={`fas ${product.image || icon}`} style={{ fontSize: '50px', color: 'var(--primary-color)' }}></i>
                                     )}
-                                    {returnRate >= 15 && (
-                                        <span style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--danger-color)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px' }}>HOT</span>
+                                    {hasDiscount && (
+                                        <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }}>
+                                            {discountPercentage}% OFF
+                                        </span>
                                     )}
                                 </div>
-                                <div style={{ padding: '20px' }}>
-                                    <h3 style={{ fontSize: '16px', marginBottom: '15px' }}>{product.name}</h3>
+                                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                    <h3 style={{ fontSize: '16px', marginBottom: '8px', marginTop: 0 }}>{product.name}</h3>
+                                    
+                                    {/* Description */}
+                                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px', height: '36px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineBreak: 'anywhere' }}>
+                                        {product.description}
+                                    </p>
+
+                                    {/* Colors Display */}
+                                    {product.colors && product.colors.length > 0 && (
+                                        <div className="color-options-container" style={{ display: 'flex', gap: '6px', margin: '0 0 12px 0' }}>
+                                            {product.colors.map((color, idx) => (
+                                                <span 
+                                                    key={idx} 
+                                                    className="color-dot" 
+                                                    style={{ 
+                                                        display: 'inline-block',
+                                                        width: '14px', 
+                                                        height: '14px', 
+                                                        borderRadius: '50%', 
+                                                        border: '1px solid var(--border-color)',
+                                                        background: color.toLowerCase() === 'black' || color.toLowerCase() === 'midnight black' ? '#0f172a' :
+                                                                    color.toLowerCase() === 'white' ? '#ffffff' :
+                                                                    color.toLowerCase() === 'blue' || color.toLowerCase() === 'ocean blue' ? '#2563eb' :
+                                                                    color.toLowerCase() === 'red' || color.toLowerCase() === 'crimson red' ? '#dc2626' :
+                                                                    color.toLowerCase() === 'green' ? '#16a34a' :
+                                                                    color.toLowerCase() === 'gold' || color.toLowerCase() === 'rose gold' ? '#d97706' :
+                                                                    color.toLowerCase() === 'silver' || color.toLowerCase() === 'silver metallic' ? '#cbd5e1' :
+                                                                    color.toLowerCase() === 'purple' || color.toLowerCase() === 'deep purple' ? '#7c3aed' :
+                                                                    color.toLowerCase() === 'space gray' ? '#4b5563' :
+                                                                    color.toLowerCase() === 'titanium gray' ? '#6b7280' : '#888888'
+                                                    }}
+                                                    title={color}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
-                                        <div>
+                                        <div style={{ gridColumn: 'span 2' }}>
                                             <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Price", "মূল্য")}</span>
-                                            <br />
-                                            <strong style={{ color: 'var(--primary-color)' }}>৳{product.price.toLocaleString()}</strong>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+                                                <strong style={{ color: '#10b981', fontSize: '16px' }}>৳{product.price.toLocaleString()}</strong>
+                                                {hasDiscount && (
+                                                    <span style={{ fontSize: '12px', textDecoration: 'line-through', color: 'var(--text-secondary)' }}>
+                                                        ৳{product.previousPrice!.toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <div>
-                                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Return", "লাভ")}</span>
+                                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Auto-Sell Profit", "অটো-সেল লাভ")}</span>
                                             <br />
                                             <strong style={{ color: 'var(--success-color)' }}>+{returnRate}%</strong>
+                                        </div>
+                                        <div>
+                                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Self-Sell Profit", "সেলফ-সেল লাভ")}</span>
+                                            <br />
+                                            <strong style={{ color: 'var(--success-color)' }}>+{Math.round(returnRate * 1.25)}%</strong>
                                         </div>
                                         <div>
                                             <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Duration", "সময়কাল")}</span>
@@ -369,14 +500,11 @@ export default function ClientProductsPage() {
                                             <strong>{product.stock} {tText("units", "ইউনিট")}</strong>
                                         </div>
                                     </div>
-                                    {product.description && (
-                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '15px' }}>
-                                            {product.description.substring(0, 50)}{product.description.length > 50 ? '...' : ''}
-                                        </p>
-                                    )}
-                                    <button className="btn btn-primary btn-block" onClick={() => openInvestModal(product)}>
-                                        <i className="fas fa-shopping-cart" style={{ marginRight: '6px' }}></i> {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
-                                    </button>
+                                    <div style={{ marginTop: 'auto' }}>
+                                        <button className="btn btn-primary btn-block" onClick={() => openInvestModal(product)} disabled={product.stock === 0}>
+                                            <i className="fas fa-shopping-cart" style={{ marginRight: '6px' }}></i> {product.stock === 0 ? tText("Out of Stock", "স্টক শেষ") : tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -396,10 +524,10 @@ export default function ClientProductsPage() {
                             <div className="product-summary" style={{ border: '1px solid var(--border-color)', background: 'var(--bg-secondary)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                     <div style={{ width: '60px', height: '60px', background: 'var(--primary-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {selectedProduct.image ? (
+                                        {selectedProduct.image && (selectedProduct.image.startsWith('http') || selectedProduct.image.startsWith('/')) ? (
                                             <img src={selectedProduct.image} style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '8px' }} alt={selectedProduct.name} />
                                         ) : (
-                                            <i className={`fas ${selectedProduct.icon || getCategoryIcon(selectedProduct.category)}`} style={{ fontSize: '28px', color: 'var(--primary-color)' }}></i>
+                                            <i className={`fas ${selectedProduct.image || getCategoryIcon(selectedProduct.category)}`} style={{ fontSize: '28px', color: 'var(--primary-color)' }}></i>
                                         )}
                                     </div>
                                     <div>
@@ -424,6 +552,42 @@ export default function ClientProductsPage() {
                                         style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                                     />
                                 </div>
+
+                                {selectedProduct.colors && selectedProduct.colors.length > 0 && (
+                                    <div className="form-group" style={{ marginBottom: '15px' }}>
+                                        <label>{tText("Select Color", "রঙ চয়ন করুন")}</label>
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                            {selectedProduct.colors.map((color, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    type="button"
+                                                    onClick={() => setSelectedColor(color)}
+                                                    style={{
+                                                        display: 'inline-block',
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        borderRadius: '50%',
+                                                        border: selectedColor === color ? '3px solid var(--primary-color)' : '1px solid var(--border-color)',
+                                                        background: color.toLowerCase() === 'black' || color.toLowerCase() === 'midnight black' ? '#0f172a' :
+                                                                    color.toLowerCase() === 'white' ? '#ffffff' :
+                                                                    color.toLowerCase() === 'blue' || color.toLowerCase() === 'ocean blue' ? '#2563eb' :
+                                                                    color.toLowerCase() === 'red' || color.toLowerCase() === 'crimson red' ? '#dc2626' :
+                                                                    color.toLowerCase() === 'green' ? '#16a34a' :
+                                                                    color.toLowerCase() === 'gold' || color.toLowerCase() === 'rose gold' ? '#d97706' :
+                                                                    color.toLowerCase() === 'silver' || color.toLowerCase() === 'silver metallic' ? '#cbd5e1' :
+                                                                    color.toLowerCase() === 'purple' || color.toLowerCase() === 'deep purple' ? '#7c3aed' :
+                                                                    color.toLowerCase() === 'space gray' ? '#4b5563' :
+                                                                    color.toLowerCase() === 'titanium gray' ? '#6b7280' : '#888888',
+                                                        cursor: 'pointer',
+                                                        boxShadow: selectedColor === color ? '0 0 8px rgba(16, 185, 129, 0.4)' : 'none',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    title={color}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="form-group">
                                     <label>{tText("Select Sell Mode", "বিক্রয় মোড চয়ন করুন")}</label>
@@ -462,7 +626,7 @@ export default function ClientProductsPage() {
                                     </div>
                                 </div>
 
-                                <button type="submit" className="btn btn-primary btn-block btn-lg" style={{ marginTop: '20px' }} disabled={confirming}>
+                                <button type="submit" id="modal-confirm-btn" className="btn btn-primary btn-block btn-lg" style={{ marginTop: '20px' }} disabled={confirming}>
                                     {confirming ? (
                                         <>
                                             <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i>

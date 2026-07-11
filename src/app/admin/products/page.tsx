@@ -5,65 +5,7 @@ import { useToast } from '@/context/ToastContext';
 import Storage from '@/lib/storage';
 import db from '@/lib/database';
 
-interface Product {
-    id: string;
-    name: string;
-    category: 'electronics' | 'fashion' | 'home' | 'health';
-    price: number;
-    returnRate: number;
-    duration: number; // in days
-    stock: number;
-    minUnits: number;
-    description: string;
-    image?: string;
-    active: boolean;
-    createdAt: string;
-}
-
-const defaultProductsList: Product[] = [
-    {
-        id: '1',
-        name: 'Smart Watch Pro',
-        category: 'electronics',
-        price: 5000,
-        returnRate: 15,
-        duration: 30,
-        stock: 50,
-        minUnits: 1,
-        description: 'Premium smart watch with health monitoring features.',
-        image: '',
-        active: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: '2',
-        name: 'Wireless Earbuds Elite',
-        category: 'electronics',
-        price: 3000,
-        returnRate: 12,
-        duration: 21,
-        stock: 100,
-        minUnits: 1,
-        description: 'High-quality wireless earbuds with noise cancellation.',
-        image: '',
-        active: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: '3',
-        name: 'Solar Power Bank 20000mAh',
-        category: 'electronics',
-        price: 2500,
-        returnRate: 10,
-        duration: 14,
-        stock: 75,
-        minUnits: 2,
-        description: 'Eco-friendly solar powered portable charger.',
-        image: '',
-        active: true,
-        createdAt: new Date().toISOString()
-    }
-];
+import { Product, defaultProducts as defaultProductsList } from '@/lib/products';
 
 export default function AdminProductsPage() {
     const { showToast } = useToast();
@@ -85,13 +27,15 @@ export default function AdminProductsPage() {
 
     // Form inputs state
     const [prodName, setProdName] = useState('');
-    const [prodCategory, setProdCategory] = useState<'electronics' | 'fashion' | 'home' | 'health'>('electronics');
+    const [prodCategory, setProdCategory] = useState<string>('electronics');
     const [prodPrice, setProdPrice] = useState('');
+    const [prodPreviousPrice, setProdPreviousPrice] = useState('');
     const [prodReturn, setProdReturn] = useState('');
     const [prodDuration, setProdDuration] = useState('');
     const [prodStock, setProdStock] = useState('');
     const [prodMinUnits, setProdMinUnits] = useState('1');
     const [prodDescription, setProdDescription] = useState('');
+    const [prodColors, setProdColors] = useState('');
     const [prodImage, setProdImage] = useState('');
     const [prodActive, setProdActive] = useState(true);
 
@@ -117,11 +61,13 @@ export default function AdminProductsPage() {
         setProdName('');
         setProdCategory('electronics');
         setProdPrice('');
+        setProdPreviousPrice('');
         setProdReturn('');
         setProdDuration('');
         setProdStock('');
         setProdMinUnits('1');
         setProdDescription('');
+        setProdColors('');
         setProdImage('');
         setProdActive(true);
         setModalOpen(true);
@@ -132,11 +78,13 @@ export default function AdminProductsPage() {
         setProdName(p.name);
         setProdCategory(p.category);
         setProdPrice(p.price.toString());
+        setProdPreviousPrice(p.previousPrice ? p.previousPrice.toString() : '');
         setProdReturn(p.returnRate.toString());
         setProdDuration(p.duration.toString());
         setProdStock(p.stock.toString());
-        setProdMinUnits(p.minUnits.toString());
+        setProdMinUnits(p.minUnits ? p.minUnits.toString() : '1');
         setProdDescription(p.description || '');
+        setProdColors(p.colors ? p.colors.join(', ') : '');
         setProdImage(p.image || '');
         setProdActive(p.active !== false);
         setModalOpen(true);
@@ -152,6 +100,7 @@ export default function AdminProductsPage() {
 
         try {
             const allProducts: Product[] = Storage.get('products') || [];
+            const parsedColors = prodColors ? prodColors.split(',').map(c => c.trim()).filter(Boolean) : [];
 
             if (selectedProduct) {
                 // Update product details
@@ -160,13 +109,15 @@ export default function AdminProductsPage() {
                     allProducts[idx] = {
                         ...allProducts[idx],
                         name: prodName.trim(),
-                        category: prodCategory,
+                        category: prodCategory as any,
                         price: Number(prodPrice),
+                        previousPrice: prodPreviousPrice ? Number(prodPreviousPrice) : undefined,
                         returnRate: Number(prodReturn),
                         duration: Number(prodDuration),
                         stock: Number(prodStock),
                         minUnits: Number(prodMinUnits),
                         description: prodDescription.trim(),
+                        colors: parsedColors,
                         image: prodImage.trim(),
                         active: prodActive
                     };
@@ -177,13 +128,15 @@ export default function AdminProductsPage() {
                 const newProduct: Product = {
                     id: db.generateId(),
                     name: prodName.trim(),
-                    category: prodCategory,
+                    category: prodCategory as any,
                     price: Number(prodPrice),
+                    previousPrice: prodPreviousPrice ? Number(prodPreviousPrice) : undefined,
                     returnRate: Number(prodReturn),
                     duration: Number(prodDuration),
                     stock: Number(prodStock),
                     minUnits: Number(prodMinUnits),
                     description: prodDescription.trim(),
+                    colors: parsedColors,
                     image: prodImage.trim(),
                     active: prodActive,
                     createdAt: new Date().toISOString()
@@ -288,6 +241,10 @@ export default function AdminProductsPage() {
                             <option value="fashion">Fashion</option>
                             <option value="home">Home & Living</option>
                             <option value="health">Health & Beauty</option>
+                            <option value="mobile">Mobile</option>
+                            <option value="computer">Computer</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="other">Other</option>
                         </select>
                         <button className="btn btn-primary" onClick={handleOpenAddModal}>
                             <i className="fas fa-plus" style={{ marginRight: '6px' }}></i> Add Product
@@ -376,19 +333,27 @@ export default function AdminProductsPage() {
                                     <label htmlFor="prodNameInput">Product Name *</label>
                                     <input type="text" id="prodNameInput" required value={prodName} onChange={e => setProdName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '12px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label htmlFor="prodCategorySelect">Category *</label>
-                                        <select id="prodCategorySelect" value={prodCategory} onChange={e => setProdCategory(e.target.value as any)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-secondary)', color: 'white' }}>
+                                        <select id="prodCategorySelect" value={prodCategory} onChange={e => setProdCategory(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-secondary)', color: 'white' }}>
                                             <option value="electronics">Electronics</option>
                                             <option value="fashion">Fashion</option>
                                             <option value="home">Home & Living</option>
                                             <option value="health">Health & Beauty</option>
+                                            <option value="mobile">Mobile</option>
+                                            <option value="computer">Computer</option>
+                                            <option value="accessories">Accessories</option>
+                                            <option value="other">Other</option>
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="prodPriceInput">Price (৳) *</label>
-                                        <input type="number" id="prodPriceInput" required min="100" value={prodPrice} onChange={e => setProdPrice(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                        <label htmlFor="prodPriceInput">Offered Price (৳) *</label>
+                                        <input type="number" id="prodPriceInput" required min="10" value={prodPrice} onChange={e => setProdPrice(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="prodPreviousPriceInput">Previous Price (৳)</label>
+                                        <input type="number" id="prodPreviousPriceInput" min="10" value={prodPreviousPrice} onChange={e => setProdPreviousPrice(e.target.value)} placeholder="e.g. 60000" style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
                                     </div>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '12px' }}>
@@ -412,12 +377,16 @@ export default function AdminProductsPage() {
                                     </div>
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
+                                    <label htmlFor="prodColorsInput">Color Options (Comma separated)</label>
+                                    <input type="text" id="prodColorsInput" placeholder="e.g. Midnight Black, Deep Purple, Silver" value={prodColors} onChange={e => setProdColors(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label htmlFor="prodDescriptionTextarea">Product Description</label>
                                     <textarea id="prodDescriptionTextarea" rows={3} value={prodDescription} onChange={e => setProdDescription(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
-                                    <label htmlFor="prodImageUrlInput">Image URL (Optional)</label>
-                                    <input type="text" id="prodImageUrlInput" placeholder="https://example.com/image.jpg" value={prodImage} onChange={e => setProdImage(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                    <label htmlFor="prodImageUrlInput">Image/Icon (Optional)</label>
+                                    <input type="text" id="prodImageUrlInput" placeholder="e.g. fa-mobile-alt or image URL" value={prodImage} onChange={e => setProdImage(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
                                 </div>
                                 <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <input type="checkbox" id="prodActiveCheckbox" checked={prodActive} onChange={e => setProdActive(e.target.checked)} style={{ cursor: 'pointer' }} />

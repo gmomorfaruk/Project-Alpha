@@ -107,7 +107,6 @@ ul {
 
 img {
     max-width: 100%;
-    height: auto;
 }
 
 button {
@@ -1911,3 +1910,16 @@ textarea::placeholder {
     }
 }
 
+/* Navbar logo light/dark theme toggle */
+.navbar-logo-light {
+    display: block;
+}
+.navbar-logo-dark {
+    display: none;
+}
+[data-theme="dark"] .navbar-logo-light {
+    display: none;
+}
+[data-theme="dark"] .navbar-logo-dark {
+    display: block;
+}

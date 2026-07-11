@@ -359,9 +359,9 @@ export default function Navbar() {
                 <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
                     <Link href="/" className="flex items-center gap-2 group cursor-pointer" style={{ textDecoration: 'none' }}>
                         <div className="relative transform group-hover:scale-105 transition-transform duration-300 flex items-center gap-2">
-                            <img src="/logo_transparent.png" alt="SmartEarnBD Logo" className="w-auto h-9 object-contain select-none" />
-                            <img src="/name_transparent.png" alt="SmartEarnBD" className="w-auto h-7 object-contain select-none dark:hidden" />
-                            <img src="/name_white.png" alt="SmartEarnBD" className="w-auto h-7 object-contain select-none hidden dark:block" />
+                            <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block', mixBlendMode: 'multiply' }} className="select-none" />
+                            <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
+                            <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
                         </div>
                     </Link>
 

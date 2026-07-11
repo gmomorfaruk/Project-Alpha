@@ -5,134 +5,15 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import Navbar from '@/components/Navbar';
 
-interface Product {
-    id: number;
-    name: string;
-    category: string;
-    price: number;
-    profitPercentage: number;
-    selfSellProfit: number;
-    duration: number;
-    stock: number;
-    image: string;
-    isActive: boolean;
-    hasOffer: boolean;
-    offerText?: string;
-}
-
-const sampleProducts: Product[] = [
-    {
-        id: 1,
-        name: 'Smartphone Package',
-        category: 'mobile',
-        price: 5000,
-        profitPercentage: 12,
-        selfSellProfit: 15,
-        duration: 30,
-        stock: 50,
-        image: 'fa-mobile-alt',
-        isActive: true,
-        hasOffer: true,
-        offerText: '20% OFF'
-    },
-    {
-        id: 2,
-        name: 'Laptop Package',
-        category: 'computer',
-        price: 15000,
-        profitPercentage: 18,
-        selfSellProfit: 22,
-        duration: 45,
-        stock: 25,
-        image: 'fa-laptop',
-        isActive: true,
-        hasOffer: true,
-        offerText: 'Special'
-    },
-    {
-        id: 3,
-        name: 'Electronics Package',
-        category: 'electronics',
-        price: 10000,
-        profitPercentage: 15,
-        selfSellProfit: 18,
-        duration: 30,
-        stock: 40,
-        image: 'fa-tv',
-        isActive: true,
-        hasOffer: false
-    },
-    {
-        id: 4,
-        name: 'Smart Watch Bundle',
-        category: 'accessories',
-        price: 3000,
-        profitPercentage: 10,
-        selfSellProfit: 13,
-        duration: 20,
-        stock: 100,
-        image: 'fa-clock',
-        isActive: true,
-        hasOffer: false
-    },
-    {
-        id: 5,
-        name: 'Gaming Console Pack',
-        category: 'electronics',
-        price: 20000,
-        profitPercentage: 20,
-        selfSellProfit: 25,
-        duration: 60,
-        stock: 15,
-        image: 'fa-gamepad',
-        isActive: true,
-        hasOffer: true,
-        offerText: 'Hot Deal'
-    },
-    {
-        id: 6,
-        name: 'Tablet Package',
-        category: 'mobile',
-        price: 8000,
-        profitPercentage: 14,
-        selfSellProfit: 17,
-        duration: 35,
-        stock: 30,
-        image: 'fa-tablet-alt',
-        isActive: true,
-        hasOffer: false
-    },
-    {
-        id: 7,
-        name: 'Home Appliances Set',
-        category: 'home',
-        price: 12000,
-        profitPercentage: 16,
-        selfSellProfit: 20,
-        duration: 40,
-        stock: 0,
-        image: 'fa-blender',
-        isActive: true,
-        hasOffer: false
-    },
-    {
-        id: 8,
-        name: 'Audio Equipment',
-        category: 'electronics',
-        price: 6000,
-        profitPercentage: 12,
-        selfSellProfit: 15,
-        duration: 25,
-        stock: 45,
-        image: 'fa-headphones',
-        isActive: true,
-        hasOffer: false
-    }
-];
+import Storage from '@/lib/storage';
+import { Product, defaultProducts as defaultProductsList } from '@/lib/products';
 
 export default function ProductsPage() {
     const { t, tText } = useTranslation();
     const [mounted, setMounted] = useState(false);
+    
+    // Data states
+    const [products, setProducts] = useState<Product[]>([]);
     
     // Filtering States
     const [searchQuery, setSearchQuery] = useState('');
@@ -142,10 +23,17 @@ export default function ProductsPage() {
 
     useEffect(() => {
         setMounted(true);
+        let list = Storage.get('products');
+        if (!list || !Array.isArray(list) || list.length === 0) {
+            list = defaultProductsList;
+            Storage.set('products', list);
+        }
+        setProducts(list);
     }, []);
 
     useEffect(() => {
-        let result = sampleProducts.filter(p => p.isActive);
+        if (!mounted) return;
+        let result = products.filter(p => p.active !== false);
 
         // Search filter
         if (searchQuery.trim()) {
@@ -167,17 +55,17 @@ export default function ProductsPage() {
                 result.sort((a, b) => b.price - a.price);
                 break;
             case 'profit-high':
-                result.sort((a, b) => b.profitPercentage - a.profitPercentage);
+                result.sort((a, b) => b.returnRate - a.returnRate);
                 break;
             case 'newest':
-                result.sort((a, b) => b.id - a.id);
+                result.sort((a, b) => b.id.localeCompare(a.id));
                 break;
             default:
                 break;
         }
 
         setFilteredProducts(result);
-    }, [searchQuery, categoryFilter, sortBy]);
+    }, [searchQuery, categoryFilter, sortBy, products, mounted]);
 
     if (!mounted) return null;
 
@@ -401,10 +289,13 @@ export default function ProductsPage() {
                             >
                                 <option value="all">{tText("All Categories", "সব বিভাগ")}</option>
                                 <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="home">Home & Living</option>
+                                <option value="health">Health & Beauty</option>
                                 <option value="mobile">Mobile</option>
                                 <option value="computer">Computer</option>
                                 <option value="accessories">Accessories</option>
-                                <option value="home">Home Appliances</option>
+                                <option value="other">Other</option>
                             </select>
                             <i className="fas fa-chevron-down"></i>
                         </div>
@@ -437,14 +328,26 @@ export default function ProductsPage() {
                                     ? tText('Out of Stock', 'স্টক শেষ') 
                                     : tText(`${product.stock} in stock`, `${product.stock}টি স্টকে আছে`);
                                 const stockIcon = product.stock === 0 ? 'fa-times-circle' : product.stock < 10 ? 'fa-exclamation-circle' : 'fa-check-circle';
+                                
+                                const hasDiscount = !!(product.previousPrice && product.previousPrice > product.price);
+                                const discountPercentage = hasDiscount 
+                                    ? Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)
+                                    : 0;
+                                const discountSavings = hasDiscount 
+                                    ? product.previousPrice! - product.price 
+                                    : 0;
+                                
+                                const selfSellProfit = Math.round(product.returnRate * 1.25);
 
                                 return (
                                     <div key={product.id} className={`product-card ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                                         <div className="product-image-container">
-                                            <i className={`fas ${product.image}`}></i>
+                                            <i className={`fas ${product.image || 'fa-box'}`}></i>
                                             <div className="product-badges">
-                                                {product.hasOffer ? (
-                                                    <span className="product-badge badge-offer">{product.offerText}</span>
+                                                {hasDiscount ? (
+                                                    <span className="product-badge badge-offer" style={{ background: '#ef4444', color: 'white' }}>
+                                                        {discountPercentage}% OFF
+                                                    </span>
                                                 ) : (
                                                     <span></span>
                                                 )}
@@ -453,20 +356,70 @@ export default function ProductsPage() {
                                         </div>
                                         <div className="product-content">
                                             <h3 className="product-title">{product.name}</h3>
+                                            
+                                            {/* Description */}
+                                            <p className="product-card-desc" style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 15px 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: '36px', lineBreak: 'anywhere' }}>
+                                                {product.description}
+                                            </p>
+
+                                            {/* Colors Display */}
+                                            {product.colors && product.colors.length > 0 && (
+                                                <div className="color-options-container" style={{ display: 'flex', gap: '6px', margin: '0 0 15px 0' }}>
+                                                    {product.colors.map((color, idx) => (
+                                                        <span 
+                                                            key={idx} 
+                                                            className="color-dot" 
+                                                            style={{ 
+                                                                display: 'inline-block',
+                                                                width: '16px', 
+                                                                height: '16px', 
+                                                                borderRadius: '50%', 
+                                                                border: '1px solid var(--border-color)',
+                                                                background: color.toLowerCase() === 'black' || color.toLowerCase() === 'midnight black' ? '#0f172a' :
+                                                                            color.toLowerCase() === 'white' ? '#ffffff' :
+                                                                            color.toLowerCase() === 'blue' || color.toLowerCase() === 'ocean blue' ? '#2563eb' :
+                                                                            color.toLowerCase() === 'red' || color.toLowerCase() === 'crimson red' ? '#dc2626' :
+                                                                            color.toLowerCase() === 'green' ? '#16a34a' :
+                                                                            color.toLowerCase() === 'gold' || color.toLowerCase() === 'rose gold' ? '#d97706' :
+                                                                            color.toLowerCase() === 'silver' || color.toLowerCase() === 'silver metallic' ? '#cbd5e1' :
+                                                                            color.toLowerCase() === 'purple' || color.toLowerCase() === 'deep purple' ? '#7c3aed' :
+                                                                            color.toLowerCase() === 'space gray' ? '#4b5563' :
+                                                                            color.toLowerCase() === 'titanium gray' ? '#6b7280' : '#888888'
+                                                            }}
+                                                            title={color}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+
                                             <div className="product-info">
-                                                <div className="info-item">
+                                                <div className="info-item" style={{ gridColumn: 'span 2' }}>
                                                     <span className="info-label">{tText("Price", "মূল্য")}</span>
-                                                    <span className="info-value price">৳{product.price.toLocaleString()}</span>
+                                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+                                                        <span className="info-value price" style={{ fontSize: '18px', fontWeight: 700, color: '#10b981' }}>
+                                                            ৳{product.price.toLocaleString()}
+                                                        </span>
+                                                        {hasDiscount && (
+                                                            <>
+                                                                <span style={{ fontSize: '14px', textDecoration: 'line-through', color: 'var(--text-secondary)' }}>
+                                                                    ৳{product.previousPrice!.toLocaleString()}
+                                                                </span>
+                                                                <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>
+                                                                    Save ৳{discountSavings.toLocaleString()}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="info-item">
                                                     <span className="info-label">{tText("Auto-Sell Profit", "অটো-সেল লাভ")}</span>
-                                                    <span className="info-value profit">+{product.profitPercentage}%</span>
+                                                    <span className="info-value profit">+{product.returnRate}%</span>
                                                 </div>
                                                 <div className="info-item">
                                                     <span className="info-label">{tText("Self-Sell Profit", "সেলফ-সেল লাভ")}</span>
-                                                    <span className="info-value profit">+{product.selfSellProfit}%</span>
+                                                    <span className="info-value profit">+{selfSellProfit}%</span>
                                                 </div>
-                                                <div className="info-item">
+                                                <div className="info-item" style={{ gridColumn: 'span 2' }}>
                                                     <span className="info-label">{tText("Duration", "সময়কাল")}</span>
                                                     <span className="info-value">{product.duration} {tText("days", "দিন")}</span>
                                                 </div>
