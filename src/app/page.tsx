@@ -3,27 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
-import { useTheme } from '@/context/ThemeContext';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
-    const { lang, t, tText, tNum, toggleLang } = useTranslation();
-    const { theme, toggleTheme } = useTheme();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    const { t, tText, tNum } = useTranslation();
     const [mounted, setMounted] = useState(false);
 
-    // Ensure state matches after mounting on client to avoid hydration mismatch
     useEffect(() => {
         setMounted(true);
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     if (!mounted) return null;
@@ -31,46 +18,7 @@ export default function Home() {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Navigation */}
-            <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} style={{ boxShadow: scrolled ? 'var(--shadow-md)' : 'none' }}>
-                <div className="container">
-                    <Link href="/" className="logo">
-                        <i className="fas fa-rocket"></i>
-                        <span>SmartEarnBD</span>
-                    </Link>
-                    
-                    <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
-                        <Link href="/" className="active" onClick={() => setMobileMenuOpen(false)}>
-                            {t('nav.home')}
-                        </Link>
-                        <Link href="/products" onClick={() => setMobileMenuOpen(false)}>
-                            {t('nav.products')}
-                        </Link>
-                        <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
-                            {t('nav.about')}
-                        </Link>
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            {t('nav.login')}
-                        </Link>
-                        <Link href="/signup" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>
-                            {t('nav.signup')}
-                        </Link>
-                    </div>
-
-                    <div className="nav-controls">
-                        <button className="theme-toggle" id="themeToggle" onClick={toggleTheme} title="Toggle Theme">
-                            <i className={`fas ${theme === 'dark' ? 'fa-sun' : theme === 'system' ? 'fa-desktop' : 'fa-moon'}`}></i>
-                        </button>
-                        
-                        <button className="lang-toggle" id="langToggle" onClick={toggleLang} title="Toggle Language">
-                            <span>{lang.toUpperCase()}</span>
-                        </button>
-                        
-                        <button className="mobile-menu" id="mobileMenu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* Hero Section */}
             <section className="hero">
@@ -373,9 +321,9 @@ export default function Home() {
                 <div className="container">
                     <div className="footer-grid">
                         <div className="footer-brand">
-                            <Link href="/" className="logo">
-                                <i className="fas fa-rocket"></i>
-                                <span>SmartEarnBD</span>
+                            <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <img src="/logo_transparent.png" alt="SmartEarnBD Logo" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
                             </Link>
                             <p>{tText("Your trusted investment platform for secure and profitable investments.", "নিরাপদ এবং লাভজনক বিনিয়োগের জন্য আপনার বিশ্বস্ত বিনিয়োগ প্ল্যাটফর্ম।")}</p>
                             <div className="social-links">

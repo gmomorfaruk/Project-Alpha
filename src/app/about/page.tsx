@@ -3,26 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
-import { useTheme } from '@/context/ThemeContext';
+import Navbar from '@/components/Navbar';
 
 export default function About() {
-    const { lang, t, tText, toggleLang } = useTranslation();
-    const { theme, toggleTheme } = useTheme();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    const { t, tText } = useTranslation();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     if (!mounted) return null;
@@ -252,46 +240,7 @@ export default function About() {
             `}</style>
 
             {/* Navigation */}
-            <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} style={{ boxShadow: scrolled ? 'var(--shadow-md)' : 'none' }}>
-                <div className="container">
-                    <Link href="/" className="logo">
-                        <i className="fas fa-rocket"></i>
-                        <span>SmartEarnBD</span>
-                    </Link>
-                    
-                    <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
-                        <Link href="/">
-                            {t('nav.home')}
-                        </Link>
-                        <Link href="/products">
-                            {t('nav.products')}
-                        </Link>
-                        <Link href="/about" className="active">
-                            {t('nav.about')}
-                        </Link>
-                        <Link href="/login">
-                            {t('nav.login')}
-                        </Link>
-                        <Link href="/signup" className="btn btn-primary">
-                            {t('nav.signup')}
-                        </Link>
-                    </div>
-
-                    <div className="nav-controls">
-                        <button className="theme-toggle" id="themeToggle" onClick={toggleTheme} title="Toggle Theme">
-                            <i className={`fas ${theme === 'dark' ? 'fa-sun' : theme === 'system' ? 'fa-desktop' : 'fa-moon'}`}></i>
-                        </button>
-                        
-                        <button className="lang-toggle" id="langToggle" onClick={toggleLang} title="Toggle Language">
-                            <span>{lang.toUpperCase()}</span>
-                        </button>
-                        
-                        <button className="mobile-menu" id="mobileMenu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* Hero Section */}
             <section className="about-hero">

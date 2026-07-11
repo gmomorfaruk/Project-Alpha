@@ -4,20 +4,18 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
-import { useTheme } from '@/context/ThemeContext';
+import Navbar from '@/components/Navbar';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import Security from '@/lib/security';
 import Storage from '@/lib/storage';
 
 export default function LoginPage() {
-    const { lang, t, tText, toggleLang } = useTranslation();
-    const { theme, toggleTheme } = useTheme();
+    const { t, tText } = useTranslation();
     const { login, user } = useAuth();
     const { showToast } = useToast();
     const router = useRouter();
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -485,32 +483,7 @@ export default function LoginPage() {
             `}</style>
 
             {/* Navigation */}
-            <nav className="navbar">
-                <div className="container">
-                    <Link href="/" className="logo">
-                        <i className="fas fa-rocket"></i>
-                        <span>SmartEarnBD</span>
-                    </Link>
-                    <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
-                        <Link href="/">{t('nav.home')}</Link>
-                        <Link href="/products">{t('nav.products')}</Link>
-                        <Link href="/about">{t('nav.about')}</Link>
-                        <Link href="/login" className="active">{t('nav.login')}</Link>
-                        <Link href="/signup" className="btn btn-primary">{t('nav.signup')}</Link>
-                    </div>
-                    <div className="nav-controls">
-                        <button className="theme-toggle" onClick={toggleTheme} title="Toggle Theme">
-                            <i className={`fas ${theme === 'dark' ? 'fa-sun' : theme === 'system' ? 'fa-desktop' : 'fa-moon'}`}></i>
-                        </button>
-                        <button className="lang-toggle" onClick={toggleLang} title="Toggle Language">
-                            <span>{lang.toUpperCase()}</span>
-                        </button>
-                        <button className="mobile-menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* Login Section */}
             <section className="auth-section-pro">
