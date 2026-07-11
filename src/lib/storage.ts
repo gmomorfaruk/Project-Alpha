@@ -4,17 +4,21 @@ const APP_PREFIX = 'projectAlpha_';
 const isBrowser = typeof window !== 'undefined';
 
 const SYNC_TABLES = [
-    'users', 'currentUser', 'session',
-    'tasks', 'task_completions', 
-    'transactions', 'investments', 'deposits', 'withdrawals',
-    'adminInvestments', 'membershipRecords', 'productSaleRecords',
-    'depositRecords', 'userEarningRecords', 'withdrawalRecords',
-    'dailySummaries',
-    'products', 'memberships', 'membershipRequests',
-    'announcements', 'proofs', 'referrals',
-    'allChatUsers', 'chatMessages',
-    'activity_logs', 'securityLogs', 'logs',
-    'config', 'settings'
+    'users',
+    'workTasks',
+    'transactions',
+    'investments',
+    'products',
+    'announcements',
+    'activity_logs',
+    'taskCompletions',
+    'referrals',
+    'membershipRequests',
+    'sellProofs',
+    'deposits',
+    'withdrawals',
+    'settings',
+    'chatMessages'
 ];
 
 export const Storage = {
