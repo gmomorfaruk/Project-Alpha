@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="sidebar-logo">
                     <Link href="/dashboard">
                         <i className="fas fa-rocket logo-icon"></i>
-                        <span>Project Alpha</span>
+                        <span>SmartEarn</span>
                     </Link>
                 </div>
                 
@@ -131,7 +131,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <div className="drawer-header">
                         <Link href="/dashboard" className="drawer-logo" onClick={() => setMobileMenuOpen(false)}>
                             <i className="fas fa-rocket logo-icon"></i>
-                            <span>Project Alpha</span>
+                            <span>SmartEarn</span>
                         </Link>
                         <button className="drawer-close-btn" onClick={() => setMobileMenuOpen(false)}>
                             <i className="fas fa-times"></i>

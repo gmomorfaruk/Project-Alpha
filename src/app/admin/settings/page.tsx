@@ -40,7 +40,7 @@ interface AppSettings {
 }
 
 const defaultSettings: AppSettings = {
-    platformName: 'Project Alpha',
+    platformName: 'SmartEarn',
     defaultLanguage: 'en',
     maintenanceMode: false,
     minDeposit: 500,

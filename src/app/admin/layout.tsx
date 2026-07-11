@@ -431,7 +431,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="admin-sidebar-header">
                     <Link href="/admin" className="admin-logo">
                         <i className="fas fa-rocket"></i>
-                        <span>Project Alpha</span>
+                        <span>SmartEarn</span>
                     </Link>
                     <button className="admin-hamburger" onClick={() => setMobileMenuOpen(false)}>
                         <i className="fas fa-times"></i>

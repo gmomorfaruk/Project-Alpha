@@ -35,7 +35,7 @@ export default function Home() {
                 <div className="container">
                     <Link href="/" className="logo">
                         <i className="fas fa-rocket"></i>
-                        <span>Project Alpha</span>
+                        <span>SmartEarn</span>
                     </Link>
                     
                     <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
@@ -375,7 +375,7 @@ export default function Home() {
                         <div className="footer-brand">
                             <Link href="/" className="logo">
                                 <i className="fas fa-rocket"></i>
-                                <span>Project Alpha</span>
+                                <span>SmartEarn</span>
                             </Link>
                             <p>{tText("Your trusted investment platform for secure and profitable investments.", "নিরাপদ এবং লাভজনক বিনিয়োগের জন্য আপনার বিশ্বস্ত বিনিয়োগ প্ল্যাটফর্ম।")}</p>
                             <div className="social-links">
@@ -406,14 +406,14 @@ export default function Home() {
                         <div className="footer-column">
                             <h4>{tText("Contact Us", "যোগাযোগ")}</h4>
                             <ul>
-                                <li><a href="mailto:support@projectalpha.com"><i className="fas fa-envelope"></i> support@projectalpha.com</a></li>
+                                <li><a href="mailto:support@smartearn.com"><i className="fas fa-envelope"></i> support@smartearn.com</a></li>
                                 <li><a href="tel:+8801XXXXXXXXX"><i className="fas fa-phone"></i> {tNum("+880 1XXX-XXXXXX")}</a></li>
                                 <li><span><i className="fas fa-map-marker-alt"></i> {tText("Dhaka, Bangladesh", "ঢাকা, বাংলাদেশ")}</span></li>
                             </ul>
                         </div>
                     </div>
                     <div className="footer-bottom">
-                        <p>&copy; {tNum(2026)} Project Alpha. {tText("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}</p>
+                        <p>&copy; {tNum(2026)} SmartEarn. {tText("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}</p>
                         <div className="footer-bottom-links">
                             <a href="#">{tText("Privacy Policy", "গোপনীয়তা নীতি")}</a>
                             <a href="#">{tText("Terms of Service", "সেবার শর্তাবলী")}</a>

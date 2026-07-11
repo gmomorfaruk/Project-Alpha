@@ -11,8 +11,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 
 export const metadata: Metadata = {
-  title: "Project Alpha - Investment Platform",
-  description: "Project Alpha - Your trusted investment platform. Earn daily profits through secure investments.",
+  title: "SmartEarn - Investment Platform",
+  description: "SmartEarn - Your trusted investment platform. Earn daily profits through secure investments.",
 };
 
 export default function RootLayout({
