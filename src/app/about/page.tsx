@@ -256,7 +256,7 @@ export default function About() {
                 <div className="container">
                     <Link href="/" className="logo">
                         <i className="fas fa-rocket"></i>
-                        <span>SmartEarn</span>
+                        <span>SmartEarnBD</span>
                     </Link>
                     
                     <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
@@ -296,7 +296,7 @@ export default function About() {
             {/* Hero Section */}
             <section className="about-hero">
                 <div className="container">
-                    <h1>{tText("About SmartEarn", "স্মার্টআর্ন সম্পর্কে")}</h1>
+                    <h1>{tText("About SmartEarnBD", "স্মার্টআর্নবিডি সম্পর্কে")}</h1>
                     <p>{tText("We're on a mission to make investing accessible and profitable for everyone in Bangladesh.", "আমরা বাংলাদেশের সবার জন্য বিনিয়োগকে সহজলভ্য এবং লাভজনক করার মিশনে আছি।")}</p>
                 </div>
             </section>
@@ -307,7 +307,7 @@ export default function About() {
                     <div className="about-grid">
                         <div className="about-content">
                             <h2>{tText("Who We Are", "আমরা কারা")}</h2>
-                            <p>{tText("SmartEarn is a leading investment platform in Bangladesh that connects investors with profitable opportunities. Founded in 2024, we've grown to serve thousands of satisfied investors across the country.", "স্মার্টআর্ন বাংলাদেশের একটি শীর্ষস্থানীয় বিনিয়োগ প্ল্যাটফর্ম যা বিনিয়োগকারীদের লাভজনক সুযোগের সাথে সংযুক্ত করে। ২০২৪ সালে প্রতিষ্ঠিত, আমরা সারা দেশে হাজার হাজার সন্তুষ্ট বিনিয়োগকারীদের সেবা দিতে বড় হয়েছি।")}</p>
+                            <p>{tText("SmartEarnBD is a leading investment platform in Bangladesh that connects investors with profitable opportunities. Founded in 2024, we've grown to serve thousands of satisfied investors across the country.", "স্মার্টআর্নবিডি বাংলাদেশের একটি শীর্ষস্থানীয় বিনিয়োগ প্ল্যাটফর্ম যা বিনিয়োগকারীদের লাভজনক সুযোগের সাথে সংযুক্ত করে। ২০২৪ সালে প্রতিষ্ঠিত, আমরা সারা দেশে হাজার হাজার সন্তুষ্ট বিনিয়োগকারীদের সেবা দিতে বড় হয়েছি।")}</p>
                             <p>{tText("Our platform offers a unique combination of auto-sell and self-sell options, giving our investors flexibility in how they manage their investments and maximize their returns.", "আমাদের প্ল্যাটফর্ম অটো-সেল এবং সেলফ-সেলের একটি অনন্য সমন্বয় প্রদান করে, যা আমাদের বিনিয়োগকারীদের তাদের বিনিয়োগ পরিচালনা এবং রিটার্ন সর্বাধিক করার ক্ষেত্রে নমনীয়তা দেয়।")}</p>
                             <p>{tText("We believe in transparency, security, and putting our investors first. That's why we've built a platform that's easy to use, secure, and designed to help you grow your wealth.", "আমরা স্বচ্ছতা, নিরাপত্তা এবং আমাদের বিনিয়োগকারীদের প্রথমে রাখায় বিশ্বাস করি। এই কারণেই আমরা একটি প্ল্যাটফর্ম তৈরি করেছি যা ব্যবহার করা সহজ, নিরাপদ এবং আপনার সম্পদ বৃদ্ধিতে সহায়তা করার জন্য ডিজাইন করা হয়েছে।")}</p>
                         </div>
@@ -372,7 +372,7 @@ export default function About() {
                 <div className="container">
                     <div className="section-header">
                         <h2>{tText("Our Leadership Team", "আমাদের নেতৃত্ব দল")}</h2>
-                        <p>{tText("Meet the experts behind SmartEarn", "স্মার্টআর্নের পেছনের বিশেষজ্ঞদের সাথে পরিচিত হন")}</p>
+                        <p>{tText("Meet the experts behind SmartEarnBD", "স্মার্টআর্নবিডির পেছনের বিশেষজ্ঞদের সাথে পরিচিত হন")}</p>
                     </div>
                     <div className="team-grid">
                         <div className="team-card">
@@ -420,7 +420,7 @@ export default function About() {
                                 <i className="fas fa-envelope"></i>
                             </div>
                             <h4>{tText("Email Us", "ইমেইল করুন")}</h4>
-                            <p><a href="mailto:support@smartearn.com">support@smartearn.com</a></p>
+                            <p><a href="mailto:support@smartearnbd.com">support@smartearnbd.com</a></p>
                         </div>
                         <div className="contact-card">
                             <div className="icon">
@@ -444,7 +444,7 @@ export default function About() {
             <footer className="footer">
                 <div className="container">
                     <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-                        <p>&copy; 2026 SmartEarn. All rights reserved.</p>
+                        <p>&copy; 2026 SmartEarnBD. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

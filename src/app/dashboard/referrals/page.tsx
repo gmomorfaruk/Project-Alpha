@@ -55,8 +55,8 @@ export default function ClientReferralsPage() {
         
         if (navigator.share) {
             navigator.share({
-                title: 'Join SmartEarn',
-                text: `Join me on SmartEarn and start earning! Use my referral code: ${user.referralCode}`,
+                title: 'Join SmartEarnBD',
+                text: `Join me on SmartEarnBD and start earning! Use my referral code: ${user.referralCode}`,
                 url: link
             }).catch(() => {
                 navigator.clipboard.writeText(link);

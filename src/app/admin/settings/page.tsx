@@ -40,7 +40,7 @@ interface AppSettings {
 }
 
 const defaultSettings: AppSettings = {
-    platformName: 'SmartEarn',
+    platformName: 'SmartEarnBD',
     defaultLanguage: 'en',
     maintenanceMode: false,
     minDeposit: 500,

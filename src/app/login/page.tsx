@@ -489,7 +489,7 @@ export default function LoginPage() {
                 <div className="container">
                     <Link href="/" className="logo">
                         <i className="fas fa-rocket"></i>
-                        <span>SmartEarn</span>
+                        <span>SmartEarnBD</span>
                     </Link>
                     <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
                         <Link href="/">{t('nav.home')}</Link>

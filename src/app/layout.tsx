@@ -11,8 +11,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 
 export const metadata: Metadata = {
-  title: "SmartEarn - Investment Platform",
-  description: "SmartEarn - Your trusted investment platform. Earn daily profits through secure investments.",
+  title: "SmartEarnBD - Investment Platform",
+  description: "SmartEarnBD - Your trusted investment platform. Earn daily profits through secure investments.",
 };
 
 export default function RootLayout({

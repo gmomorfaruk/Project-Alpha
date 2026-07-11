@@ -390,7 +390,7 @@ export default function ProductsPage() {
                 <div className="container">
                     <Link href="/" className="logo">
                         <i className="fas fa-rocket"></i>
-                        <span>SmartEarn</span>
+                        <span>SmartEarnBD</span>
                     </Link>
                     
                     <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`} id="navLinks">
@@ -550,7 +550,7 @@ export default function ProductsPage() {
             <footer className="footer">
                 <div className="container">
                     <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
-                        <p>&copy; 2026 SmartEarn. All rights reserved.</p>
+                        <p>&copy; 2026 SmartEarnBD. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
