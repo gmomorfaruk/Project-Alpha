@@ -4,16 +4,92 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import Navbar from '@/components/Navbar';
-
 import Storage from '@/lib/storage';
 import { Product, defaultProducts as defaultProductsList } from '@/lib/products';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
+import db from '@/lib/database';
 
 export default function ProductsPage() {
     const { t, tText } = useTranslation();
+    const { user } = useAuth();
+    const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
     
     // Data states
     const [products, setProducts] = useState<Product[]>([]);
+    
+    // Checkout states
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
+    const [custName, setCustName] = useState('');
+    const [custPhone, setCustPhone] = useState('');
+    const [custAddress, setCustAddress] = useState('');
+    const [orderQty, setOrderQty] = useState(1);
+    const [orderColor, setOrderColor] = useState('');
+    const [payMethod, setPayMethod] = useState<'bkash' | 'nagad'>('bkash');
+    const [transactionId, setTransactionId] = useState('');
+    const [submittingOrder, setSubmittingOrder] = useState(false);
+
+    const handlePlaceOrder = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!checkoutProduct) return;
+
+        if (!custName.trim() || !custPhone.trim() || !custAddress.trim() || !transactionId.trim()) {
+            showToast('Please fill all fields', 'error');
+            return;
+        }
+
+        if (orderQty < 1) {
+            showToast('Please specify a valid quantity', 'error');
+            return;
+        }
+
+        if (orderQty > checkoutProduct.stock) {
+            showToast(`Only ${checkoutProduct.stock} units are in stock`, 'error');
+            return;
+        }
+
+        setSubmittingOrder(true);
+        try {
+            const allOrders = Storage.get('orders') || [];
+            const newOrder = {
+                id: db.generateId(),
+                productName: checkoutProduct.name,
+                productId: checkoutProduct.id,
+                price: checkoutProduct.price,
+                quantity: orderQty,
+                color: orderColor,
+                totalAmount: checkoutProduct.price * orderQty,
+                customerName: custName.trim(),
+                customerPhone: custPhone.trim(),
+                deliveryAddress: custAddress.trim(),
+                paymentMethod: payMethod,
+                transactionId: transactionId.trim(),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            allOrders.push(newOrder);
+            Storage.set('orders', allOrders);
+
+            // Decrement product stock
+            const allProducts: Product[] = Storage.get('products') || [];
+            const pIdx = allProducts.findIndex(p => p.id === checkoutProduct.id);
+            if (pIdx !== -1) {
+                allProducts[pIdx].stock = Math.max(0, allProducts[pIdx].stock - orderQty);
+                Storage.set('products', allProducts);
+                setProducts(allProducts);
+            }
+
+            showToast('Order placed successfully! Admin will verify payment and ship your item.', 'success');
+            setCheckoutOpen(false);
+        } catch (err) {
+            showToast('Failed to place order', 'error');
+        } finally {
+            setSubmittingOrder(false);
+        }
+    };
     
     // Filtering States
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,12 +99,26 @@ export default function ProductsPage() {
 
     useEffect(() => {
         setMounted(true);
+        // Force reset products list to load updated discounts
+        const hasReset = Storage.get('products_reset_v5');
         let list = Storage.get('products');
-        if (!list || !Array.isArray(list) || list.length === 0) {
+        if (!hasReset || !list || !Array.isArray(list) || list.length === 0) {
             list = defaultProductsList;
             Storage.set('products', list);
+            Storage.set('products_reset_v5', true);
         }
         setProducts(list);
+
+        // Parse search parameters safely on client side
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const filterParam = params.get('filter');
+            if (filterParam === 'offers') {
+                setCategoryFilter('offers');
+            } else if (filterParam) {
+                setCategoryFilter(filterParam);
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -43,7 +133,14 @@ export default function ProductsPage() {
 
         // Category filter
         if (categoryFilter !== 'all') {
-            result = result.filter(p => p.category === categoryFilter);
+            if (categoryFilter === 'offers') {
+                result = result.filter(p => {
+                    const isOfferProduct = p.hasOffer !== undefined ? p.hasOffer : !!(p.previousPrice && p.previousPrice > p.price);
+                    return isOfferProduct;
+                });
+            } else {
+                result = result.filter(p => p.category === categoryFilter);
+            }
         }
 
         // Sorting
@@ -172,7 +269,7 @@ export default function ProductsPage() {
                     display: flex;
                     justify-content: space-between;
                 }
-                .product-badge {
+                .prod-badge {
                     padding: 5px 12px;
                     border-radius: 20px;
                     font-size: 11px;
@@ -295,6 +392,7 @@ export default function ProductsPage() {
                                 <option value="mobile">Mobile</option>
                                 <option value="computer">Computer</option>
                                 <option value="accessories">Accessories</option>
+                                <option value="offers">{tText("Offers", "অফার")}</option>
                                 <option value="other">Other</option>
                             </select>
                             <i className="fas fa-chevron-down"></i>
@@ -338,20 +436,33 @@ export default function ProductsPage() {
                                     : 0;
                                 
                                 const selfSellProfit = Math.round(product.returnRate * 1.25);
+                                const hasOffer = product.hasOffer !== undefined ? product.hasOffer : hasDiscount;
+                                const offerText = product.offerText || (hasDiscount ? `${discountPercentage}% OFF` : '');
+                                const offerColor = product.offerColor || '#ef4444';
 
                                 return (
                                     <div key={product.id} className={`product-card ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                                         <div className="product-image-container">
                                             <i className={`fas ${product.image || 'fa-box'}`}></i>
                                             <div className="product-badges">
-                                                {hasDiscount ? (
-                                                    <span className="product-badge badge-offer" style={{ background: '#ef4444', color: 'white' }}>
-                                                        {discountPercentage}% OFF
+                                                {hasOffer ? (
+                                                    <span className="prod-badge badge-offer" style={{ 
+                                                        background: offerColor, 
+                                                        color: 'white',
+                                                        padding: '4px 10px',
+                                                        borderRadius: '20px',
+                                                        fontSize: '11px',
+                                                        fontWeight: 700,
+                                                        letterSpacing: '0.5px',
+                                                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                                        textTransform: 'uppercase'
+                                                    }}>
+                                                        {offerText}
                                                     </span>
                                                 ) : (
                                                     <span></span>
                                                 )}
-                                                <span className="product-badge badge-category">{product.category}</span>
+                                                <span className="prod-badge badge-category">{product.category}</span>
                                             </div>
                                         </div>
                                         <div className="product-content">
@@ -393,51 +504,79 @@ export default function ProductsPage() {
                                             )}
 
                                             <div className="product-info">
-                                                <div className="info-item" style={{ gridColumn: 'span 2' }}>
-                                                    <span className="info-label">{tText("Price", "মূল্য")}</span>
-                                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-                                                        <span className="info-value price" style={{ fontSize: '18px', fontWeight: 700, color: '#10b981' }}>
-                                                            ৳{product.price.toLocaleString()}
-                                                        </span>
-                                                        {hasDiscount && (
-                                                            <>
-                                                                <span style={{ fontSize: '14px', textDecoration: 'line-through', color: 'var(--text-secondary)' }}>
-                                                                    ৳{product.previousPrice!.toLocaleString()}
-                                                                </span>
-                                                                <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>
-                                                                    Save ৳{discountSavings.toLocaleString()}
-                                                                </span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="info-item">
-                                                    <span className="info-label">{tText("Auto-Sell Profit", "অটো-সেল লাভ")}</span>
-                                                    <span className="info-value profit">+{product.returnRate}%</span>
-                                                </div>
-                                                <div className="info-item">
-                                                    <span className="info-label">{tText("Self-Sell Profit", "সেলফ-সেল লাভ")}</span>
-                                                    <span className="info-value profit">+{selfSellProfit}%</span>
-                                                </div>
-                                                <div className="info-item" style={{ gridColumn: 'span 2' }}>
-                                                    <span className="info-label">{tText("Duration", "সময়কাল")}</span>
-                                                    <span className="info-value">{product.duration} {tText("days", "দিন")}</span>
-                                                </div>
+                                                 <div className="info-item" style={{ gridColumn: 'span 2' }}>
+                                                     <span className="info-label">{tText("Price", "মূল্য")}</span>
+                                                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+                                                         <span className="info-value price" style={{ fontSize: '18px', fontWeight: 700, color: '#10b981' }}>
+                                                             ৳{product.price.toLocaleString()}
+                                                         </span>
+                                                         {hasDiscount && (
+                                                             <>
+                                                                 <span style={{ fontSize: '14px', textDecoration: 'line-through', color: 'var(--text-secondary)' }}>
+                                                                     ৳{product.previousPrice!.toLocaleString()}
+                                                                 </span>
+                                                                 <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>
+                                                                     Save ৳{discountSavings.toLocaleString()}
+                                                                 </span>
+                                                             </>
+                                                         )}
+                                                     </div>
+                                                 </div>
+                                                 {user && (user.role === 'partner' || user.role === 'admin') && (
+                                                     <>
+                                                         <div className="info-item">
+                                                             <span className="info-label">{tText("Auto-Sell Profit", "অটো-সেল লাভ")}</span>
+                                                             <span className="info-value profit">+{product.returnRate}%</span>
+                                                         </div>
+                                                         <div className="info-item">
+                                                             <span className="info-label">{tText("Self-Sell Profit", "সেলফ-সেল লাভ")}</span>
+                                                             <span className="info-value profit">+{selfSellProfit}%</span>
+                                                         </div>
+                                                         <div className="info-item" style={{ gridColumn: 'span 2' }}>
+                                                             <span className="info-label">{tText("Duration", "সময়কাল")}</span>
+                                                             <span className="info-value">{product.duration} {tText("days", "দিন")}</span>
+                                                         </div>
+                                                     </>
+                                                 )}
                                             </div>
                                             <div className={`stock-info ${stockClass}`}>
                                                 <i className={`fas ${stockIcon}`}></i>
                                                 <span>{stockText}</span>
                                             </div>
-                                            <div className="product-footer">
-                                                {product.stock === 0 ? (
-                                                    <button className="btn btn-primary btn-block" disabled>
-                                                        {tText("Out of Stock", "স্টক শেষ")}
-                                                    </button>
-                                                ) : (
-                                                    <Link href="/login" className="btn btn-primary btn-block">
-                                                        {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
-                                                    </Link>
-                                                )}
+                                            <div className="product-footer" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                 {product.stock === 0 ? (
+                                                     <button className="btn btn-primary btn-block" disabled>
+                                                         {tText("Out of Stock", "স্টক শেষ")}
+                                                     </button>
+                                                 ) : user && (user.role === 'partner' || user.role === 'admin') ? (
+                                                     <Link href="/dashboard/products" className="btn btn-primary btn-block">
+                                                         {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                                     </Link>
+                                                 ) : (
+                                                     <>
+                                                         <button 
+                                                             className="btn btn-primary btn-block"
+                                                             onClick={() => {
+                                                                 setCheckoutProduct(product);
+                                                                 setOrderQty(1);
+                                                                 setOrderColor(product.colors && product.colors.length > 0 ? product.colors[0] : '');
+                                                                 setCustName('');
+                                                                 setCustPhone('');
+                                                                 setCustAddress('');
+                                                                 setTransactionId('');
+                                                                 setCheckoutOpen(true);
+                                                             }}
+                                                         >
+                                                             <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i>
+                                                             {tText("Order Now", "এখনই অর্ডার করুন")}
+                                                         </button>
+                                                         <div style={{ textAlign: 'center', marginTop: '4px' }}>
+                                                             <Link href="/signup" style={{ fontSize: '11px', color: 'var(--primary-color)', textDecoration: 'none' }}>
+                                                                 {tText("Earn money from this product? Become a Partner", "এই পণ্য থেকে টাকা আয় করতে চান? পার্টনার হোন")}
+                                                             </Link>
+                                                         </div>
+                                                     </>
+                                                 )}
                                             </div>
                                         </div>
                                     </div>
@@ -447,6 +586,197 @@ export default function ProductsPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Guest Checkout Modal */}
+            {checkoutOpen && checkoutProduct && (
+                <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
+                    <div className="modal" style={{ maxWidth: '500px', width: '100%', background: 'var(--bg-primary, #0f1c30)', border: '1px solid var(--border-color, #1e2d4a)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+                        <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, color: 'white' }}>{tText("Checkout - Order Product", "চেকআউট - পণ্য অর্ডার করুন")}</h3>
+                            <button className="modal-close" onClick={() => setCheckoutOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '18px' }}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form onSubmit={handlePlaceOrder} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div className="modal-body" style={{ padding: '20px', maxHeight: '60vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                
+                                {/* Product Summary */}
+                                <div style={{ display: 'flex', gap: '15px', background: 'var(--bg-secondary)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                    <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: 'var(--primary-color)' }}>
+                                        <i className={`fas ${checkoutProduct.image || 'fa-box'}`}></i>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                        <h4 style={{ margin: 0, fontSize: '15px', color: 'white' }}>{checkoutProduct.name}</h4>
+                                        <span style={{ fontSize: '13px', color: '#10b981', fontWeight: 600 }}>৳{checkoutProduct.price.toLocaleString()}</span>
+                                    </div>
+                                </div>
+
+                                {/* Color Selection */}
+                                {checkoutProduct.colors && checkoutProduct.colors.length > 0 && (
+                                    <div className="form-group">
+                                        <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>{tText("Select Color", "রং নির্বাচন করুন")}</label>
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            {checkoutProduct.colors.map((color, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    type="button"
+                                                    onClick={() => setOrderColor(color)}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        borderRadius: '20px',
+                                                        border: '1px solid',
+                                                        borderColor: orderColor === color ? 'var(--primary-color)' : 'var(--border-color)',
+                                                        background: orderColor === color ? 'var(--primary-light)' : 'none',
+                                                        color: orderColor === color ? 'white' : 'var(--text-secondary)',
+                                                        fontSize: '12px',
+                                                        cursor: 'pointer',
+                                                        fontWeight: orderColor === color ? 600 : 400
+                                                    }}
+                                                >
+                                                    {color}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Quantity Selector */}
+                                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{tText("Quantity", "পরিমাণ")}</label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setOrderQty(Math.max(1, orderQty - 1))}
+                                            style={{ width: '30px', height: '30px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'none', color: 'white', cursor: 'pointer' }}
+                                        >
+                                            -
+                                        </button>
+                                        <span style={{ fontSize: '16px', fontWeight: 600, color: 'white', minWidth: '20px', textAlign: 'center' }}>{orderQty}</span>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setOrderQty(Math.min(checkoutProduct.stock, orderQty + 1))}
+                                            style={{ width: '30px', height: '30px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'none', color: 'white', cursor: 'pointer' }}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Form Inputs */}
+                                <div className="form-group">
+                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>{tText("Full Name", "পূর্ণ নাম")}</label>
+                                    <input 
+                                        type="text" 
+                                        required
+                                        value={custName}
+                                        onChange={e => setCustName(e.target.value)}
+                                        placeholder={tText("Enter your full name", "আপনার পূর্ণ নাম লিখুন")}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white' }}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>{tText("Phone Number", "মোবাইল নম্বর")}</label>
+                                    <input 
+                                        type="tel" 
+                                        required
+                                        value={custPhone}
+                                        onChange={e => setCustPhone(e.target.value)}
+                                        placeholder={tText("Enter your mobile number", "আপনার মোবাইল নম্বর লিখুন")}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white' }}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>{tText("Delivery Address", "ডেলিভারি ঠিকানা")}</label>
+                                    <textarea 
+                                        required
+                                        rows={2}
+                                        value={custAddress}
+                                        onChange={e => setCustAddress(e.target.value)}
+                                        placeholder={tText("Enter complete address (District, Area, Road/Village)", "সম্পূর্ণ ঠিকানা লিখুন (জেলা, এলাকা, রোড/গ্রাম)")}
+                                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white', resize: 'none' }}
+                                    />
+                                </div>
+
+                                {/* Payment Info */}
+                                <div style={{ borderTop: '1px dashed var(--border-color)', paddingTop: '15px', marginTop: '10px' }}>
+                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>{tText("Payment Instruction", "পেমেন্ট নির্দেশনা")}</label>
+                                    <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                                        {tText(
+                                            `Please send the total price of ৳${(checkoutProduct.price * orderQty).toLocaleString()} to the bKash/Nagad number below, then fill in your Transaction ID:`,
+                                            `নীচের বিকাশ/নগদ নম্বরে মোট ৳${(checkoutProduct.price * orderQty).toLocaleString()} মূল্যটি সেন্ডমানি বা পেমেন্ট করুন, তারপর আপনার ট্রানজেকশন আইডিটি লিখুন:`
+                                        )}
+                                    </p>
+                                    <div style={{ background: 'var(--bg-secondary)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '12px', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>bKash / Nagad Number:</div>
+                                        <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--primary-color)', margin: '4px 0' }}>01783840582</div>
+                                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Type: Personal (Send Money)</span>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPayMethod('bkash')}
+                                            style={{
+                                                padding: '10px',
+                                                borderRadius: '8px',
+                                                border: '1px solid',
+                                                borderColor: payMethod === 'bkash' ? '#e2125a' : 'var(--border-color)',
+                                                background: payMethod === 'bkash' ? 'rgba(226, 18, 90, 0.1)' : 'none',
+                                                color: payMethod === 'bkash' ? '#e2125a' : 'white',
+                                                cursor: 'pointer',
+                                                fontWeight: 600,
+                                                fontSize: '13px'
+                                            }}
+                                        >
+                                            bKash
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPayMethod('nagad')}
+                                            style={{
+                                                padding: '10px',
+                                                borderRadius: '8px',
+                                                border: '1px solid',
+                                                borderColor: payMethod === 'nagad' ? '#f6901e' : 'var(--border-color)',
+                                                background: payMethod === 'nagad' ? 'rgba(246, 144, 30, 0.1)' : 'none',
+                                                color: payMethod === 'nagad' ? '#f6901e' : 'white',
+                                                cursor: 'pointer',
+                                                fontWeight: 600,
+                                                fontSize: '13px'
+                                            }}
+                                        >
+                                            Nagad
+                                        </button>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>{tText("Transaction ID (TxID)", "ট্রানজেকশন আইডি")}</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={transactionId}
+                                            onChange={e => setTransactionId(e.target.value)}
+                                            placeholder="Example: 9K88FGH765"
+                                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'white', fontFamily: 'monospace' }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="modal-footer" style={{ padding: '20px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '10px' }}>
+                                <button type="button" className="btn btn-outline" onClick={() => setCheckoutOpen(false)} style={{ flex: 1 }}>
+                                    {tText("Cancel", "বাতিল করুন")}
+                                </button>
+                                <button type="submit" className="btn btn-primary" disabled={submittingOrder} style={{ flex: 1 }}>
+                                    {submittingOrder ? tText("Placing...", "অর্ডার হচ্ছে...") : tText("Place Order", "অর্ডার সাবমিট করুন")}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Footer */}
             <footer className="footer">

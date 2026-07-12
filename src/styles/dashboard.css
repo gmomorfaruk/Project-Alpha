@@ -285,11 +285,13 @@ body {
 
 .search-icon {
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
     font-size: 14px;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .search-input {
@@ -298,11 +300,13 @@ body {
     background: var(--bg-hover);
     border: 1px solid transparent;
     border-radius: 14px;
-    padding: 0 16px 0 44px;
+    padding: 0 16px 0 40px;
     font-size: 14px;
     color: var(--text-primary);
     outline: none;
     transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .search-input:focus {
@@ -310,6 +314,7 @@ body {
     background: var(--bg-card);
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
 }
+
 
 .header-right {
     display: flex;

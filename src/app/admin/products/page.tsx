@@ -38,16 +38,22 @@ export default function AdminProductsPage() {
     const [prodColors, setProdColors] = useState('');
     const [prodImage, setProdImage] = useState('');
     const [prodActive, setProdActive] = useState(true);
+    const [prodHasOffer, setProdHasOffer] = useState(false);
+    const [prodOfferText, setProdOfferText] = useState('');
+    const [prodOfferColor, setProdOfferColor] = useState('#ef4444');
 
     useEffect(() => {
         loadProductsData();
     }, []);
 
     const loadProductsData = () => {
+        // Force reset products list to load updated discounts
+        const hasReset = Storage.get('products_reset_v5');
         let allProducts: Product[] = Storage.get('products') || [];
-        if (!allProducts || !Array.isArray(allProducts) || allProducts.length === 0) {
+        if (!hasReset || !allProducts || !Array.isArray(allProducts) || allProducts.length === 0) {
             allProducts = defaultProductsList;
             Storage.set('products', allProducts);
+            Storage.set('products_reset_v5', true);
         }
 
         setProducts(allProducts);
@@ -70,6 +76,9 @@ export default function AdminProductsPage() {
         setProdColors('');
         setProdImage('');
         setProdActive(true);
+        setProdHasOffer(false);
+        setProdOfferText('');
+        setProdOfferColor('#ef4444');
         setModalOpen(true);
     };
 
@@ -87,6 +96,9 @@ export default function AdminProductsPage() {
         setProdColors(p.colors ? p.colors.join(', ') : '');
         setProdImage(p.image || '');
         setProdActive(p.active !== false);
+        setProdHasOffer(p.hasOffer !== undefined ? p.hasOffer : !!(p.previousPrice && p.previousPrice > p.price));
+        setProdOfferText(p.offerText || '');
+        setProdOfferColor(p.offerColor || '#ef4444');
         setModalOpen(true);
     };
 
@@ -119,7 +131,10 @@ export default function AdminProductsPage() {
                         description: prodDescription.trim(),
                         colors: parsedColors,
                         image: prodImage.trim(),
-                        active: prodActive
+                        active: prodActive,
+                        hasOffer: prodHasOffer,
+                        offerText: prodOfferText.trim(),
+                        offerColor: prodOfferColor.trim()
                     };
                     showToast('Product upgraded successfully!', 'success');
                 }
@@ -139,6 +154,9 @@ export default function AdminProductsPage() {
                     colors: parsedColors,
                     image: prodImage.trim(),
                     active: prodActive,
+                    hasOffer: prodHasOffer,
+                    offerText: prodOfferText.trim(),
+                    offerColor: prodOfferColor.trim(),
                     createdAt: new Date().toISOString()
                 };
                 allProducts.push(newProduct);
@@ -187,7 +205,9 @@ export default function AdminProductsPage() {
     // Filters logic
     const filteredProducts = products.filter((p) => {
         const matchesQuery = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCat = filterCategory === 'all' || p.category === filterCategory;
+        const isOfferProduct = p.hasOffer !== undefined ? p.hasOffer : !!(p.previousPrice && p.previousPrice > p.price);
+        const matchesCat = filterCategory === 'all' || 
+            (filterCategory === 'offers' ? isOfferProduct : p.category === filterCategory);
         return matchesQuery && matchesCat;
     });
 
@@ -244,6 +264,7 @@ export default function AdminProductsPage() {
                             <option value="mobile">Mobile</option>
                             <option value="computer">Computer</option>
                             <option value="accessories">Accessories</option>
+                            <option value="offers">Offers</option>
                             <option value="other">Other</option>
                         </select>
                         <button className="btn btn-primary" onClick={handleOpenAddModal}>
@@ -379,6 +400,28 @@ export default function AdminProductsPage() {
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label htmlFor="prodColorsInput">Color Options (Comma separated)</label>
                                     <input type="text" id="prodColorsInput" placeholder="e.g. Midnight Black, Deep Purple, Silver" value={prodColors} onChange={e => setProdColors(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                </div>
+                                <div style={{ border: '1px dashed var(--border-color)', padding: '15px', borderRadius: '12px', marginBottom: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--primary-color)' }}>Offer Details</h4>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                                        <input type="checkbox" id="prodHasOfferCheckbox" checked={prodHasOffer} onChange={e => setProdHasOffer(e.target.checked)} style={{ cursor: 'pointer' }} />
+                                        <label htmlFor="prodHasOfferCheckbox" style={{ cursor: 'pointer', fontWeight: 600 }}>Active Offer Badge</label>
+                                    </div>
+                                    {prodHasOffer && (
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                            <div className="form-group">
+                                                <label htmlFor="prodOfferTextInput">Offer Badge Text *</label>
+                                                <input type="text" id="prodOfferTextInput" placeholder="e.g. 20% OFF or Hot Deal" required={prodHasOffer} value={prodOfferText} onChange={e => setProdOfferText(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                            </div>
+                                            <div className="form-group">
+                                                <label htmlFor="prodOfferColorInput">Badge Color</label>
+                                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                    <input type="color" id="prodOfferColorInput" value={prodOfferColor} onChange={e => setProdOfferColor(e.target.value)} style={{ width: '40px', height: '40px', padding: '2px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'transparent', cursor: 'pointer' }} />
+                                                    <input type="text" value={prodOfferColor} onChange={e => setProdOfferColor(e.target.value)} placeholder="#ef4444" style={{ flex: 1, padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label htmlFor="prodDescriptionTextarea">Product Description</label>

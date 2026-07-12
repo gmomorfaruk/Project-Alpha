@@ -359,7 +359,6 @@ export default function Navbar() {
                 <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
                     <Link href="/" className="flex items-center gap-2 group cursor-pointer" style={{ textDecoration: 'none' }}>
                         <div className="relative transform group-hover:scale-105 transition-transform duration-300 flex items-center gap-2">
-                            <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block', mixBlendMode: 'multiply' }} className="select-none" />
                             <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
                             <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
                         </div>
@@ -410,14 +409,7 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        {/* Deals Link */}
-                        <Link 
-                            href="/products?filter=offers" 
-                            className={pathname === '/products' && router.toString().includes('filter=offers') ? 'nav-link-pill-active' : 'nav-link-pill-inactive'}
-                        >
-                            <i className="fas fa-tags"></i>
-                            <span>{tText('Deals', 'অফার')}</span>
-                        </Link>
+
 
                         {/* About Us Link */}
                         <Link 
@@ -873,14 +865,7 @@ export default function Navbar() {
 
                                 <div className="border-t border-slate-100 dark:border-slate-900 my-1"></div>
 
-                                <Link 
-                                    href="/products?filter=offers" 
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center gap-3 p-3 rounded-xl no-underline font-semibold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900"
-                                >
-                                    <i className="fas fa-tags w-5"></i>
-                                    <span>{tText('Hot Deals', 'গরম অফার')}</span>
-                                </Link>
+
 
                                 <Link 
                                     href="/about" 

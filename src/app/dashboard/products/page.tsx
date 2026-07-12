@@ -104,10 +104,13 @@ export default function ClientProductsPage() {
 
     // Load products on mount
     useEffect(() => {
+        // Force reset products list to load updated discounts
+        const hasReset = Storage.get('products_reset_v5');
         let list = Storage.get('products');
-        if (!list || !Array.isArray(list) || list.length === 0) {
+        if (!hasReset || !list || !Array.isArray(list) || list.length === 0) {
             list = defaultProducts;
             Storage.set('products', list);
+            Storage.set('products_reset_v5', true);
         }
         setProducts(list);
     }, []);
@@ -407,13 +410,16 @@ export default function ClientProductsPage() {
                     activeProducts.map((product) => {
                         const icon = product.image || getCategoryIcon(product.category);
                         const returnRate = product.returnRate || 10;
-                        const hasDiscount = product.previousPrice && product.previousPrice > product.price;
+                        const hasDiscount = !!(product.previousPrice && product.previousPrice > product.price);
                         const discountPercentage = hasDiscount 
                             ? Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)
                             : 0;
                         const discountSavings = hasDiscount 
                             ? product.previousPrice! - product.price 
                             : 0;
+                        const hasOffer = product.hasOffer !== undefined ? product.hasOffer : hasDiscount;
+                        const offerText = product.offerText || (hasDiscount ? `${discountPercentage}% OFF` : '');
+                        const offerColor = product.offerColor || '#ef4444';
 
                         return (
                             <div key={product.id} className="product-card" style={{ background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -423,9 +429,22 @@ export default function ClientProductsPage() {
                                     ) : (
                                         <i className={`fas ${product.image || icon}`} style={{ fontSize: '50px', color: 'var(--primary-color)' }}></i>
                                     )}
-                                    {hasDiscount && (
-                                        <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }}>
-                                            {discountPercentage}% OFF
+                                    {hasOffer && (
+                                        <span style={{ 
+                                            position: 'absolute', 
+                                            top: '10px', 
+                                            right: '10px', 
+                                            background: offerColor, 
+                                            color: 'white', 
+                                            padding: '4px 10px', 
+                                            borderRadius: '20px', 
+                                            fontSize: '11px', 
+                                            fontWeight: 700,
+                                            letterSpacing: '0.5px',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            {offerText}
                                         </span>
                                     )}
                                 </div>

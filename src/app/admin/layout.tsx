@@ -214,6 +214,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { path: '/admin', name: 'Overview', icon: 'fa-tachometer-alt' },
         { path: '/admin/users', name: 'Users', icon: 'fa-users' },
+        { path: '/admin/orders', name: 'Orders', icon: 'fa-shopping-cart' },
         { path: '/admin/transactions', name: 'Transactions', icon: 'fa-exchange-alt' },
         { path: '/admin/memberships', name: 'Memberships', icon: 'fa-crown' },
         { path: '/admin/products', name: 'Products', icon: 'fa-box' },

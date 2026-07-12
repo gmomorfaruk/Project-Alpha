@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import Navbar from '@/components/Navbar';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
     const { t, tText, tNum } = useTranslation();
+    const { user } = useAuth();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -95,17 +97,21 @@ export default function Home() {
                                     <span className="label">{tText("Price", "মূল্য")}</span>
                                     <span className="value">{tNum("৳5,000")}</span>
                                 </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Profit", "লাভ")}</span>
-                                    <span className="value profit">{tNum("+12%")}</span>
-                                </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                    <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
-                                </div>
+                                {user && (user.role === 'partner' || user.role === 'admin') && (
+                                    <>
+                                        <div className="detail">
+                                            <span className="label">{tText("Profit", "লাভ")}</span>
+                                            <span className="value profit">{tNum("+12%")}</span>
+                                        </div>
+                                        <div className="detail">
+                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
+                                            <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <Link href="/products" className="btn btn-primary btn-block">
-                                {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
                             </Link>
                         </div>
 
@@ -120,17 +126,21 @@ export default function Home() {
                                     <span className="label">{tText("Price", "মূল্য")}</span>
                                     <span className="value">{tNum("৳15,000")}</span>
                                 </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Profit", "লাভ")}</span>
-                                    <span className="value profit">{tNum("+18%")}</span>
-                                </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                    <span className="value">{tNum(45) + " " + tText("days", "দিন")}</span>
-                                </div>
+                                {user && (user.role === 'partner' || user.role === 'admin') && (
+                                    <>
+                                        <div className="detail">
+                                            <span className="label">{tText("Profit", "লাভ")}</span>
+                                            <span className="value profit">{tNum("+18%")}</span>
+                                        </div>
+                                        <div className="detail">
+                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
+                                            <span className="value">{tNum(45) + " " + tText("days", "দিন")}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <Link href="/products" className="btn btn-primary btn-block">
-                                {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
                             </Link>
                         </div>
 
@@ -144,17 +154,21 @@ export default function Home() {
                                     <span className="label">{tText("Price", "মূল্য")}</span>
                                     <span className="value">{tNum("৳10,000")}</span>
                                 </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Profit", "লাভ")}</span>
-                                    <span className="value profit">{tNum("+15%")}</span>
-                                </div>
-                                <div className="detail">
-                                    <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                    <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
-                                </div>
+                                {user && (user.role === 'partner' || user.role === 'admin') && (
+                                    <>
+                                        <div className="detail">
+                                            <span className="label">{tText("Profit", "লাভ")}</span>
+                                            <span className="value profit">{tNum("+15%")}</span>
+                                        </div>
+                                        <div className="detail">
+                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
+                                            <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <Link href="/products" className="btn btn-primary btn-block">
-                                {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
                             </Link>
                         </div>
                     </div>
