@@ -4,22 +4,22 @@
 /* ===== CSS VARIABLES - LIGHT THEME (DEFAULT) ===== */
 :root,
 [data-theme="light"] {
-    /* Primary Colors - Royal Blue & Indigo */
+    /* Primary Colors - Royal Blue & Deep Navy */
     --primary-color: #2563EB;
-    --primary-dark: #4F46E5;
+    --primary-dark: #0B1F3A;
     --primary-light: rgba(37, 99, 235, 0.08);
-    --primary-gradient: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
-    --primary-hover: #4F46E5;
+    --primary-gradient: linear-gradient(135deg, #2563EB 0%, #0B1F3A 100%);
+    --primary-hover: #1d4ed8;
     
     /* Secondary/Accent - Indigo */
-    --accent-color: #4F46E5;
-    --accent-light: rgba(79, 70, 229, 0.08);
+    --accent-color: #2563EB;
+    --accent-light: rgba(37, 99, 235, 0.08);
     
     /* Status Colors - Refined & Calm */
-    --success-color: #10B981;
-    --success-light: rgba(16, 185, 129, 0.08);
-    --warning-color: #F59E0B;
-    --warning-light: rgba(245, 158, 11, 0.08);
+    --success-color: #16A34A;
+    --success-light: rgba(22, 163, 74, 0.08);
+    --warning-color: #F97316;
+    --warning-light: rgba(249, 115, 22, 0.08);
     --danger-color: #EF4444;
     --danger-light: rgba(239, 68, 68, 0.08);
     --info-color: #2563EB;
@@ -29,7 +29,7 @@
     --bg-primary: #F8FAFC;
     --bg-secondary: #F8FAFC;
     --bg-tertiary: #E2E8F0;
-    --bg-dark: #0F172A;
+    --bg-dark: #0B1F3A;
     --bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
     --bg-card: #FFFFFF;
     --bg-hover: #F1F5F9;
@@ -41,25 +41,25 @@
     --text-light: #FFFFFF;
     
     /* Border Colors - Subtle & Clean */
-    --border-color: #E5E7EB;
-    --border-light: #F3F4F6;
+    --border-color: #E2E8F0;
+    --border-light: #F1F5F9;
     --border-focus: #2563EB;
     
     /* Shadow - Soft & Refined */
-    --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.02);
-    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-    --shadow-md: 0 10px 40px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 15px 30px rgba(15, 23, 42, 0.04);
-    --shadow-xl: 0 25px 50px rgba(15, 23, 42, 0.06);
-    --shadow-primary: 0 4px 14px rgba(37, 99, 235, 0.2);
-    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.05);
-    --shadow-card-hover: 0 20px 50px rgba(37, 99, 235, 0.15);
+    --shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.02);
+    --shadow-sm: 0 2px 8px rgba(11, 31, 58, 0.04);
+    --shadow-md: 0 10px 40px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 15px 30px rgba(11, 31, 58, 0.04);
+    --shadow-xl: 0 25px 50px rgba(11, 31, 58, 0.05);
+    --shadow-primary: 0 4px 14px rgba(37, 99, 235, 0.15);
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.03);
+    --shadow-card-hover: 0 20px 50px rgba(37, 99, 235, 0.1);
     
-    /* Border Radius - Smooth & Modern */
-    --radius-sm: 8px;
-    --radius-md: 14px; /* Buttons and Inputs */
-    --radius-lg: 20px; /* Cards */
-    --radius-xl: 20px;
+    /* Border Radius - Brand Design System Rules */
+    --radius-sm: 16px; /* Modals */
+    --radius-md: 12px; /* Buttons and Inputs */
+    --radius-lg: 18px; /* Cards */
+    --radius-xl: 18px;
     --radius-full: 999px; /* Badges */
     
     /* Spacing */

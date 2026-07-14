@@ -7,6 +7,7 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { useCart } from '@/context/CartContext';
 
 // Define the Product interface matching the system
 interface Product {
@@ -115,6 +116,8 @@ export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
     const { user, isAuthenticated, logout } = useAuth();
     const { showToast } = useToast();
+    const ecommerceCart = useCart();
+    const isBuyerStyleCart = !user || user.role === 'buyer';
 
     // Scroll state
     const [scrolled, setScrolled] = useState(false);
@@ -357,12 +360,14 @@ export default function Navbar() {
         <>
             <div className="navbar-floating-wrapper">
                 <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-                    <Link href="/" className="flex items-center gap-2 group cursor-pointer" style={{ textDecoration: 'none' }}>
-                        <div className="relative transform group-hover:scale-105 transition-transform duration-300 flex items-center gap-2">
-                            <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
-                            <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
-                        </div>
-                    </Link>
+                    <div className="navbar-logo-wrapper">
+                        <Link href="/" className="flex items-center gap-2 group cursor-pointer" style={{ textDecoration: 'none' }}>
+                            <div className="relative transform group-hover:scale-105 transition-transform duration-300 flex items-center gap-2">
+                                <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
+                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
+                            </div>
+                        </Link>
+                    </div>
 
                     {/* Desktop Center Navigation Links */}
                     <div className="nav-links-pill">
@@ -460,7 +465,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Right Action Icons Panel */}
-                    <div className="flex items-center gap-2">
+                    <div className="navbar-actions-wrapper">
                         {/* Search Icon */}
                         <button 
                             onClick={() => setSearchOpen(true)}
@@ -541,63 +546,122 @@ export default function Navbar() {
                                 title={tText('Active Cart', 'সক্রিয় কার্ট')}
                             >
                                 <i className="fas fa-shopping-cart"></i>
-                                {cartCount > 0 && (
-                                    <span className="navbar-badge badge-green">{tNum(cartCount)}</span>
+                                {isBuyerStyleCart ? (
+                                    ecommerceCart.cartCount > 0 && (
+                                        <span className="navbar-badge badge-green">{tNum(ecommerceCart.cartCount)}</span>
+                                    )
+                                ) : (
+                                    cartCount > 0 && (
+                                        <span className="navbar-badge badge-green">{tNum(cartCount)}</span>
+                                    )
                                 )}
                             </button>
 
                             {cartOpen && (
                                 <div className="navbar-dropdown w-80">
-                                    <div className="navbar-dropdown-header">{tText('Selected Packages', 'নির্বাচিত প্যাকেজসমূহ')}</div>
-                                    {cartItems.length === 0 ? (
-                                        <div className="p-4 text-center text-xs text-slate-400">
-                                            {tText('No package in cart', 'কার্টে কোনো প্যাকেজ নেই')}
-                                        </div>
-                                    ) : (
-                                        <div className="max-h-64 overflow-y-auto p-1">
-                                            {cartItems.map(item => (
-                                                <div key={item.id} className="flex items-center justify-between p-2 mb-1 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-500">
-                                                            <i className={`fas ${item.image}`}></i>
-                                                        </div>
-                                                        <div className="text-left">
-                                                            <div className="font-semibold text-xs text-slate-800 dark:text-white truncate w-36">{item.name}</div>
-                                                            <div className="text-[10px] text-slate-400">
-                                                                {tText('Profit', 'লাভ')}: <span className="text-emerald-500 font-bold">+{tNum(item.profitPercentage)}%</span> • {tNum(item.duration)} {tText('Days', 'দিন')}
+                                    {isBuyerStyleCart ? (
+                                        <>
+                                            <div className="navbar-dropdown-header">{tText('Shopping Cart', 'শপিং কার্ট')}</div>
+                                            {ecommerceCart.cartItems.length === 0 ? (
+                                                <div className="p-4 text-center text-xs text-slate-400">
+                                                    {tText('No items in cart', 'কার্টে কোনো পণ্য নেই')}
+                                                </div>
+                                            ) : (
+                                                <div className="max-h-64 overflow-y-auto p-1">
+                                                    {ecommerceCart.cartItems.map((item, idx) => (
+                                                        <div key={idx} className="flex items-center justify-between p-2 mb-1 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-8 h-8 rounded bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-500">
+                                                                    <i className={`fas ${item.product.image || 'fa-box'}`}></i>
+                                                                </div>
+                                                                <div className="text-left">
+                                                                    <div className="font-semibold text-xs text-slate-800 dark:text-white truncate w-32">{item.product.name}</div>
+                                                                    <div className="text-[10px] text-slate-400">
+                                                                        {item.color ? `${tText('Color', 'রং')}: ${item.color} • ` : ''}{tText('Qty', 'পরিমাণ')}: {item.quantity}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="text-xs font-bold text-slate-800 dark:text-white">৳{tNum(item.product.price * item.quantity)}</div>
+                                                                <button 
+                                                                    onClick={() => ecommerceCart.removeFromCart(item.product.id, item.color)}
+                                                                    className="text-slate-400 hover:text-red-500 p-1"
+                                                                >
+                                                                    <i className="fas fa-times"></i>
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="text-xs font-bold text-slate-800 dark:text-white">৳{tNum(item.price)}</div>
-                                                        <button 
-                                                            onClick={() => handleRemoveFromCart(item.id, item.name)}
-                                                            className="text-slate-400 hover:text-red-500 p-1"
+                                                    ))}
+                                                    
+                                                    <div className="p-3 bg-slate-50 dark:bg-slate-800/30 rounded-xl mt-2 flex flex-col gap-2">
+                                                        <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                                                            <span>{tText('Total Price', 'মোট মূল্য')}:</span>
+                                                            <span className="text-emerald-500">৳{tNum(ecommerceCart.cartTotal)}</span>
+                                                        </div>
+                                                        <Link 
+                                                            href="/cart" 
+                                                            onClick={() => setCartOpen(false)}
+                                                            className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold text-center no-underline transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/25"
                                                         >
-                                                            <i className="fas fa-times"></i>
+                                                            {tText('Go to Cart', 'কার্টে যান')}
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="navbar-dropdown-header">{tText('Selected Packages', 'নির্বাচিত প্যাকেজসমূহ')}</div>
+                                            {cartItems.length === 0 ? (
+                                                <div className="p-4 text-center text-xs text-slate-400">
+                                                    {tText('No package in cart', 'কার্টে কোনো প্যাকেজ নেই')}
+                                                </div>
+                                            ) : (
+                                                <div className="max-h-64 overflow-y-auto p-1">
+                                                    {cartItems.map(item => (
+                                                        <div key={item.id} className="flex items-center justify-between p-2 mb-1 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-8 h-8 rounded bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-500">
+                                                                    <i className={`fas ${item.image}`}></i>
+                                                                </div>
+                                                                <div className="text-left">
+                                                                    <div className="font-semibold text-xs text-slate-800 dark:text-white truncate w-36">{item.name}</div>
+                                                                    <div className="text-[10px] text-slate-400">
+                                                                        {tText('Profit', 'লাভ')}: <span className="text-emerald-500 font-bold">+{tNum(item.profitPercentage)}%</span> • {tNum(item.duration)} {tText('Days', 'দিন')}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="text-xs font-bold text-slate-800 dark:text-white">৳{tNum(item.price)}</div>
+                                                                <button 
+                                                                    onClick={() => handleRemoveFromCart(item.id, item.name)}
+                                                                    className="text-slate-400 hover:text-red-500 p-1"
+                                                                >
+                                                                    <i className="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    
+                                                    <div className="p-3 bg-slate-50 dark:bg-slate-800/30 rounded-xl mt-2 flex flex-col gap-2">
+                                                        <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                                                            <span>{tText('Total Investment', 'মোট বিনিয়োগ')}:</span>
+                                                            <span className="text-emerald-500">৳{tNum(cartItems.reduce((acc, curr) => acc + curr.price, 0))}</span>
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => {
+                                                                if (cartItems.length > 0) {
+                                                                    handleInvestFromNavbar(cartItems[0]);
+                                                                }
+                                                            }}
+                                                            className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/25"
+                                                        >
+                                                            {tText('Confirm Investment', 'বিনিয়োগ নিশ্চিত করুন')}
                                                         </button>
                                                     </div>
                                                 </div>
-                                            ))}
-                                            
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-800/30 rounded-xl mt-2 flex flex-col gap-2">
-                                                <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
-                                                    <span>{tText('Total Investment', 'মোট বিনিয়োগ')}:</span>
-                                                    <span className="text-emerald-500">৳{tNum(cartItems.reduce((acc, curr) => acc + curr.price, 0))}</span>
-                                                </div>
-                                                <button 
-                                                    onClick={() => {
-                                                        // Checkout first item in cart as simulation
-                                                        if (cartItems.length > 0) {
-                                                            handleInvestFromNavbar(cartItems[0]);
-                                                        }
-                                                    }}
-                                                    className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/25"
-                                                >
-                                                    {tText('Confirm Investment', 'বিনিয়োগ নিশ্চিত করুন')}
-                                                </button>
-                                            </div>
-                                        </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -629,27 +693,42 @@ export default function Navbar() {
                                                 </div>
                                             </div>
 
-                                            <Link href="/dashboard" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
-                                                <i className="fas fa-tachometer-alt text-emerald-500"></i>
-                                                <span>{tText('Dashboard', 'ড্যাশবোর্ড')}</span>
-                                            </Link>
-                                            
-                                            {user.role === 'admin' && (
-                                                <Link href="/admin" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
-                                                    <i className="fas fa-user-shield text-emerald-500"></i>
-                                                    <span>{tText('Admin Panel', 'অ্যাডমিন প্যানেল')}</span>
-                                                </Link>
+                                            {user.role === 'buyer' ? (
+                                                <>
+                                                    <Link href="/buyer/dashboard" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                        <i className="fas fa-shopping-bag text-emerald-500"></i>
+                                                        <span>{tText('My Orders', 'আমার অর্ডারসমূহ')}</span>
+                                                    </Link>
+                                                    <Link href="/cart" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                        <i className="fas fa-shopping-cart text-emerald-500"></i>
+                                                        <span>{tText('My Cart', 'আমার কার্ট')}</span>
+                                                    </Link>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Link href="/dashboard" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                        <i className="fas fa-tachometer-alt text-emerald-500"></i>
+                                                        <span>{tText('Dashboard', 'ড্যাশবোর্ড')}</span>
+                                                    </Link>
+                                                    
+                                                    {user.role === 'admin' && (
+                                                        <Link href="/admin" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                            <i className="fas fa-user-shield text-emerald-500"></i>
+                                                            <span>{tText('Admin Panel', 'অ্যাডমিন প্যানেল')}</span>
+                                                        </Link>
+                                                    )}
+
+                                                    <Link href="/dashboard/investments" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                        <i className="fas fa-chart-line text-emerald-500"></i>
+                                                        <span>{tText('My Investments', 'আমার বিনিয়োগ')}</span>
+                                                    </Link>
+
+                                                    <Link href="/dashboard/wallet" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                        <i className="fas fa-wallet text-emerald-500"></i>
+                                                        <span>{tText('Deposit / Withdraw', 'জমা / উত্তোলন')}</span>
+                                                    </Link>
+                                                </>
                                             )}
-
-                                            <Link href="/dashboard/investments" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
-                                                <i className="fas fa-chart-line text-emerald-500"></i>
-                                                <span>{tText('My Investments', 'আমার বিনিয়োগ')}</span>
-                                            </Link>
-
-                                            <Link href="/dashboard/wallet" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
-                                                <i className="fas fa-wallet text-emerald-500"></i>
-                                                <span>{tText('Deposit / Withdraw', 'জমা / উত্তোলন')}</span>
-                                            </Link>
                                         </>
                                     ) : (
                                         <>
@@ -901,11 +980,11 @@ export default function Navbar() {
                             {isAuthenticated ? (
                                 <div className="flex flex-col gap-2">
                                     <Link 
-                                        href="/dashboard" 
+                                        href={user?.role === 'buyer' ? '/buyer/dashboard' : '/dashboard'} 
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold text-center text-sm no-underline shadow-md hover:bg-emerald-600"
                                     >
-                                        {tText('Go to Dashboard', 'ড্যাশবোর্ডে যান')}
+                                        {user?.role === 'buyer' ? tText('My Orders', 'আমার অর্ডারসমূহ') : tText('Go to Dashboard', 'ড্যাশবোর্ডে যান')}
                                     </Link>
                                     <button 
                                         onClick={() => {

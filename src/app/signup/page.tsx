@@ -23,6 +23,7 @@ function SignupContent() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [referralCode, setReferralCode] = useState('');
+    const [role, setRole] = useState('user');
     const [agreeTerms, setAgreeTerms] = useState(false);
     
     // UI controls state
@@ -45,7 +46,13 @@ function SignupContent() {
 
     useEffect(() => {
         if (user) {
-            router.push(user.role === 'admin' ? '/admin' : '/dashboard');
+            if (user.role === 'admin') {
+                router.push('/admin');
+            } else if (user.role === 'buyer') {
+                router.push('/buyer/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
         }
     }, [user, router]);
 
@@ -104,7 +111,8 @@ function SignupContent() {
                 phone: phone.trim(),
                 email: email.trim().toLowerCase(),
                 password,
-                referralCode: referralCode.trim()
+                referralCode: referralCode.trim(),
+                role
             };
 
             const res = await signup(formData);
@@ -497,6 +505,31 @@ function SignupContent() {
                                             <i className={`fas ${showConfirmPass ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="auth-input-group">
+                                <label htmlFor="roleSelect">{tText("Account Type", "অ্যাকাউন্টের ধরন")}</label>
+                                <div className="auth-input-wrap">
+                                    <i className="fas fa-users field-icon"></i>
+                                    <select
+                                        id="roleSelect"
+                                        value={role}
+                                        onChange={e => setRole(e.target.value)}
+                                        style={{ 
+                                            width: '100%', 
+                                            padding: '12px 12px 12px 40px', 
+                                            border: '1px solid var(--border-color)', 
+                                            borderRadius: '8px', 
+                                            background: 'var(--bg-secondary)', 
+                                            color: 'var(--text-primary)', 
+                                            outline: 'none',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        <option value="user" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{tText("Investor / Package Holder", "বিনিয়োগকারী / প্যাকেজ হোল্ডার")}</option>
+                                        <option value="buyer" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{tText("Buyer (Shop & Order)", "ক্রেতা (পণ্য ও অর্ডার)")}</option>
+                                    </select>
                                 </div>
                             </div>
 

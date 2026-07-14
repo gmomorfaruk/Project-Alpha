@@ -9,6 +9,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
   title: "SmartEarnBD - Investment Platform",
@@ -34,7 +35,9 @@ export default function RootLayout({
           <LanguageProvider>
             <ToastProvider>
               <AuthProvider>
-                {children}
+                <CartProvider>
+                  {children}
+                </CartProvider>
               </AuthProvider>
             </ToastProvider>
           </LanguageProvider>

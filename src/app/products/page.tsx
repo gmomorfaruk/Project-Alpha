@@ -8,10 +8,12 @@ import Storage from '@/lib/storage';
 import { Product, defaultProducts as defaultProductsList } from '@/lib/products';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { useCart } from '@/context/CartContext';
 import db from '@/lib/database';
 
 export default function ProductsPage() {
-    const { t, tText } = useTranslation();
+    const { lang, t, tText } = useTranslation();
+    const ecommerceCart = useCart();
     const { user } = useAuth();
     const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
@@ -543,7 +545,7 @@ export default function ProductsPage() {
                                                 <i className={`fas ${stockIcon}`}></i>
                                                 <span>{stockText}</span>
                                             </div>
-                                            <div className="product-footer" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <div className="product-footer">
                                                  {product.stock === 0 ? (
                                                      <button className="btn btn-primary btn-block" disabled>
                                                          {tText("Out of Stock", "স্টক শেষ")}
@@ -553,29 +555,45 @@ export default function ProductsPage() {
                                                          {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
                                                      </Link>
                                                  ) : (
-                                                     <>
-                                                         <button 
-                                                             className="btn btn-primary btn-block"
-                                                             onClick={() => {
-                                                                 setCheckoutProduct(product);
-                                                                 setOrderQty(1);
-                                                                 setOrderColor(product.colors && product.colors.length > 0 ? product.colors[0] : '');
-                                                                 setCustName('');
-                                                                 setCustPhone('');
-                                                                 setCustAddress('');
-                                                                 setTransactionId('');
-                                                                 setCheckoutOpen(true);
-                                                             }}
-                                                         >
-                                                             <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i>
-                                                             {tText("Order Now", "এখনই অর্ডার করুন")}
-                                                         </button>
+                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                         <div style={{ display: 'flex', gap: '8px' }}>
+                                                             <button 
+                                                                 className="btn btn-primary"
+                                                                 style={{ flex: 1 }}
+                                                                 onClick={() => {
+                                                                     setCheckoutProduct(product);
+                                                                     setOrderQty(1);
+                                                                     setOrderColor(product.colors && product.colors.length > 0 ? product.colors[0] : '');
+                                                                     setCheckoutOpen(true);
+                                                                 }}
+                                                             >
+                                                                 <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i>
+                                                                 {tText("Buy Now", "কিনুন")}
+                                                             </button>
+                                                             <button 
+                                                                 className="btn btn-outline"
+                                                                 style={{ 
+                                                                     flex: 1, 
+                                                                     borderColor: 'var(--primary-color)', 
+                                                                     color: 'var(--primary-color)',
+                                                                     background: 'none'
+                                                                 }}
+                                                                 onClick={() => {
+                                                                     const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : undefined;
+                                                                     ecommerceCart.addToCart(product, 1, defaultColor);
+                                                                     showToast(lang === 'bn' ? `${product.name} কার্টে যোগ করা হয়েছে` : `${product.name} added to cart`, 'success');
+                                                                 }}
+                                                             >
+                                                                 <i className="fas fa-cart-plus" style={{ marginRight: '6px' }}></i>
+                                                                 {tText("Add to Cart", "কার্ট")}
+                                                             </button>
+                                                         </div>
                                                          <div style={{ textAlign: 'center', marginTop: '4px' }}>
                                                              <Link href="/signup" style={{ fontSize: '11px', color: 'var(--primary-color)', textDecoration: 'none' }}>
                                                                  {tText("Earn money from this product? Become a Partner", "এই পণ্য থেকে টাকা আয় করতে চান? পার্টনার হোন")}
                                                              </Link>
                                                          </div>
-                                                     </>
+                                                     </div>
                                                  )}
                                             </div>
                                         </div>

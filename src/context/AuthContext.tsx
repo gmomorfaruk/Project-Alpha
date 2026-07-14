@@ -176,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signup = async (formData: any) => {
         try {
-            const { email, fullName, phone, password, referralCode } = formData;
+            const { email, fullName, phone, password, referralCode, role } = formData;
             let users = Storage.get('users') || [];
 
             if (Storage.isCloudConnected()) {
@@ -197,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 phone,
                 email,
                 password,
-                role: 'user',
+                role: role || 'user',
                 isLoggedIn: true,
                 balance: 0,
                 points: 0,

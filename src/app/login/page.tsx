@@ -37,7 +37,13 @@ export default function LoginPage() {
     useEffect(() => {
         setMounted(true);
         if (user) {
-            router.push(user.role === 'admin' ? '/admin' : '/dashboard');
+            if (user.role === 'admin') {
+                router.push('/admin');
+            } else if (user.role === 'buyer') {
+                router.push('/buyer/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
         }
     }, [user, router]);
 
@@ -55,7 +61,13 @@ export default function LoginPage() {
             if (res.success) {
                 showToast('Login successful! Redirecting...', 'success');
                 setTimeout(() => {
-                    router.push(res.role === 'admin' ? '/admin' : '/dashboard');
+                    if (res.role === 'admin') {
+                        router.push('/admin');
+                    } else if (res.role === 'buyer') {
+                        router.push('/buyer/dashboard');
+                    } else {
+                        router.push('/dashboard');
+                    }
                 }, 1000);
             } else {
                 showToast(res.message, 'error');

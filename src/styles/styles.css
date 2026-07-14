@@ -1612,6 +1612,10 @@ textarea::placeholder {
 }
 
 .navbar {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
     pointer-events: auto;
     display: flex;
     align-items: center;
@@ -1621,17 +1625,33 @@ textarea::placeholder {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(229, 231, 235, 0.4);
+    border: 1px solid rgba(15, 23, 42, 0.15);
     border-radius: 999px;
     padding: 10px 24px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.navbar-logo-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.navbar-actions-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.85);
     box-shadow: 0 12px 40px rgba(16, 185, 129, 0.06), 0 2px 4px rgba(0, 0, 0, 0.02);
-    border-color: rgba(16, 185, 129, 0.15);
+    border-color: rgba(15, 23, 42, 0.18);
 }
 
 [data-theme="dark"] .navbar {
