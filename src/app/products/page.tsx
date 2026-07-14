@@ -33,6 +33,69 @@ export default function ProductsPage() {
     const [transactionId, setTransactionId] = useState('');
     const [submittingOrder, setSubmittingOrder] = useState(false);
 
+    // Product Details states
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const [selectedDetailsProduct, setSelectedDetailsProduct] = useState<Product | null>(null);
+    const [detailsQty, setDetailsQty] = useState(1);
+    const [detailsColor, setDetailsColor] = useState('');
+
+    const openProductDetails = (product: Product) => {
+        setSelectedDetailsProduct(product);
+        setDetailsQty(1);
+        setDetailsColor(product.colors && product.colors.length > 0 ? product.colors[0] : '');
+        setDetailsOpen(true);
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            url.searchParams.set('productId', product.id);
+            window.history.pushState({}, '', url.toString());
+        }
+    };
+
+    const closeProductDetails = () => {
+        setDetailsOpen(false);
+        setSelectedDetailsProduct(null);
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('productId');
+            window.history.pushState({}, '', url.toString());
+        }
+    };
+
+    // Wishlist state and handlers
+    const [wishlist, setWishlist] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            setWishlist(storedWishlist.map(String));
+        }
+    }, []);
+
+    useEffect(() => {
+        const updateListener = () => {
+            const storedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            setWishlist(storedWishlist.map(String));
+        };
+        window.addEventListener('wishlist-updated', updateListener);
+        return () => window.removeEventListener('wishlist-updated', updateListener);
+    }, []);
+
+    const handleToggleWishlist = (productId: string, productName: string) => {
+        const stored = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        const stringId = String(productId);
+        let updated = [];
+        if (stored.map(String).includes(stringId)) {
+            updated = stored.filter((id: any) => String(id) !== stringId);
+            showToast(lang === 'bn' ? `${productName} পছন্দের তালিকা থেকে সরানো হয়েছে` : `${productName} removed from wishlist`, 'info');
+        } else {
+            updated = [...stored, stringId];
+            showToast(lang === 'bn' ? `${productName} পছন্দের তালিকায় যোগ করা হয়েছে` : `${productName} added to wishlist`, 'success');
+        }
+        localStorage.setItem('wishlist', JSON.stringify(updated));
+        setWishlist(updated);
+        window.dispatchEvent(new Event('wishlist-updated'));
+    };
+
     const handlePlaceOrder = (e: React.FormEvent) => {
         e.preventDefault();
         if (!checkoutProduct) return;
@@ -122,6 +185,22 @@ export default function ProductsPage() {
             }
         }
     }, []);
+
+    useEffect(() => {
+        if (products.length > 0 && typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const prodId = params.get('productId');
+            if (prodId) {
+                const found = products.find(p => p.id === prodId);
+                if (found) {
+                    setSelectedDetailsProduct(found);
+                    setDetailsQty(1);
+                    setDetailsColor(found.colors && found.colors.length > 0 ? found.colors[0] : '');
+                    setDetailsOpen(true);
+                }
+            }
+        }
+    }, [products]);
 
     useEffect(() => {
         if (!mounted) return;
@@ -444,10 +523,10 @@ export default function ProductsPage() {
 
                                 return (
                                     <div key={product.id} className={`product-card ${product.stock === 0 ? 'out-of-stock' : ''}`}>
-                                        <div className="product-image-container">
+                                        <div className="product-image-container" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => openProductDetails(product)}>
                                             <i className={`fas ${product.image || 'fa-box'}`}></i>
-                                            <div className="product-badges">
-                                                {hasOffer ? (
+                                            <div className="product-badges" style={{ display: 'flex', gap: '6px', left: '15px', top: '15px', position: 'absolute' }}>
+                                                {hasOffer && (
                                                     <span className="prod-badge badge-offer" style={{ 
                                                         background: offerColor, 
                                                         color: 'white',
@@ -461,14 +540,40 @@ export default function ProductsPage() {
                                                     }}>
                                                         {offerText}
                                                     </span>
-                                                ) : (
-                                                    <span></span>
                                                 )}
-                                                <span className="prod-badge badge-category">{product.category}</span>
+                                                <span className="prod-badge badge-category" style={{ background: 'var(--bg-primary)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }}>{product.category}</span>
                                             </div>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleWishlist(product.id, product.name);
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '15px',
+                                                    right: '15px',
+                                                    background: 'rgba(255, 255, 255, 0.85)',
+                                                    backdropFilter: 'blur(4px)',
+                                                    border: '1px solid rgba(255,255,255,0.3)',
+                                                    borderRadius: '50%',
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    cursor: 'pointer',
+                                                    color: wishlist.includes(product.id) ? '#ef4444' : '#64748b',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                                    zIndex: 10,
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                                title={tText("Add to Wishlist", "পছন্দের তালিকায় যোগ করুন")}
+                                            >
+                                                <i className={`${wishlist.includes(product.id) ? 'fas' : 'far'} fa-heart`} style={{ fontSize: '14px' }}></i>
+                                            </button>
                                         </div>
                                         <div className="product-content">
-                                            <h3 className="product-title">{product.name}</h3>
+                                            <h3 className="product-title" style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => openProductDetails(product)}>{product.name}</h3>
                                             
                                             {/* Description */}
                                             <p className="product-card-desc" style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 15px 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: '36px', lineBreak: 'anywhere' }}>
@@ -541,9 +646,19 @@ export default function ProductsPage() {
                                                      </>
                                                  )}
                                             </div>
-                                            <div className={`stock-info ${stockClass}`}>
-                                                <i className={`fas ${stockIcon}`}></i>
-                                                <span>{stockText}</span>
+                                            <div className={`stock-info ${stockClass}`} style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <i className={`fas ${stockIcon}`}></i>
+                                                    <span>{stockText}</span>
+                                                </div>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => openProductDetails(product)}
+                                                    style={{ background: 'none', border: 'none', color: 'var(--primary-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: 0 }}
+                                                >
+                                                    <i className="fas fa-eye"></i>
+                                                    {tText("View Details", "বিস্তারিত")}
+                                                </button>
                                             </div>
                                             <div className="product-footer">
                                                  {product.stock === 0 ? (
@@ -604,6 +719,232 @@ export default function ProductsPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Product Details Modal */}
+            {detailsOpen && selectedDetailsProduct && (() => {
+                const product = selectedDetailsProduct;
+                const hasDiscount = !!(product.previousPrice && product.previousPrice > product.price);
+                const discountPercentage = hasDiscount 
+                    ? Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)
+                    : 0;
+                const discountSavings = hasDiscount 
+                    ? product.previousPrice! - product.price 
+                    : 0;
+                const selfSellProfit = Math.round(product.returnRate * 1.25);
+                const isOutOfStock = product.stock === 0;
+
+                return (
+                    <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+                        <div className="modal" style={{ maxWidth: '600px', width: '100%', background: 'var(--bg-primary, #0f1c30)', border: '1px solid var(--border-color, #1e2d4a)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+                            <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h3 style={{ margin: 0, color: 'white' }}>{tText("Product Details", "পণ্যের বিবরণ")}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleToggleWishlist(product.id, product.name)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: wishlist.includes(product.id) ? '#ef4444' : 'var(--text-secondary)',
+                                            cursor: 'pointer',
+                                            fontSize: '18px',
+                                            padding: 0,
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                        title={tText("Wishlist", "পছন্দের তালিকা")}
+                                    >
+                                        <i className={`${wishlist.includes(product.id) ? 'fas' : 'far'} fa-heart`}></i>
+                                    </button>
+                                    <button className="modal-close" onClick={closeProductDetails} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '18px', padding: 0, display: 'flex', alignItems: 'center' }}>
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div className="modal-body" style={{ padding: '20px', maxHeight: '70vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {/* Image and main pricing/category */}
+                                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                                    <div style={{ width: '120px', height: '120px', borderRadius: '12px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px', color: 'var(--primary-color)', flexShrink: 0, border: '1px solid var(--border-color)' }}>
+                                        <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '200px' }}>
+                                        <span className="prod-badge badge-category" style={{ width: 'fit-content', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>
+                                            {product.category}
+                                        </span>
+                                        <h4 style={{ margin: 0, fontSize: '20px', color: 'white', fontWeight: 600 }}>{product.name}</h4>
+                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '4px' }}>
+                                            <span style={{ fontSize: '22px', fontWeight: 700, color: '#10b981' }}>৳{product.price.toLocaleString()}</span>
+                                            {hasDiscount && (
+                                                <>
+                                                    <span style={{ fontSize: '16px', textDecoration: 'line-through', color: 'var(--text-secondary)' }}>
+                                                        ৳{product.previousPrice!.toLocaleString()}
+                                                    </span>
+                                                    <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 600, background: 'rgba(239, 68, 68, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                                                        {discountPercentage}% OFF
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                        {hasDiscount && (
+                                            <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 600 }}>
+                                                {tText(`You save ৳${discountSavings.toLocaleString()}`, `আপনার সাশ্রয় ৳${discountSavings.toLocaleString()}`)}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '15px' }}>
+                                    <h5 style={{ margin: '0 0 8px 0', color: 'white', fontSize: '14px', fontWeight: 600 }}>{tText("Description", "বর্ণনা")}</h5>
+                                    <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                        {product.description}
+                                    </p>
+                                </div>
+
+                                {/* Product Specifications or Options */}
+                                {product.colors && product.colors.length > 0 && (
+                                    <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '15px' }}>
+                                        <label style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
+                                            {tText("Select Color", "রং নির্বাচন করুন")}
+                                        </label>
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            {product.colors.map((color, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    type="button"
+                                                    onClick={() => setDetailsColor(color)}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        borderRadius: '20px',
+                                                        border: '1px solid',
+                                                        borderColor: detailsColor === color ? 'var(--primary-color)' : 'var(--border-color)',
+                                                        background: detailsColor === color ? 'var(--primary-light)' : 'none',
+                                                        color: detailsColor === color ? 'white' : 'var(--text-secondary)',
+                                                        fontSize: '12px',
+                                                        cursor: 'pointer',
+                                                        fontWeight: detailsColor === color ? 600 : 400
+                                                    }}
+                                                >
+                                                    {color}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Stock & Investment Stats (Only for partners/admins) */}
+                                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{tText("Availability", "উপলব্ধতা")}</span>
+                                        <span style={{ 
+                                            fontSize: '13px', 
+                                            fontWeight: 600, 
+                                            color: isOutOfStock ? '#ef4444' : product.stock < 10 ? '#f59e0b' : '#10b981' 
+                                        }}>
+                                            {isOutOfStock ? tText("Out of Stock", "স্টক শেষ") : tText(`${product.stock} units in stock`, `${product.stock}টি স্টকে আছে`)}
+                                        </span>
+                                    </div>
+
+                                    {user && (user.role === 'partner' || user.role === 'admin') && (
+                                        <div style={{ background: 'var(--bg-secondary)', padding: '15px', borderRadius: '10px', border: '1px solid var(--border-color)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                            <div>
+                                                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Auto-Sell Return", "অটো-সেল লাভ")}</span>
+                                                <div style={{ fontSize: '16px', fontWeight: 700, color: '#10b981', marginTop: '4px' }}>+{product.returnRate}%</div>
+                                            </div>
+                                            <div>
+                                                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Self-Sell Return", "সেলফ-সেল লাভ")}</span>
+                                                <div style={{ fontSize: '16px', fontWeight: 700, color: '#10b981', marginTop: '4px' }}>+{selfSellProfit}%</div>
+                                            </div>
+                                            <div style={{ gridColumn: 'span 2' }}>
+                                                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{tText("Investment Duration", "বিনিয়োগের সময়কাল")}</span>
+                                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'white', marginTop: '4px' }}>{product.duration} {tText("days", "দিন")}</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Quantity Selector (Only for non-partners or when buying) */}
+                                {(!user || (user.role !== 'partner' && user.role !== 'admin')) && !isOutOfStock && (
+                                    <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{tText("Quantity", "পরিমাণ")}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setDetailsQty(Math.max(1, detailsQty - 1))}
+                                                style={{ width: '32px', height: '32px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                            >
+                                                -
+                                            </button>
+                                            <span style={{ fontSize: '16px', fontWeight: 600, color: 'white', minWidth: '20px', textAlign: 'center' }}>{detailsQty}</span>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setDetailsQty(Math.min(product.stock, detailsQty + 1))}
+                                                style={{ width: '32px', height: '32px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="modal-footer" style={{ padding: '20px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '10px' }}>
+                                <button type="button" className="btn btn-outline" onClick={closeProductDetails} style={{ flex: 1 }}>
+                                    {tText("Close", "বন্ধ করুন")}
+                                </button>
+                                
+                                {isOutOfStock ? (
+                                    <button className="btn btn-primary" style={{ flex: 1 }} disabled>
+                                        {tText("Out of Stock", "স্টক নেই")}
+                                    </button>
+                                ) : user && (user.role === 'partner' || user.role === 'admin') ? (
+                                    <Link 
+                                        href="/dashboard/products" 
+                                        className="btn btn-primary" 
+                                        style={{ flex: 1, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        onClick={closeProductDetails}
+                                    >
+                                        <i className="fas fa-chart-line" style={{ marginRight: '6px' }}></i>
+                                        {tText("Invest Now", "বিনিয়োগ করুন")}
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-outline" 
+                                            style={{ flex: 1, borderColor: 'var(--primary-color)', color: 'var(--primary-color)', background: 'none' }}
+                                            onClick={() => {
+                                                ecommerceCart.addToCart(product, detailsQty, detailsColor || undefined);
+                                                showToast(lang === 'bn' ? `${product.name} কার্টে যোগ করা হয়েছে` : `${product.name} added to cart`, 'success');
+                                                closeProductDetails();
+                                            }}
+                                        >
+                                            <i className="fas fa-cart-plus" style={{ marginRight: '6px' }}></i>
+                                            {tText("Add to Cart", "কার্ট")}
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-primary" 
+                                            style={{ flex: 1 }}
+                                            onClick={() => {
+                                                closeProductDetails();
+                                                setCheckoutProduct(product);
+                                                setOrderQty(detailsQty);
+                                                setOrderColor(detailsColor);
+                                                setCheckoutOpen(true);
+                                            }}
+                                        >
+                                            <i className="fas fa-shopping-bag" style={{ marginRight: '6px' }}></i>
+                                            {tText("Buy Now", "কিনুন")}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Guest Checkout Modal */}
             {checkoutOpen && checkoutProduct && (

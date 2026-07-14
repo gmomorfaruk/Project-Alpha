@@ -8,20 +8,22 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useCart } from '@/context/CartContext';
+import Storage from '@/lib/storage';
+import { defaultProducts as defaultProductsList } from '@/lib/products';
 
 // Define the Product interface matching the system
 interface Product {
-    id: number;
+    id: any;
     name: string;
     category: string;
     price: number;
     profitPercentage: number;
-    selfSellProfit: number;
+    selfSellProfit?: number;
     duration: number;
     stock: number;
-    image: string;
-    isActive: boolean;
-    hasOffer: boolean;
+    image?: string;
+    isActive?: boolean;
+    hasOffer?: boolean;
     offerText?: string;
 }
 
@@ -161,15 +163,40 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const getSystemProducts = (): Product[] => {
+        if (typeof window === 'undefined') return [];
+        const list = Storage.get('products') || defaultProductsList;
+        return list.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            category: p.category,
+            price: p.price,
+            profitPercentage: p.returnRate,
+            selfSellProfit: Math.round(p.returnRate * 1.25),
+            duration: p.duration,
+            stock: p.stock,
+            image: p.image || 'fa-box',
+            isActive: p.active,
+            hasOffer: p.hasOffer || !!(p.previousPrice && p.previousPrice > p.price),
+            offerText: p.offerText || (p.previousPrice && p.previousPrice > p.price ? `${Math.round(((p.previousPrice - p.price) / p.previousPrice) * 100)}% OFF` : '')
+        }));
+    };
+
     // Load wishlist & cart from localStorage
     const loadWishlistAndCart = () => {
         try {
             const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const sysProducts = getSystemProducts();
             
             // Map IDs back to full products
-            const fullWishlist = sampleProducts.filter(p => wishlist.includes(p.id));
-            const fullCart = sampleProducts.filter(p => cart.includes(p.id));
+            const fullWishlist = sysProducts.filter(p => wishlist.map(String).includes(String(p.id)));
+            const fullCart = sysProducts.filter(p => cart.map((item: any) => {
+                if (typeof item === 'object' && item !== null && item.product) {
+                    return String(item.product.id);
+                }
+                return String(item);
+            }).includes(String(p.id)));
 
             setWishlistItems(fullWishlist);
             setWishlistCount(fullWishlist.length);
@@ -232,7 +259,8 @@ export default function Navbar() {
             setSearchResults([]);
             return;
         }
-        const filtered = sampleProducts.filter(product =>
+        const sysProducts = getSystemProducts();
+        const filtered = sysProducts.filter(product =>
             product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             product.category.toLowerCase().includes(searchQuery.toLowerCase())
         );
@@ -240,15 +268,16 @@ export default function Navbar() {
     }, [searchQuery]);
 
     // Handle item add/remove actions
-    const toggleWishlistItem = (id: number, name: string) => {
+    const toggleWishlistItem = (id: any, name: string) => {
         try {
             const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            const stringId = String(id);
             let nextWishlist = [];
-            if (wishlist.includes(id)) {
-                nextWishlist = wishlist.filter((item: number) => item !== id);
+            if (wishlist.map(String).includes(stringId)) {
+                nextWishlist = wishlist.filter((item: any) => String(item) !== stringId);
                 showToast(lang === 'bn' ? `${name} পছন্দের তালিকা থেকে সরানো হয়েছে` : `${name} removed from wishlist`, 'info');
             } else {
-                nextWishlist = [...wishlist, id];
+                nextWishlist = [...wishlist, stringId];
                 showToast(lang === 'bn' ? `${name} পছন্দের তালিকায় যোগ করা হয়েছে` : `${name} added to wishlist`, 'success');
             }
             localStorage.setItem('wishlist', JSON.stringify(nextWishlist));
@@ -258,10 +287,16 @@ export default function Navbar() {
         }
     };
 
-    const handleRemoveFromCart = (id: number, name: string) => {
+    const handleRemoveFromCart = (id: any, name: string) => {
         try {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const nextCart = cart.filter((item: number) => item !== id);
+            const stringId = String(id);
+            const nextCart = cart.filter((item: any) => {
+                if (typeof item === 'object' && item !== null && item.product) {
+                    return String(item.product.id) !== stringId;
+                }
+                return String(item) !== stringId;
+            });
             localStorage.setItem('cart', JSON.stringify(nextCart));
             showToast(lang === 'bn' ? `${name} কার্ট থেকে সরানো হয়েছে` : `${name} removed from cart`, 'info');
             window.dispatchEvent(new Event('cart-updated'));

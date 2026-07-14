@@ -5,14 +5,30 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/context/AuthContext';
+import Storage from '@/lib/storage';
+import { Product, defaultProducts as defaultProductsList } from '@/lib/products';
+import { useCart } from '@/context/CartContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function Home() {
-    const { t, tText, tNum } = useTranslation();
+    const { lang, t, tText, tNum } = useTranslation();
     const { user } = useAuth();
+    const ecommerceCart = useCart();
+    const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
 
     useEffect(() => {
         setMounted(true);
+        // Force reset products list to load updated discounts
+        const hasReset = Storage.get('products_reset_v5');
+        let list = Storage.get('products');
+        if (!hasReset || !list || !Array.isArray(list) || list.length === 0) {
+            list = defaultProductsList;
+            Storage.set('products', list);
+            Storage.set('products_reset_v5', true);
+        }
+        setProducts(list.slice(0, 3));
     }, []);
 
     if (!mounted) return null;
@@ -86,91 +102,101 @@ export default function Home() {
                         <p>{tText("Choose from our carefully selected investment products", "আমাদের যত্ন সহকারে নির্বাচিত বিনিয়োগ পণ্য থেকে বেছে নিন")}</p>
                     </div>
                     <div className="products-grid">
-                        <div className="product-card">
-                            <div className="product-badge">{tText("Hot", "হট")}</div>
-                            <div className="product-image">
-                                <i className="fas fa-mobile-alt"></i>
-                            </div>
-                            <h3>{tText("Smartphone Package", "স্মার্টফোন প্যাকেজ")}</h3>
-                            <div className="product-details">
-                                <div className="detail">
-                                    <span className="label">{tText("Price", "মূল্য")}</span>
-                                    <span className="value">{tNum("৳5,000")}</span>
-                                </div>
-                                {user && (user.role === 'partner' || user.role === 'admin') && (
-                                    <>
-                                        <div className="detail">
-                                            <span className="label">{tText("Profit", "লাভ")}</span>
-                                            <span className="value profit">{tNum("+12%")}</span>
-                                        </div>
-                                        <div className="detail">
-                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                            <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <Link href="/products" className="btn btn-primary btn-block">
-                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
-                            </Link>
-                        </div>
+                        {products.map((product, idx) => {
+                            const hasDiscount = !!(product.previousPrice && product.previousPrice > product.price);
+                            const discountPercentage = hasDiscount 
+                                ? Math.round(((product.previousPrice! - product.price) / product.previousPrice!) * 100)
+                                : 0;
+                            
+                            // Determine badge based on index or discounts
+                            const badgeText = idx === 0 
+                                ? tText("Hot", "হট") 
+                                : hasDiscount 
+                                    ? tText(`${discountPercentage}% OFF`, `${discountPercentage}% ছাড়`) 
+                                    : tText("Featured", "ফিচার্ড");
+                            
+                            const isFeaturedCard = idx === 1;
 
-                        <div className="product-card featured">
-                            <div className="product-badge special">{tText("Special Offer", "বিশেষ অফার")}</div>
-                            <div className="product-image">
-                                <i className="fas fa-laptop"></i>
-                            </div>
-                            <h3>{tText("Laptop Package", "ল্যাপটপ প্যাকেজ")}</h3>
-                            <div className="product-details">
-                                <div className="detail">
-                                    <span className="label">{tText("Price", "মূল্য")}</span>
-                                    <span className="value">{tNum("৳15,000")}</span>
+                            return (
+                                <div key={product.id} className={`product-card ${isFeaturedCard ? 'featured' : ''}`}>
+                                    <div className="product-badge">
+                                        {badgeText}
+                                    </div>
+                                    <div className="product-image" style={{ cursor: 'pointer' }}>
+                                        <Link href={`/products?productId=${product.id}`}>
+                                            <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                        </Link>
+                                    </div>
+                                    <h3 style={{ cursor: 'pointer' }}>
+                                        <Link href={`/products?productId=${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            {product.name}
+                                        </Link>
+                                    </h3>
+                                    <div className="product-details">
+                                        <div className="detail">
+                                            <span className="label">{tText("Price", "মূল্য")}</span>
+                                            <span className="value" style={{ color: '#10b981', fontWeight: 700 }}>
+                                                ৳{product.price.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        {user && (user.role === 'partner' || user.role === 'admin') ? (
+                                            <>
+                                                <div className="detail">
+                                                    <span className="label">{tText("Auto-Sell Profit", "অটো-সেল লাভ")}</span>
+                                                    <span className="value profit">+{product.returnRate}%</span>
+                                                </div>
+                                                <div className="detail">
+                                                    <span className="label">{tText("Duration", "সময়কাল")}</span>
+                                                    <span className="value">{product.duration} {tText("days", "দিন")}</span>
+                                                </div>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        {user && (user.role === 'partner' || user.role === 'admin') ? (
+                                            <Link href={`/products?productId=${product.id}`} className="btn btn-primary btn-block" style={{ textDecoration: 'none', textAlign: 'center' }}>
+                                                {tText("Invest Now", "এখনই বিনিয়োগ করুন")}
+                                            </Link>
+                                        ) : (
+                                            <>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    <Link href={`/products?productId=${product.id}`} className="btn btn-primary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', textDecoration: 'none' }}>
+                                                        <i className="fas fa-shopping-bag"></i>
+                                                        {tText("Buy Now", "কিনুন")}
+                                                    </Link>
+                                                    <button 
+                                                        className="btn btn-outline"
+                                                        style={{ 
+                                                            flex: 1, 
+                                                            borderColor: 'var(--primary-color)', 
+                                                            color: 'var(--primary-color)',
+                                                            background: 'none',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: '4px'
+                                                        }}
+                                                        onClick={() => {
+                                                            const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : undefined;
+                                                            ecommerceCart.addToCart(product, 1, defaultColor);
+                                                            showToast(lang === 'bn' ? `${product.name} কার্টে যোগ করা হয়েছে` : `${product.name} added to cart`, 'success');
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-cart-plus"></i>
+                                                        {tText("Add to Cart", "কার্ট")}
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                        <Link href={`/products?productId=${product.id}`} style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginTop: '4px' }}>
+                                            <i className="fas fa-eye"></i>
+                                            {tText("View Details", "বিস্তারিত দেখুন")}
+                                        </Link>
+                                    </div>
                                 </div>
-                                {user && (user.role === 'partner' || user.role === 'admin') && (
-                                    <>
-                                        <div className="detail">
-                                            <span className="label">{tText("Profit", "লাভ")}</span>
-                                            <span className="value profit">{tNum("+18%")}</span>
-                                        </div>
-                                        <div className="detail">
-                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                            <span className="value">{tNum(45) + " " + tText("days", "দিন")}</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <Link href="/products" className="btn btn-primary btn-block">
-                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
-                            </Link>
-                        </div>
-
-                        <div className="product-card">
-                            <div className="product-image">
-                                <i className="fas fa-tv"></i>
-                            </div>
-                            <h3>{tText("Electronics Package", "ইলেকট্রনিক্স প্যাকেজ")}</h3>
-                            <div className="product-details">
-                                <div className="detail">
-                                    <span className="label">{tText("Price", "মূল্য")}</span>
-                                    <span className="value">{tNum("৳10,000")}</span>
-                                </div>
-                                {user && (user.role === 'partner' || user.role === 'admin') && (
-                                    <>
-                                        <div className="detail">
-                                            <span className="label">{tText("Profit", "লাভ")}</span>
-                                            <span className="value profit">{tNum("+15%")}</span>
-                                        </div>
-                                        <div className="detail">
-                                            <span className="label">{tText("Duration", "সময়কাল")}</span>
-                                            <span className="value">{tNum(30) + " " + tText("days", "দিন")}</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <Link href="/products" className="btn btn-primary btn-block">
-                                {user && (user.role === 'partner' || user.role === 'admin') ? tText("Invest Now", "এখনই বিনিয়োগ করুন") : tText("Buy Now", "এখনই কিনুন")}
-                            </Link>
-                        </div>
+                            );
+                        })}
                     </div>
                     <div className="view-all">
                         <Link href="/products" className="btn btn-outline">
