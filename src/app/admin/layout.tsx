@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
+import { useTheme } from '@/context/ThemeContext';
 import Storage from '@/lib/storage';
 import Security from '@/lib/security';
 
@@ -15,6 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const router = useRouter();
     const { tText } = useTranslation();
     const { showToast } = useToast();
+    const { theme } = useTheme();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [authorized, setAuthorized] = useState(false);
@@ -127,7 +129,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // Loading state
     if (!authorized) {
         return (
-            <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: '#0A1828', color: 'white' }}>
+            <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: '#0A1828', color: 'var(--text-primary, white)' }}>
                 <div style={{ textAlign: 'center' }}>
                     <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', marginBottom: '15px', color: '#178582' }}></i>
                     <h3>Checking Authorization...</h3>
@@ -139,7 +141,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // PIN Gate screen
     if (!pinVerified) {
         return (
-            <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0A1828 0%, #0f2744 50%, #0A1828 100%)', color: 'white' }}>
+            <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0A1828 0%, #0f2744 50%, #0A1828 100%)', color: 'var(--text-primary, white)' }}>
                 <div style={{ textAlign: 'center', maxWidth: '400px', width: '100%', padding: '0 20px' }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px' }}>
                         <i className="fas fa-shield-alt" style={{ fontSize: '32px', color: '#ef4444' }}></i>
@@ -174,7 +176,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                         background: 'rgba(255,255,255,0.05)',
                                         border: pinAttempts > 0 ? '2px solid rgba(239, 68, 68, 0.5)' : '2px solid rgba(255,255,255,0.1)',
                                         borderRadius: '12px',
-                                        color: 'white',
+                                        color: 'var(--text-primary, white)',
                                         outline: 'none',
                                         fontFamily: 'monospace'
                                     }}
@@ -190,7 +192,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 width: '200px',
                                 padding: '14px',
                                 background: 'linear-gradient(135deg, #178582, #0d5a58)',
-                                color: 'white',
+                                color: 'var(--text-primary, white)',
                                 border: 'none',
                                 borderRadius: '12px',
                                 fontSize: '15px',
@@ -256,7 +258,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     gap: 10px;
                     font-size: 18px;
                     font-weight: 700;
-                    color: white;
+                    color: var(--text-primary, white);
                     text-decoration: none;
                 }
                 .admin-logo i {
@@ -283,11 +285,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     transition: all 0.3s ease;
                 }
                 .admin-nav-link:hover {
-                    color: white;
+                    color: var(--text-primary, white);
                     background: rgba(255,255,255,0.03);
                 }
                 .admin-nav-link.active {
-                    color: white;
+                    color: var(--text-primary, white);
                     background: var(--primary-gradient, linear-gradient(135deg, #178582, #0d5a58));
                 }
                 .admin-topbar {
@@ -308,7 +310,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 .admin-hamburger {
                     background: none;
                     border: none;
-                    color: white;
+                    color: var(--text-primary, white);
                     font-size: 20px;
                     cursor: pointer;
                     display: none;
@@ -318,10 +320,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     height: 40px;
                 }
                 .admin-sidebar-header .admin-hamburger {
-                    color: rgba(255, 255, 255, 0.7);
+                    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
                 }
                 .admin-sidebar-header .admin-hamburger:hover {
-                    color: white;
+                    color: var(--text-primary, white);
                 }
                 .admin-topbar-right {
                     display: flex;
@@ -332,7 +334,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    color: white;
+                    color: var(--text-primary, white);
                 }
                 .admin-user-avatar {
                     width: 36px;
@@ -342,7 +344,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: white;
+                    color: var(--text-primary, white);
                     font-size: 14px;
                     font-weight: 700;
                 }
@@ -432,7 +434,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="admin-sidebar-header">
                     <Link href="/admin" className="admin-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
-                        <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
+                        <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
                     </Link>
                     <button className="admin-hamburger" onClick={() => setMobileMenuOpen(false)}>
                         <i className="fas fa-times"></i>
@@ -474,7 +476,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </button>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>ADMIN PANEL</span>
-                        <span style={{ fontSize: '13px', color: 'white', fontWeight: 600 }}>System Control Center</span>
+                        <span style={{ fontSize: '13px', color: 'var(--text-primary, white)', fontWeight: 600 }}>System Control Center</span>
                     </div>
                 </div>
                 <div className="admin-topbar-right">

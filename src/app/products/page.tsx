@@ -346,9 +346,8 @@ export default function ProductsPage() {
                     position: absolute;
                     top: 15px;
                     left: 15px;
-                    right: 15px;
                     display: flex;
-                    justify-content: space-between;
+                    gap: 6px;
                 }
                 .prod-badge {
                     padding: 5px 12px;
