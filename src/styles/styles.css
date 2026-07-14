@@ -1668,7 +1668,9 @@ textarea::placeholder {
 
 /* Nav links styling */
 .nav-links-pill {
-    display: none !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .nav-link-pill-active {
