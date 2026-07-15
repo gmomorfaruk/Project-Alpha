@@ -21,21 +21,9 @@ body {
     font-family: 'Hind Siliguri', 'Inter', sans-serif;
 }
 
-/* Sidebar Styling (Desktop) */
+/* Sidebar Styling (Desktop) - Hidden for horizontal navbar refactoring */
 .sidebar-nav {
-    width: 280px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: var(--bg-card);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    z-index: 1000;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    display: none !important;
 }
 
 .sidebar-logo {
@@ -223,7 +211,7 @@ body {
 /* Dashboard Main Layout */
 .dashboard-main {
     flex: 1;
-    margin-left: 280px;
+    margin-left: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -233,22 +221,142 @@ body {
 
 /* Top Header */
 .header-top {
-    height: 80px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 40px;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 900;
+}
+
+.header-row-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 24px;
+}
+
+.header-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 32px;
+}
+
+.header-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+}
+
+.header-menu-item:hover {
+    background: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.header-menu-item.active {
+    background: #DBEAFE !important;
+    color: #2563EB !important;
+}
+
+[data-theme="dark"] .header-menu-item.active {
+    background: rgba(37, 99, 235, 0.2) !important;
+    color: #3B82F6 !important;
+}
+
+.header-menu-item i {
+    width: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Header menu adjustments on medium desktop screens to prevent overlap */
+@media (max-width: 1200px) and (min-width: 993px) {
+    .header-menu {
+        margin-left: 16px;
+        gap: 4px;
+    }
+    .header-menu-item {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Right-aligned desktop utilities */
+.header-utilities {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Desktop / Mobile view toggle utility classes */
+.mobile-only-utilities {
+    display: none !important;
+}
+
+.desktop-only-utilities {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Desktop Drawer (Slide-out from Right) */
+.desktop-menu-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.desktop-menu-drawer.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.desktop-menu-drawer .drawer-content-right {
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.desktop-menu-drawer.active .drawer-content-right {
+    transform: translateX(0);
 }
 
 .header-left {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-shrink: 0;
 }
 
 .mobile-hamburger {
@@ -290,38 +398,67 @@ body {
 /* Search Bar */
 .header-search {
     position: relative;
-    width: 320px;
+    width: 44px;
+    height: 44px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
-.search-icon {
+.header-search.expanded {
+    width: 240px;
+}
+
+.search-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
     position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 14px;
-    z-index: 2;
-    pointer-events: none;
+    right: 0;
+    top: 0;
+    z-index: 3;
+}
+
+.search-toggle-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary-color);
 }
 
 .search-input {
+    position: absolute;
+    right: 0;
+    top: 0;
     width: 100%;
-    height: 44px;
+    height: 100%;
     background: var(--bg-hover);
     border: 1px solid transparent;
     border-radius: 14px;
-    padding: 0 16px 0 40px;
+    padding: 0 44px 0 16px;
     font-size: 14px;
     color: var(--text-primary);
     outline: none;
-    transition: all 0.2s ease;
-    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: scaleX(0.9);
+    transform-origin: right;
 }
 
-.search-input:focus {
-    border-color: var(--primary-color);
+.header-search.expanded .search-input {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scaleX(1);
     background: var(--bg-card);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
 }
 
@@ -511,17 +648,31 @@ body {
 
 /* Responsive Layout */
 @media (max-width: 992px) {
-    .sidebar-nav {
-        transform: translateX(-100%);
-        pointer-events: none;
-    }
-    
     .dashboard-main {
         margin-left: 0;
     }
     
     .header-top {
-        padding: 0 24px;
+        padding: 12px 24px;
+        gap: 0;
+    }
+    
+    .header-row-sub {
+        display: none !important;
+    }
+    
+    .header-menu {
+        display: none !important;
+    }
+    
+    .mobile-only-utilities {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .desktop-only-utilities {
+        display: none !important;
     }
     
     .mobile-hamburger {

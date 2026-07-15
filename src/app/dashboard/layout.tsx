@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -14,10 +14,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { theme, toggleTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
+    const [searchExpanded, setSearchExpanded] = useState(false);
+
+    const searchRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -27,12 +31,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     // Handle close menus on click outside
     useEffect(() => {
-        const handleOutsideClick = () => {
+        const handleOutsideClick = (e: Event) => {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setSearchExpanded(false);
+            }
             setNotificationOpen(false);
+            setDesktopMenuOpen(false);
         };
         window.addEventListener('click', handleOutsideClick);
         return () => window.removeEventListener('click', handleOutsideClick);
     }, []);
+
+    // Focus search input when expanded
+    useEffect(() => {
+        if (searchExpanded && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [searchExpanded]);
 
     if (loading || !user) {
         return (
@@ -50,6 +65,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setNotificationOpen(!notificationOpen);
     };
 
+    const toggleDesktopMenu = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setDesktopMenuOpen(!desktopMenuOpen);
+    };
+
     const getGreeting = () => {
         const hour = new Date().getHours();
         if (hour < 12) return tText("Good Morning", "শুভ সকাল");
@@ -57,15 +77,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return tText("Good Evening", "শুভ সন্ধ্যা");
     };
 
-    const navItems = [
+    const coreNavItems = [
         { href: '/dashboard', label: tText('Dashboard', 'ড্যাশবোর্ড'), icon: 'fa-home' },
         { href: '/dashboard/wallet', label: tText('Wallet', 'ওয়ালেট'), icon: 'fa-wallet' },
         { href: '/dashboard/products', label: tText('Packages', 'প্যাকেজ'), icon: 'fa-box' },
         { href: '/dashboard/investments', label: tText('Investments', 'বিনিয়োগ'), icon: 'fa-chart-line' },
-        { href: '/dashboard/tasks', label: tText('Tasks', 'কাজ'), icon: 'fa-tasks' },
+        { href: '/dashboard/tasks', label: tText('Tasks', 'কাজ'), icon: 'fa-tasks' }
+    ];
+
+    const drawerItems = [
         { href: '/dashboard/referrals', label: tText('Referrals', 'রেফারেলস'), icon: 'fa-users' },
         { href: '/dashboard/membership', label: tText('Membership', 'মেম্বারশিপ'), icon: 'fa-crown' },
-        { href: '/dashboard/sell-proofs', label: tText('Sell Proofs', 'বিক্রয় প্রমাণ'), icon: 'fa-receipt' }
+        { href: '/dashboard/sell-proofs', label: tText('Sell Proofs', 'বিক্রয় প্রমাণ'), icon: 'fa-receipt' },
+        { href: '/dashboard/profile', label: tText('Settings', 'সেটিংস'), icon: 'fa-cog' }
+    ];
+
+    // For mobile menu drawer
+    const navItems = [
+        ...coreNavItems,
+        ...drawerItems
     ];
 
     const mobileBottomItems = [
@@ -78,51 +108,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <div className="dashboard-container">
-            {/* Desktop Left Sidebar */}
-            <aside className="sidebar-nav">
-                <div className="sidebar-logo">
-                    <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
-                    </Link>
-                </div>
-                
-                <hr className="sidebar-divider" />
-                
-                <nav className="sidebar-menu">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`sidebar-item ${pathname === item.href ? 'active' : ''}`}
-                        >
-                            <i className={`fas ${item.icon}`}></i>
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
+            {/* Desktop Slide-out Drawer */}
+            <div className={`desktop-menu-drawer ${desktopMenuOpen ? 'active' : ''}`} onClick={() => setDesktopMenuOpen(false)}>
+                <div className="drawer-content-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="drawer-header">
+                        <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>{tText("Menu", "মেনু")}</h4>
+                        <button className="drawer-close-btn" onClick={() => setDesktopMenuOpen(false)}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <hr className="sidebar-divider" />
+                    
+                    <nav className="drawer-menu">
+                        {drawerItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`sidebar-item ${pathname === item.href ? 'active' : ''}`}
+                                onClick={() => setDesktopMenuOpen(false)}
+                            >
+                                <i className={`fas ${item.icon}`}></i>
+                                <span>{item.label}</span>
+                            </Link>
+                        ))}
+                    </nav>
 
-                <hr className="sidebar-divider" />
-                
-                <div className="sidebar-footer">
-                    <Link
-                        href="/dashboard/profile"
-                        className={`sidebar-item ${pathname === '/dashboard/profile' ? 'active' : ''}`}
-                    >
-                        <i className="fas fa-cog"></i>
-                        <span>{tText("Settings", "সেটিংস")}</span>
-                    </Link>
+                    <hr className="sidebar-divider" />
                     
-                    <button className="sidebar-item theme-switch-btn" onClick={toggleTheme}>
-                        <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
-                        <span>{tText("Toggle Theme", "থিম পরিবর্তন")}</span>
-                    </button>
-                    
-                    <button className="sidebar-item logout-btn" onClick={logout}>
-                        <i className="fas fa-sign-out-alt"></i>
-                        <span>{tText("Logout", "লগআউট")}</span>
-                    </button>
+                    <div className="drawer-footer">
+                        <button className="sidebar-item logout-btn" onClick={() => { logout(); setDesktopMenuOpen(false); }}>
+                            <i className="fas fa-sign-out-alt"></i>
+                            <span>{tText("Logout", "লগআউট")}</span>
+                        </button>
+                    </div>
                 </div>
-            </aside>
+            </div>
 
             {/* Mobile Drawer Navigation Sidebar */}
             <div className={`mobile-sidebar-drawer ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
@@ -175,75 +196,147 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="dashboard-main">
                 {/* Top Navbar */}
                 <header className="header-top">
-                    <div className="header-left">
-                        {/* Mobile hamburger menu toggle */}
-                        <button className="mobile-hamburger" onClick={() => setMobileMenuOpen(true)}>
-                            <i className="fas fa-bars"></i>
-                        </button>
-
-                        <div className="header-greeting-wrapper">
-                            <span className="greeting-subtitle">{getGreeting()},</span>
-                            <span className="greeting-title"> {user.name || user.fullName || 'User'}</span>
-                            <span className="greeting-welcome"> 👋</span>
-                        </div>
-                    </div>
-
-                    <div className="header-search">
-                        <i className="fas fa-search search-icon"></i>
-                        <input type="text" placeholder={tText("Search...", "অনুসন্ধান...")} className="search-input" />
-                    </div>
-
-                    <div className="header-right">
-                        {/* Search icon triggers placeholder search in mobile view */}
-                        <button className="header-icon-btn mobile-search-btn" title="Search">
-                            <i className="fas fa-search"></i>
-                        </button>
-
-                        <button className="header-icon-btn" onClick={toggleTheme} title="Toggle Theme">
-                            <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
-                        </button>
-
-                        <button className="header-icon-btn" onClick={toggleLang} title="Toggle Language">
-                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{lang.toUpperCase()}</span>
-                        </button>
-
-                        {/* Notifications Toggle */}
-                        <div style={{ position: 'relative' }}>
-                            <button className="header-icon-btn" onClick={toggleNotifications} title="Notifications">
-                                <i className="fas fa-bell"></i>
-                                {notifications.length > 0 && (
-                                    <span className="notification-badge-dot"></span>
-                                )}
+                    {/* Row 1: Logo + Core links, Search Bar (desktop), Utilities (desktop), Utilities (mobile) */}
+                    <div className="header-row-main">
+                        <div className="header-left">
+                            {/* Mobile hamburger menu toggle */}
+                            <button className="mobile-hamburger" onClick={() => setMobileMenuOpen(true)}>
+                                <i className="fas fa-bars"></i>
                             </button>
-                            
-                            {/* Notifications Panel */}
-                            <div className={`navbar-dropdown notification-panel ${notificationOpen ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
-                                <div className="notification-panel-header">
-                                    <h4>{tText("Notifications", "বিজ্ঞপ্তি সমূহ")}</h4>
-                                </div>
-                                {notifications.length === 0 ? (
-                                    <p className="no-notifications">{tText("No new notifications", "কোন নতুন বিজ্ঞপ্তি নেই")}</p>
-                                ) : (
-                                    <div className="notifications-list">
-                                        {notifications.map((n, i) => (
-                                            <div key={i} className="notification-list-item">
-                                                <p>{n.message}</p>
-                                                <span>{new Date(n.timestamp).toLocaleString()}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+
+                            <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
+                            </Link>
+
+                            {/* Core navigation links - desktop only */}
+                            <nav className="header-menu">
+                                {coreNavItems.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={`header-menu-item ${pathname === item.href ? 'active' : ''}`}
+                                    >
+                                        <i className={`fas ${item.icon}`}></i>
+                                        <span>{item.label}</span>
+                                    </Link>
+                                ))}
+                            </nav>
                         </div>
 
-                        {/* User Avatar */}
-                        <Link href="/dashboard/profile" className="header-user-avatar">
-                            {user.avatar ? (
-                                <img src={user.avatar} alt="avatar" />
-                            ) : (
-                                <i className="fas fa-user"></i>
-                            )}
-                        </Link>
+                        {/* Desktop utilities (Theme, Lang, Notifications, Menu) */}
+                        <div className="header-utilities desktop-only-utilities">
+                            {/* Search Bar - desktop only */}
+                            <div 
+                                ref={searchRef}
+                                className={`header-search ${searchExpanded ? 'expanded' : ''}`}
+                            >
+                                <button 
+                                    className="search-toggle-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSearchExpanded(!searchExpanded);
+                                    }}
+                                    title={tText("Search", "অনুসন্ধান")}
+                                >
+                                    <i className="fas fa-search"></i>
+                                </button>
+                                <input 
+                                    ref={searchInputRef}
+                                    type="text" 
+                                    placeholder={tText("Search...", "অনুসন্ধান...")} 
+                                    className="search-input" 
+                                />
+                            </div>
+
+                            <button className="header-icon-btn" onClick={toggleTheme} title="Toggle Theme">
+                                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+                            </button>
+
+                            <button className="header-icon-btn" onClick={toggleLang} title="Toggle Language">
+                                <span style={{ fontSize: '12px', fontWeight: 600 }}>{lang.toUpperCase()}</span>
+                            </button>
+
+                            <div style={{ position: 'relative' }}>
+                                <button className="header-icon-btn" onClick={toggleNotifications} title="Notifications">
+                                    <i className="fas fa-bell"></i>
+                                    {notifications.length > 0 && (
+                                        <span className="notification-badge-dot"></span>
+                                    )}
+                                </button>
+                                
+                                <div className={`navbar-dropdown notification-panel ${notificationOpen ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
+                                    <div className="notification-panel-header">
+                                        <h4>{tText("Notifications", "বিজ্ঞপ্তি সমূহ")}</h4>
+                                    </div>
+                                    {notifications.length === 0 ? (
+                                        <p className="no-notifications">{tText("No new notifications", "কোন নতুন বিজ্ঞপ্তি নেই")}</p>
+                                    ) : (
+                                        <div className="notifications-list">
+                                            {notifications.map((n, i) => (
+                                                <div key={i} className="notification-list-item">
+                                                    <p>{n.message}</p>
+                                                    <span>{new Date(n.timestamp).toLocaleString()}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <button className="header-icon-btn hamburger-menu-btn" onClick={toggleDesktopMenu} title="Menu">
+                                <i className="fas fa-bars"></i>
+                            </button>
+                        </div>
+
+                        {/* Mobile-only utilities (Theme, Lang, Notifications, Avatar) */}
+                        <div className="header-right mobile-only-utilities">
+                            <button className="header-icon-btn mobile-search-btn" title="Search">
+                                <i className="fas fa-search"></i>
+                            </button>
+
+                            <button className="header-icon-btn" onClick={toggleTheme} title="Toggle Theme">
+                                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+                            </button>
+
+                            <button className="header-icon-btn" onClick={toggleLang} title="Toggle Language">
+                                <span style={{ fontSize: '12px', fontWeight: 600 }}>{lang.toUpperCase()}</span>
+                            </button>
+
+                            <div style={{ position: 'relative' }}>
+                                <button className="header-icon-btn" onClick={toggleNotifications} title="Notifications">
+                                    <i className="fas fa-bell"></i>
+                                    {notifications.length > 0 && (
+                                        <span className="notification-badge-dot"></span>
+                                    )}
+                                </button>
+                                
+                                <div className={`navbar-dropdown notification-panel ${notificationOpen ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
+                                    <div className="notification-panel-header">
+                                        <h4>{tText("Notifications", "বিজ্ঞপ্তি সমূহ")}</h4>
+                                    </div>
+                                    {notifications.length === 0 ? (
+                                        <p className="no-notifications">{tText("No new notifications", "কোন নতুন বিজ্ঞপ্তি নেই")}</p>
+                                    ) : (
+                                        <div className="notifications-list">
+                                            {notifications.map((n, i) => (
+                                                <div key={i} className="notification-list-item">
+                                                    <p>{n.message}</p>
+                                                    <span>{new Date(n.timestamp).toLocaleString()}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <Link href="/dashboard/profile" className="header-user-avatar">
+                                {user.avatar ? (
+                                    <img src={user.avatar} alt="avatar" />
+                                ) : (
+                                    <i className="fas fa-user"></i>
+                                )}
+                            </Link>
+                        </div>
                     </div>
                 </header>
 
