@@ -205,6 +205,7 @@ export default function ClientMembershipPage() {
                 paymentMethod: selectedMethod,
                 senderNumber: senderNumber.trim(),
                 txnId: txnId.trim(),
+                transactionId: txnId.trim(),
                 note: paymentNote.trim(),
                 status: 'pending',
                 createdAt: new Date().toISOString()

@@ -129,6 +129,13 @@ export default function Navbar() {
     const [cartCount, setCartCount] = useState(0);
     const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
     const [cartItems, setCartItems] = useState<Product[]>([]);
+    const [adminPathPrefix, setAdminPathPrefix] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setAdminPathPrefix(sessionStorage.getItem('adminPathPrefix'));
+        }
+    }, [user, pathname]);
 
     // UI interactive states
     const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -641,8 +648,8 @@ export default function Navbar() {
                                                         <span>{tText('Dashboard', 'ড্যাশবোর্ড')}</span>
                                                     </Link>
                                                     
-                                                    {user.role === 'admin' && (
-                                                        <Link href="/admin" className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
+                                                    {user.role === 'admin' && adminPathPrefix !== null && (
+                                                        <Link href={adminPathPrefix || '/'} className="navbar-dropdown-item no-underline" onClick={() => setProfileOpen(false)}>
                                                             <i className="fas fa-user-shield text-emerald-500"></i>
                                                             <span>{tText('Admin Panel', 'অ্যাডমিন প্যানেল')}</span>
                                                         </Link>
@@ -678,23 +685,47 @@ export default function Navbar() {
                                         {tText('Preferences', 'পছন্দসমূহ')}
                                     </div>
                                     
-                                    {/* Language Switcher */}
-                                    <div className="navbar-dropdown-item" onClick={toggleLang}>
-                                        <i className="fas fa-globe text-emerald-500"></i>
-                                        <div className="flex justify-between w-full items-center">
-                                            <span>{tText('Language', 'ভাষা')}</span>
-                                            <span className="text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded font-bold">{lang.toUpperCase()}</span>
-                                        </div>
-                                    </div>
+                                     {/* Language Switcher */}
+                                     <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/60">
+                                         <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 mb-1.5 font-bold tracking-wider">
+                                             <span>{tText('LANGUAGE', 'ভাষা')}</span>
+                                         </div>
+                                         <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-900/60 p-0.5 rounded-lg" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                                             <button 
+                                                 onClick={() => { if (lang !== 'en') toggleLang(); }} 
+                                                 className={`py-1 text-xs font-bold rounded-md transition-all ${lang === 'en' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'}`}
+                                             >
+                                                 English
+                                             </button>
+                                             <button 
+                                                 onClick={() => { if (lang !== 'bn') toggleLang(); }} 
+                                                 className={`py-1 text-xs font-bold rounded-md transition-all ${lang === 'bn' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'}`}
+                                             >
+                                                 বাংলা
+                                             </button>
+                                         </div>
+                                     </div>
 
-                                    {/* Theme Switcher */}
-                                    <div className="navbar-dropdown-item" onClick={toggleTheme}>
-                                        <i className={`fas ${theme === 'dark' ? 'fa-sun text-yellow-500' : 'fa-moon text-indigo-500'}`}></i>
-                                        <div className="flex justify-between w-full items-center">
-                                            <span>{tText('Theme', 'থিম')}</span>
-                                            <span className="text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded font-bold capitalize">{theme}</span>
-                                        </div>
-                                    </div>
+                                     {/* Theme Switcher */}
+                                     <div className="px-3 py-2">
+                                         <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 mb-1.5 font-bold tracking-wider">
+                                             <span>{tText('THEME', 'থিম')}</span>
+                                         </div>
+                                         <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-900/60 p-0.5 rounded-lg" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                                             <button 
+                                                 onClick={() => { if (theme !== 'light') toggleTheme(); }} 
+                                                 className={`py-1 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1.5 ${theme === 'light' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'}`}
+                                             >
+                                                 <i className="fas fa-sun text-[10px]"></i> Light
+                                             </button>
+                                             <button 
+                                                 onClick={() => { if (theme !== 'dark') toggleTheme(); }} 
+                                                 className={`py-1 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1.5 ${theme === 'dark' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'}`}
+                                             >
+                                                 <i className="fas fa-moon text-[10px]"></i> Dark
+                                             </button>
+                                         </div>
+                                     </div>
 
                                     {isAuthenticated && (
                                         <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
@@ -767,8 +798,12 @@ export default function Navbar() {
                                         className="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/35 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-lg">
-                                                <i className={`fas ${product.image}`}></i>
+                                            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-lg overflow-hidden">
+                                                {product.image && (product.image.startsWith('http') || product.image.startsWith('data:image/') || product.image.startsWith('/')) ? (
+                                                    <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                                )}
                                             </div>
                                             <div className="text-left">
                                                 <div className="font-bold text-slate-800 dark:text-white text-sm">{product.name}</div>
@@ -795,160 +830,196 @@ export default function Navbar() {
             )}
 
             {/* Mobile Responsive Sidebar Drawer */}
-            {mobileMenuOpen && (
+            {/* Mobile Responsive Sidebar Drawer */}
+            <div 
+                className={`desktop-menu-drawer ${mobileMenuOpen ? 'active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ zIndex: 1050 }}
+            >
                 <div 
-                    className="fixed inset-0 z-1050 bg-slate-900/40 backdrop-blur-sm animation: fadeIn 0.2s" 
-                    onClick={() => setMobileMenuOpen(false)}
+                    className="drawer-content-right"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
                 >
-                    <div 
-                        className="fixed right-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-950 p-6 flex flex-col justify-between shadow-2xl border-l border-slate-100 dark:border-slate-900 animation: slideLeft 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', paddingRight: '4px' }}>
-                            {/* Drawer Header */}
-                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-4 mb-4">
-                                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: 'none' }}>
-                                    <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
-                                </Link>
-                                <button 
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="w-8 h-8 rounded-full border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 hover:text-red-500"
-                                >
-                                    <i className="fas fa-times"></i>
-                                </button>
-                            </div>
-
-                            {/* Links Menu */}
-                            <div className="flex flex-col gap-2 text-left">
-                                <Link 
-                                    href="/" 
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className={`flex items-center gap-3 p-3 rounded-xl no-underline font-semibold text-sm ${pathname === '/' ? 'bg-emerald-500/10 text-emerald-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900'}`}
-                                >
-                                    <i className="fas fa-home w-5"></i>
-                                    <span>{tText('Home', 'হোম')}</span>
-                                </Link>
-
-                                <div className="border-t border-slate-100 dark:border-slate-900 my-1"></div>
-                                
-                                {/* Collapsible Categories Accordion */}
-                                <div>
-                                    <button 
-                                        onClick={() => setDrawerCategoriesOpen(!drawerCategoriesOpen)}
-                                        className="w-full flex items-center justify-between p-3 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 font-semibold text-sm border-none bg-transparent"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <i className="fas fa-th-large text-emerald-500"></i>
-                                            <span>{tText('Categories', 'ক্যাটাগরি')}</span>
-                                        </div>
-                                        <i className={`fas fa-chevron-down text-xs transition-transform duration-200 ${drawerCategoriesOpen ? 'rotate-180' : ''}`}></i>
-                                    </button>
-                                    {drawerCategoriesOpen && (
-                                        <div className="pl-8 flex flex-col gap-2 mt-1">
-                                            <Link href="/products?category=mobile" onClick={() => setMobileMenuOpen(false)} className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fas fa-mobile-alt w-4"></i> Mobile Packages
-                                            </Link>
-                                            <Link href="/products?category=computer" onClick={() => setMobileMenuOpen(false)} className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fas fa-laptop w-4"></i> Laptop Packages
-                                            </Link>
-                                            <Link href="/products?category=electronics" onClick={() => setMobileMenuOpen(false)} className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fas fa-tv w-4"></i> Electronics Packages
-                                            </Link>
-                                            <Link href="/products?category=accessories" onClick={() => setMobileMenuOpen(false)} className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fas fa-clock w-4"></i> Accessories
-                                            </Link>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="border-t border-slate-100 dark:border-slate-900 my-1"></div>
-
-                                <Link 
-                                    href="/about" 
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className={`flex items-center gap-3 p-3 rounded-xl no-underline font-semibold text-sm ${pathname === '/about' ? 'bg-emerald-500/10 text-emerald-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900'}`}
-                                >
-                                    <i className="fas fa-shield-alt w-5"></i>
-                                    <span>{tText('About Us', 'আমাদের সম্পর্কে')}</span>
-                                </Link>
-
-                                <div className="border-t border-slate-100 dark:border-slate-900 my-1"></div>
-                                
-                                {/* Collapsible Support Accordion */}
-                                <div>
-                                    <button 
-                                        onClick={() => setDrawerSupportOpen(!drawerSupportOpen)}
-                                        className="w-full flex items-center justify-between p-3 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 font-semibold text-sm border-none bg-transparent"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <i className="fas fa-headset text-emerald-500"></i>
-                                            <span>{tText('Contact', 'যোগাযোগ')}</span>
-                                        </div>
-                                        <i className={`fas fa-chevron-down text-xs transition-transform duration-200 ${drawerSupportOpen ? 'rotate-180' : ''}`}></i>
-                                    </button>
-                                    {drawerSupportOpen && (
-                                        <div className="pl-8 flex flex-col gap-2 mt-1">
-                                            <a href="https://wa.me/8801700000000" target="_blank" rel="noopener noreferrer" className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fab fa-whatsapp w-4 text-green-500"></i> WhatsApp Support
-                                            </a>
-                                            <a href="https://t.me/smartearnbd" target="_blank" rel="noopener noreferrer" className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fab fa-telegram w-4 text-blue-500"></i> Telegram Channel
-                                            </a>
-                                            <a href="mailto:support@smartearnbd.com" className="py-2 text-xs no-underline text-slate-500 hover:text-emerald-500 flex items-center gap-2">
-                                                <i className="fas fa-envelope w-4 text-red-400"></i> Email Support
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', paddingRight: '4px' }}>
+                        {/* Drawer Header */}
+                        <div className="drawer-header">
+                            <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>{tText('Menu', 'মেনু')}</h4>
+                            <button 
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="drawer-close-btn"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
                         </div>
 
-                        {/* Mobile Preferences & Auth */}
-                        <div className="flex flex-col gap-3">
+                        <hr className="sidebar-divider" />
 
+                        {/* Links Menu */}
+                        <div className="drawer-menu">
+                            <Link 
+                                href="/" 
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`sidebar-item ${pathname === '/' ? 'active' : ''}`}
+                            >
+                                <i className="fas fa-home"></i>
+                                <span>{tText('Home', 'হোম')}</span>
+                            </Link>
 
-                            {isAuthenticated ? (
-                                <div className="flex flex-col gap-2">
-                                    <Link 
-                                        href={user?.role === 'buyer' ? '/buyer/dashboard' : '/dashboard'} 
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold text-center text-sm no-underline shadow-md hover:bg-emerald-600"
-                                    >
-                                        {user?.role === 'buyer' ? tText('My Orders', 'আমার অর্ডারসমূহ') : tText('Go to Dashboard', 'ড্যাশবোর্ডে যান')}
-                                    </Link>
-                                    <button 
-                                        onClick={() => {
-                                            logout();
-                                            setMobileMenuOpen(false);
-                                            showToast(lang === 'bn' ? 'সফলভাবে লগআউট করা হয়েছে' : 'Logged out successfully', 'info');
-                                        }}
-                                        className="w-full py-3 border border-red-500/20 text-red-500 rounded-xl font-bold text-center text-sm hover:bg-red-50 dark:hover:bg-red-950/20"
-                                    >
-                                        {tText('Logout', 'লগআউট')}
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex gap-2">
-                                    <Link 
-                                        href="/login" 
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex-1 py-3 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-center text-sm no-underline text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900"
-                                    >
-                                        {tText('Login', 'লগইন')}
-                                    </Link>
-                                    <Link 
-                                        href="/signup" 
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold text-center text-sm no-underline hover:bg-emerald-600 shadow-md shadow-emerald-500/10"
-                                    >
-                                        {tText('Sign Up', 'সাইন আপ')}
-                                    </Link>
-                                </div>
-                            )}
+                            <hr className="sidebar-divider" />
+                            
+                            {/* Collapsible Categories Accordion */}
+                            <div className="w-full">
+                                <button 
+                                    onClick={() => setDrawerCategoriesOpen(!drawerCategoriesOpen)}
+                                    className="sidebar-item"
+                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <i className="fas fa-th-large"></i>
+                                        <span>{tText('Categories', 'ক্যাটাগরি')}</span>
+                                    </div>
+                                    <i className="fas fa-chevron-down"
+                                       style={{ fontSize: '12px', transition: 'transform 0.2s', transform: drawerCategoriesOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                                    ></i>
+                                </button>
+                                {drawerCategoriesOpen && (
+                                    <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                                        <Link href="/products?category=mobile" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fas fa-mobile-alt"></i>
+                                            <span>Mobile Packages</span>
+                                        </Link>
+                                        <Link href="/products?category=computer" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fas fa-laptop"></i>
+                                            <span>Laptop Packages</span>
+                                        </Link>
+                                        <Link href="/products?category=electronics" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fas fa-tv"></i>
+                                            <span>Electronics Packages</span>
+                                        </Link>
+                                        <Link href="/products?category=accessories" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fas fa-clock"></i>
+                                            <span>Accessories</span>
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+
+                            <hr className="sidebar-divider" />
+
+                            <Link 
+                                href="/about" 
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`sidebar-item ${pathname === '/about' ? 'active' : ''}`}
+                            >
+                                <i className="fas fa-shield-alt"></i>
+                                <span>{tText('About Us', 'আমাদের সম্পর্কে')}</span>
+                            </Link>
+
+                            <hr className="sidebar-divider" />
+                            
+                            {/* Collapsible Support Accordion */}
+                            <div className="w-full">
+                                <button 
+                                    onClick={() => setDrawerSupportOpen(!drawerSupportOpen)}
+                                    className="sidebar-item"
+                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <i className="fas fa-headset"></i>
+                                        <span>{tText('Contact', 'যোগাযোগ')}</span>
+                                    </div>
+                                    <i className="fas fa-chevron-down"
+                                       style={{ fontSize: '12px', transition: 'transform 0.2s', transform: drawerSupportOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                                    ></i>
+                                </button>
+                                {drawerSupportOpen && (
+                                    <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                                        <a href="https://wa.me/8801700000000" target="_blank" rel="noopener noreferrer" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fab fa-whatsapp" style={{ color: '#22c55e' }}></i>
+                                            <span>WhatsApp Support</span>
+                                        </a>
+                                        <a href="https://t.me/smartearnbd" target="_blank" rel="noopener noreferrer" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fab fa-telegram" style={{ color: '#3b82f6' }}></i>
+                                            <span>Telegram Channel</span>
+                                        </a>
+                                        <a href="mailto:support@smartearnbd.com" className="sidebar-item" onClick={() => setMobileMenuOpen(false)}>
+                                            <i className="fas fa-envelope" style={{ color: '#f87171' }}></i>
+                                            <span>Email Support</span>
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
+
+                    {/* Mobile Preferences & Auth */}
+                    <div className="drawer-footer" style={{ marginTop: 'auto' }}>
+                        <hr className="sidebar-divider" style={{ margin: '8px 0 16px 0' }} />
+
+                        {isAuthenticated ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <Link 
+                                    href={user?.role === 'buyer' ? '/buyer/dashboard' : '/dashboard'} 
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="sidebar-item active"
+                                    style={{ 
+                                        justifyContent: 'center', 
+                                        fontWeight: 'bold',
+                                        background: 'var(--primary-color)',
+                                        color: 'var(--text-light)'
+                                    }}
+                                >
+                                    {user?.role === 'buyer' ? tText('My Orders', 'আমার অর্ডারসমূহ') : tText('Go to Dashboard', 'ড্যাশবোর্ডে যান')}
+                                </Link>
+                                <button 
+                                    onClick={() => {
+                                        logout();
+                                        setMobileMenuOpen(false);
+                                        showToast(lang === 'bn' ? 'সফলভাবে লগআউট করা হয়েছে' : 'Logged out successfully', 'info');
+                                    }}
+                                    className="sidebar-item logout-btn"
+                                >
+                                    <i className="fas fa-sign-out-alt"></i>
+                                    <span>{tText('Logout', 'লগআউট')}</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <Link 
+                                    href="/login" 
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="sidebar-item"
+                                    style={{ 
+                                        flex: 1, 
+                                        justifyContent: 'center', 
+                                        border: '1px solid var(--border-color)', 
+                                        textAlign: 'center',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {tText('Login', 'লগইন')}
+                                </Link>
+                                <Link 
+                                    href="/signup" 
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="sidebar-item"
+                                    style={{ 
+                                        flex: 1, 
+                                        justifyContent: 'center', 
+                                        background: '#10b981', 
+                                        color: '#ffffff', 
+                                        textAlign: 'center',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {tText('Sign Up', 'সাইন আপ')}
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
+            </div>
 
             {/* Custom sidebar animation CSS injection */}
             <style jsx global>{`

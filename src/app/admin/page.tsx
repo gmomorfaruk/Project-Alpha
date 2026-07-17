@@ -41,8 +41,13 @@ export default function AdminDashboardPage() {
     // Lists
     const [recentTxns, setRecentTxns] = useState<Txn[]>([]);
     const [recentUsers, setRecentUsers] = useState<UserRecord[]>([]);
+    const [adminPrefix, setAdminPrefix] = useState('/admin');
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const prefix = sessionStorage.getItem('adminPathPrefix') || '/admin';
+            setAdminPrefix(prefix);
+        }
         loadDashboardStats();
     }, []);
 
@@ -237,28 +242,28 @@ export default function AdminDashboardPage() {
             <div style={{ background: 'var(--bg-primary)', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-color)', marginBottom: '30px' }}>
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', color: 'white' }}><i className="fas fa-bell" style={{ color: '#f59e0b', marginRight: '10px' }}></i>Pending Actions Awaiting Approval</h3>
                 <div className="admin-pending-grid">
-                    <Link href="/admin/transactions" className="pending-item-card" style={{ borderLeftColor: '#f59e0b' }}>
+                    <Link href={`${adminPrefix}/transactions`} className="pending-item-card" style={{ borderLeftColor: '#f59e0b' }}>
                         <div className="pending-icon-wrap" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="fas fa-exchange-alt"></i></div>
                         <div>
                             <h4 className="pending-item-title">{pendingTxns}</h4>
                             <p className="pending-item-lbl">Transactions (Deposits/Withdrawals)</p>
                         </div>
                     </Link>
-                    <Link href="/admin/memberships" className="pending-item-card" style={{ borderLeftColor: '#8b5cf6' }}>
+                    <Link href={`${adminPrefix}/memberships`} className="pending-item-card" style={{ borderLeftColor: '#8b5cf6' }}>
                         <div className="pending-icon-wrap" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}><i className="fas fa-crown"></i></div>
                         <div>
                             <h4 className="pending-item-title">{pendingMemberships}</h4>
                             <p className="pending-item-lbl">Membership Upgrades</p>
                         </div>
                     </Link>
-                    <Link href="/admin/proofs" className="pending-item-card" style={{ borderLeftColor: '#3b82f6' }}>
+                    <Link href={`${adminPrefix}/proofs`} className="pending-item-card" style={{ borderLeftColor: '#3b82f6' }}>
                         <div className="pending-icon-wrap" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}><i className="fas fa-receipt"></i></div>
                         <div>
                             <h4 className="pending-item-title">{pendingProofs}</h4>
                             <p className="pending-item-lbl">Self-Sell Sales Proofs</p>
                         </div>
                     </Link>
-                    <Link href="/admin/users" className="pending-item-card" style={{ borderLeftColor: '#10b981' }}>
+                    <Link href={`${adminPrefix}/users`} className="pending-item-card" style={{ borderLeftColor: '#10b981' }}>
                         <div className="pending-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}><i className="fas fa-user-plus"></i></div>
                         <div>
                             <h4 className="pending-item-title">{newUsersToday}</h4>
@@ -273,7 +278,7 @@ export default function AdminDashboardPage() {
                 <div className="admin-recent-card">
                     <div className="admin-recent-card-header">
                         <h3>Recent Financial Ledger Logs</h3>
-                        <Link href="/admin/transactions" className="btn btn-sm btn-outline">View All</Link>
+                        <Link href={`${adminPrefix}/transactions`} className="btn btn-sm btn-outline">View All</Link>
                     </div>
                     <div>
                         {recentTxns.length === 0 ? (
@@ -309,7 +314,7 @@ export default function AdminDashboardPage() {
                 <div className="admin-recent-card">
                     <div className="admin-recent-card-header">
                         <h3>Recent User Signups</h3>
-                        <Link href="/admin/users" className="btn btn-sm btn-outline">View All</Link>
+                        <Link href={`${adminPrefix}/users`} className="btn btn-sm btn-outline">View All</Link>
                     </div>
                     <div>
                         {recentUsers.length === 0 ? (
@@ -341,9 +346,9 @@ export default function AdminDashboardPage() {
             <div className="admin-recent-card" style={{ marginTop: '30px' }}>
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', color: 'white' }}><i className="fas fa-bolt" style={{ color: 'var(--primary-color)', marginRight: '10px' }}></i>System Quick Actions</h3>
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                    <Link href="/admin/products" className="btn btn-primary"><i className="fas fa-plus" style={{ marginRight: '6px' }}></i> Add Product</Link>
-                    <Link href="/admin/users" className="btn btn-outline"><i className="fas fa-users" style={{ marginRight: '6px' }}></i> Manage Users</Link>
-                    <Link href="/admin/settings" className="btn btn-outline"><i className="fas fa-cog" style={{ marginRight: '6px' }}></i> Settings</Link>
+                    <Link href={`${adminPrefix}/products`} className="btn btn-primary"><i className="fas fa-plus" style={{ marginRight: '6px' }}></i> Add Product</Link>
+                    <Link href={`${adminPrefix}/users`} className="btn btn-outline"><i className="fas fa-users" style={{ marginRight: '6px' }}></i> Manage Users</Link>
+                    <Link href={`${adminPrefix}/settings`} className="btn btn-outline"><i className="fas fa-cog" style={{ marginRight: '6px' }}></i> Settings</Link>
                 </div>
             </div>
         </div>

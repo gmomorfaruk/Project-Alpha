@@ -47,7 +47,13 @@ function SignupContent() {
     useEffect(() => {
         if (user) {
             if (user.role === 'admin') {
-                router.push('/admin');
+                const redirectPath = sessionStorage.getItem('adminRedirectPath');
+                if (redirectPath) {
+                    sessionStorage.removeItem('adminRedirectPath');
+                    router.push(redirectPath);
+                } else {
+                    router.push('/dashboard');
+                }
             } else if (user.role === 'buyer') {
                 router.push('/buyer/dashboard');
             } else {

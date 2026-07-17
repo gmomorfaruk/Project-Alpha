@@ -20,6 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [authorized, setAuthorized] = useState(false);
+    const [adminPrefix, setAdminPrefix] = useState('/admin');
 
     // PIN Gate states
     const [pinVerified, setPinVerified] = useState(false);
@@ -32,6 +33,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         // Authenticate admin access
         const currentUser = Storage.get('currentUser');
         if (!currentUser || !currentUser.isLoggedIn) {
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('adminRedirectPath', window.location.pathname);
+            }
             router.replace('/login');
             showToast('Please log in first', 'error');
             return;
@@ -45,6 +49,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         setAuthorized(true);
+
+        // Detect dynamic admin path prefix or subdomain routing
+        if (typeof window !== 'undefined') {
+            const segments = window.location.pathname.split('/');
+            const firstSegment = segments[1];
+            
+            const knownAdminPages = ['users', 'orders', 'transactions', 'memberships', 'products', 'tasks', 'proofs', 'database', 'settings'];
+            
+            let prefix = '/admin';
+            if (firstSegment && firstSegment !== 'admin' && !knownAdminPages.includes(firstSegment)) {
+                // It's a custom secret path!
+                prefix = '/' + firstSegment;
+            } else if (knownAdminPages.includes(firstSegment) || !firstSegment) {
+                // Subdomain routing is active (no secret path in URL segment)
+                prefix = '';
+            }
+            
+            setAdminPrefix(prefix);
+            sessionStorage.setItem('adminPathPrefix', prefix);
+            sessionStorage.setItem('adminRedirectPath', window.location.pathname);
+        }
 
         // Check if PIN is already verified this session
         if (typeof window !== 'undefined') {
@@ -69,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 setPinLockTime(Math.ceil((lockUntil - Date.now()) / 1000));
             }
         }
-    }, [user, router]);
+    }, [user, router, pathname]);
 
     // Lockout countdown timer
     useEffect(() => {
@@ -86,35 +111,65 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
     }, [pinLocked, pinLockTime]);
 
-    const handlePinSubmit = (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (pinLocked) return;
 
+        // 1. Check local settings PIN for backwards compatibility (e.g., "191191")
         const settings = Storage.get('settings');
-        const correctPin = settings?.adminPin || '1234';
+        const localPin = settings?.adminPin || '1234';
+        
+        let success = pinInput === localPin;
 
-        if (pinInput === correctPin) {
+        // 2. If it doesn't match the local settings, verify against the server-side ADMIN_PANEL_PASSWORD
+        if (!success) {
+            try {
+                const res = await fetch('/api/admin/verify-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pinInput })
+                });
+                const data = await res.json();
+                success = data.success;
+            } catch (err) {
+                // fall back to false if API fails
+            }
+        }
+
+        if (success) {
             setPinVerified(true);
             setPinAttempts(0);
             sessionStorage.setItem('adminPinVerified', 'true');
             sessionStorage.setItem('adminPinTime', Date.now().toString());
-            Security.logSecurityEvent('admin_pin_success', { timestamp: new Date().toISOString() });
+            Security.logSecurityEvent('admin_password_success', { timestamp: new Date().toISOString() });
             showToast('Access granted', 'success');
         } else {
             const newAttempts = pinAttempts + 1;
             setPinAttempts(newAttempts);
             setPinInput('');
-            Security.logSecurityEvent('admin_pin_failed', { attempt: newAttempts });
+            Security.logSecurityEvent('admin_password_failed', { attempt: newAttempts });
 
-            if (newAttempts >= 3) {
-                const lockDuration = 30 * 60 * 1000; // 30 minutes
+            // Exponential lockouts:
+            // 3 failed: 1 min (60s)
+            // 4 failed: 5 min (300s)
+            // 5 or more failed: 30 min (1800s)
+            let lockDuration = 0;
+            if (newAttempts === 3) {
+                lockDuration = 60 * 1000;
+            } else if (newAttempts === 4) {
+                lockDuration = 5 * 60 * 1000;
+            } else if (newAttempts >= 5) {
+                lockDuration = 30 * 60 * 1000;
+            }
+
+            if (lockDuration > 0) {
                 const lockUntil = Date.now() + lockDuration;
                 localStorage.setItem('adminPinLockUntil', lockUntil.toString());
                 setPinLocked(true);
-                setPinLockTime(30 * 60);
-                showToast('Too many failed attempts! Admin panel locked for 30 minutes.', 'error');
+                setPinLockTime(Math.ceil(lockDuration / 1000));
+                showToast(`Too many failed attempts! Locked for ${Math.ceil(lockDuration / 60000)} minute(s).`, 'error');
             } else {
-                showToast(`Incorrect PIN. ${3 - newAttempts} attempts remaining.`, 'error');
+                showToast(`Incorrect password. Attempt ${newAttempts}.`, 'error');
             }
         }
     };
@@ -138,16 +193,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         );
     }
 
-    // PIN Gate screen
+    // Password Gate screen
     if (!pinVerified) {
         return (
             <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0A1828 0%, #0f2744 50%, #0A1828 100%)', color: 'var(--text-primary, white)' }}>
-                <div style={{ textAlign: 'center', maxWidth: '400px', width: '100%', padding: '0 20px' }}>
+                <div style={{ textAlign: 'center', maxWidth: '450px', width: '100%', padding: '0 20px' }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px' }}>
                         <i className="fas fa-shield-alt" style={{ fontSize: '32px', color: '#ef4444' }}></i>
                     </div>
                     <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>Admin Security Gate</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '30px' }}>Enter your admin PIN to access the control panel</p>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '30px' }}>Enter your admin security password to access the control panel</p>
                     
                     {pinLocked ? (
                         <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', padding: '25px' }}>
@@ -159,33 +214,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={handlePinSubmit}>
+                        <form onSubmit={handlePasswordSubmit}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '20px' }}>
                                 <input
                                     type="password"
                                     value={pinInput}
-                                    onChange={e => setPinInput(e.target.value.replace(/\D/g, '').slice(0, 8))}
-                                    placeholder="• • • •"
+                                    onChange={e => setPinInput(e.target.value)}
+                                    placeholder="Enter Security Password"
                                     autoFocus
                                     style={{
-                                        width: '200px',
-                                        padding: '16px 20px',
-                                        fontSize: '24px',
+                                        width: '260px',
+                                        padding: '14px 20px',
+                                        fontSize: '16px',
                                         textAlign: 'center',
-                                        letterSpacing: '8px',
                                         background: 'rgba(255,255,255,0.05)',
                                         border: pinAttempts > 0 ? '2px solid rgba(239, 68, 68, 0.5)' : '2px solid rgba(255,255,255,0.1)',
                                         borderRadius: '12px',
                                         color: 'var(--text-primary, white)',
-                                        outline: 'none',
-                                        fontFamily: 'monospace'
+                                        outline: 'none'
                                     }}
                                 />
                             </div>
                             {pinAttempts > 0 && (
                                 <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '15px' }}>
                                     <i className="fas fa-exclamation-triangle" style={{ marginRight: '6px' }}></i>
-                                    {3 - pinAttempts} attempts remaining before lockout
+                                    Failed attempts: {pinAttempts}
                                 </p>
                             )}
                             <button type="submit" style={{
@@ -214,16 +267,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     const navItems = [
-        { path: '/admin', name: 'Overview', icon: 'fa-tachometer-alt' },
-        { path: '/admin/users', name: 'Users', icon: 'fa-users' },
-        { path: '/admin/orders', name: 'Orders', icon: 'fa-shopping-cart' },
-        { path: '/admin/transactions', name: 'Transactions', icon: 'fa-exchange-alt' },
-        { path: '/admin/memberships', name: 'Memberships', icon: 'fa-crown' },
-        { path: '/admin/products', name: 'Products', icon: 'fa-box' },
-        { path: '/admin/tasks', name: 'Tasks', icon: 'fa-tasks' },
-        { path: '/admin/proofs', name: 'Proofs', icon: 'fa-receipt' },
-        { path: '/admin/database', name: 'Database', icon: 'fa-database' },
-        { path: '/admin/settings', name: 'Settings', icon: 'fa-cog' }
+        { path: adminPrefix || '/', name: 'Overview', icon: 'fa-tachometer-alt' },
+        { path: `${adminPrefix}/users`, name: 'Users', icon: 'fa-users' },
+        { path: `${adminPrefix}/orders`, name: 'Orders', icon: 'fa-shopping-cart' },
+        { path: `${adminPrefix}/transactions`, name: 'Transactions', icon: 'fa-exchange-alt' },
+        { path: `${adminPrefix}/memberships`, name: 'Memberships', icon: 'fa-crown' },
+        { path: `${adminPrefix}/products`, name: 'Products', icon: 'fa-box' },
+        { path: `${adminPrefix}/tasks`, name: 'Tasks', icon: 'fa-tasks' },
+        { path: `${adminPrefix}/proofs`, name: 'Proofs', icon: 'fa-receipt' },
+        { path: `${adminPrefix}/database`, name: 'Database', icon: 'fa-database' },
+        { path: `${adminPrefix}/settings`, name: 'Settings', icon: 'fa-cog' }
     ];
 
     return (
@@ -432,7 +485,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Sidebar Navigation */}
             <aside className={`admin-sidebar ${mobileMenuOpen ? 'active' : ''}`}>
                 <div className="admin-sidebar-header">
-                    <Link href="/admin" className="admin-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Link href={adminPrefix || '/'} className="admin-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
                         <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
                     </Link>

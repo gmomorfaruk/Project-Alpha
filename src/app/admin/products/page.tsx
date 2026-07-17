@@ -41,10 +41,26 @@ export default function AdminProductsPage() {
     const [prodHasOffer, setProdHasOffer] = useState(false);
     const [prodOfferText, setProdOfferText] = useState('');
     const [prodOfferColor, setProdOfferColor] = useState('#ef4444');
+    const [imageType, setImageType] = useState<'upload' | 'url' | 'icon'>('icon');
 
     useEffect(() => {
         loadProductsData();
     }, []);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 1024 * 1024) {
+                showToast('Image size should be less than 1MB', 'error');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProdImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const loadProductsData = () => {
         // Force reset products list to load updated discounts
@@ -74,7 +90,8 @@ export default function AdminProductsPage() {
         setProdMinUnits('1');
         setProdDescription('');
         setProdColors('');
-        setProdImage('');
+        setProdImage('fa-box');
+        setImageType('icon');
         setProdActive(true);
         setProdHasOffer(false);
         setProdOfferText('');
@@ -95,6 +112,16 @@ export default function AdminProductsPage() {
         setProdDescription(p.description || '');
         setProdColors(p.colors ? p.colors.join(', ') : '');
         setProdImage(p.image || '');
+
+        // Resolve existing image type
+        if (p.image?.startsWith('data:image/')) {
+            setImageType('upload');
+        } else if (p.image?.startsWith('http://') || p.image?.startsWith('https://') || p.image?.startsWith('/')) {
+            setImageType('url');
+        } else {
+            setImageType('icon');
+        }
+
         setProdActive(p.active !== false);
         setProdHasOffer(p.hasOffer !== undefined ? p.hasOffer : !!(p.previousPrice && p.previousPrice > p.price));
         setProdOfferText(p.offerText || '');
@@ -298,7 +325,18 @@ export default function AdminProductsPage() {
                             ) : (
                                 filteredProducts.map((p) => (
                                     <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                        <td style={{ padding: '12px 8px', color: 'white', fontWeight: 600 }}>{p.name}</td>
+                                        <td style={{ padding: '12px 8px', color: 'white', fontWeight: 600 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', color: 'var(--primary-color)', overflow: 'hidden', border: '1px solid var(--border-color)', flexShrink: 0 }}>
+                                                    {p.image && (p.image.startsWith('http') || p.image.startsWith('data:image/') || p.image.startsWith('/')) ? (
+                                                        <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    ) : (
+                                                        <i className={`fas ${p.image || 'fa-box'}`}></i>
+                                                    )}
+                                                </div>
+                                                <span>{p.name}</span>
+                                            </div>
+                                        </td>
                                         <td><span className="badge badge-outline" style={{ textTransform: 'uppercase', fontSize: '9px' }}>{p.category}</span></td>
                                         <td><strong>৳{p.price.toLocaleString()}</strong></td>
                                         <td><span style={{ color: '#10b981', fontWeight: 600 }}>{p.returnRate}%</span></td>
@@ -427,9 +465,55 @@ export default function AdminProductsPage() {
                                     <label htmlFor="prodDescriptionTextarea">Product Description</label>
                                     <textarea id="prodDescriptionTextarea" rows={3} value={prodDescription} onChange={e => setProdDescription(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
                                 </div>
-                                <div className="form-group" style={{ marginBottom: '12px' }}>
-                                    <label htmlFor="prodImageUrlInput">Image/Icon (Optional)</label>
-                                    <input type="text" id="prodImageUrlInput" placeholder="e.g. fa-mobile-alt or image URL" value={prodImage} onChange={e => setProdImage(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white' }} />
+                                <div style={{ border: '1px dashed var(--border-color)', padding: '15px', borderRadius: '12px', marginBottom: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '10px', fontSize: '13px', color: 'white' }}>Product Image / Icon *</label>
+                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                                        <button type="button" className={`btn btn-sm ${imageType === 'upload' ? 'btn-primary' : 'btn-outline'}`} onClick={() => { setImageType('upload'); setProdImage(''); }} style={{ flex: 1, padding: '6px', fontSize: '12px' }}>
+                                            <i className="fas fa-upload" style={{ marginRight: '6px' }}></i> Upload
+                                        </button>
+                                        <button type="button" className={`btn btn-sm ${imageType === 'url' ? 'btn-primary' : 'btn-outline'}`} onClick={() => { setImageType('url'); setProdImage(''); }} style={{ flex: 1, padding: '6px', fontSize: '12px' }}>
+                                            <i className="fas fa-link" style={{ marginRight: '6px' }}></i> URL
+                                        </button>
+                                        <button type="button" className={`btn btn-sm ${imageType === 'icon' ? 'btn-primary' : 'btn-outline'}`} onClick={() => { setImageType('icon'); setProdImage('fa-box'); }} style={{ flex: 1, padding: '6px', fontSize: '12px' }}>
+                                            <i className="fas fa-icons" style={{ marginRight: '6px' }}></i> Icon
+                                        </button>
+                                    </div>
+
+                                    {imageType === 'upload' && (
+                                        <div className="form-group">
+                                            <label htmlFor="prodImageUploadInput" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Upload Image File (max 1MB)</label>
+                                            <input type="file" id="prodImageUploadInput" accept="image/*" onChange={handleImageUpload} style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-secondary)', color: 'white', fontSize: '12px' }} />
+                                            {prodImage && prodImage.startsWith('data:image/') && (
+                                                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                                                    <img src={prodImage} alt="Preview" style={{ maxHeight: '80px', maxWidth: '100%', borderRadius: '8px', objectFit: 'contain', border: '1px solid var(--border-color)' }} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {imageType === 'url' && (
+                                        <div className="form-group">
+                                            <label htmlFor="prodImageUrlInput" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Online Image URL</label>
+                                            <input type="text" id="prodImageUrlInput" placeholder="https://example.com/image.png" value={prodImage} onChange={e => setProdImage(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white', fontSize: '13px' }} />
+                                            {prodImage && (prodImage.startsWith('http') || prodImage.startsWith('/')) && (
+                                                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                                                    <img src={prodImage} alt="Preview" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ maxHeight: '80px', maxWidth: '100%', borderRadius: '8px', objectFit: 'contain', border: '1px solid var(--border-color)' }} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {imageType === 'icon' && (
+                                        <div className="form-group">
+                                            <label htmlFor="prodImageIconInput" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>FontAwesome Icon Class</label>
+                                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                                <input type="text" id="prodImageIconInput" placeholder="e.g. fa-mobile-alt, fa-laptop, fa-box" value={prodImage} onChange={e => setProdImage(e.target.value)} style={{ flex: 1, padding: '10px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)', color: 'white', fontSize: '13px' }} />
+                                                <div style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', color: 'var(--primary-color)' }}>
+                                                    <i className={`fas ${prodImage || 'fa-box'}`}></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <input type="checkbox" id="prodActiveCheckbox" checked={prodActive} onChange={e => setProdActive(e.target.checked)} style={{ cursor: 'pointer' }} />

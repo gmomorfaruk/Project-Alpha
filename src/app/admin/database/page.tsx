@@ -352,12 +352,18 @@ CREATE POLICY "Allow all operations on tasks" ON tasks FOR ALL USING (true) WITH
 CREATE TABLE IF NOT EXISTS transactions (
     id TEXT PRIMARY KEY,
     "userId" TEXT,
+    "userEmail" TEXT,
+    "userName" TEXT,
     type TEXT NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     method TEXT,
     status TEXT DEFAULT 'pending',
     reference TEXT,
     phone TEXT,
+    "accountNumber" TEXT,
+    "transactionId" TEXT,
+    "txnId" TEXT,
+    "toNumber" TEXT,
     description TEXT,
     "processedBy" TEXT,
     "processedAt" TIMESTAMPTZ,
@@ -496,6 +502,7 @@ CREATE POLICY "Allow all operations on referrals" ON referrals FOR ALL USING (tr
 CREATE TABLE IF NOT EXISTS memberships (
     id TEXT PRIMARY KEY,
     "userId" TEXT,
+    "userEmail" TEXT,
     "userName" TEXT,
     "membershipId" TEXT,
     "membershipName" TEXT,
@@ -503,6 +510,7 @@ CREATE TABLE IF NOT EXISTS memberships (
     "paymentMethod" TEXT,
     "paymentMethodName" TEXT,
     "transactionId" TEXT,
+    "txnId" TEXT,
     "senderNumber" TEXT,
     status TEXT DEFAULT 'pending',
     note TEXT,
@@ -622,6 +630,15 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS icon TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS \"returnRate\" DECIMAL(10,2) DEFAULT 0;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INTEGER DEFAULT 0;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS \"minUnits\" INTEGER DEFAULT 1;
+
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "userEmail" TEXT;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "userName" TEXT;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "accountNumber" TEXT;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "transactionId" TEXT;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "txnId" TEXT;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS "toNumber" TEXT;
+ALTER TABLE memberships ADD COLUMN IF NOT EXISTS "userEmail" TEXT;
+ALTER TABLE memberships ADD COLUMN IF NOT EXISTS "txnId" TEXT;
 `;
 
     const handleCopySQL = () => {

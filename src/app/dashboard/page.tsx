@@ -226,6 +226,13 @@ export default function DashboardPage() {
             <div className="dashboard-hero-grid">
                 {/* Balance Card */}
                 <div className="balance-card-wrapper">
+                    {/* Card Brand & Chip detail */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', opacity: 0.8 }}>
+                        <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', borderRadius: '6px', position: 'relative', overflow: 'hidden', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }}>
+                            <div style={{ position: 'absolute', top: '15%', left: '15%', width: '70%', height: '70%', border: '1px solid rgba(0,0,0,0.15)', borderRadius: '3px' }}></div>
+                        </div>
+                        <i className="fas fa-wifi" style={{ transform: 'rotate(90deg)', opacity: 0.5, fontSize: '14px', color: 'white' }}></i>
+                    </div>
                     <div className="balance-card-content">
                         <span className="balance-label">{tText("Current Balance", "বর্তমান ব্যালেন্স")}</span>
                         <h2 className="balance-amount">{formatMoney(user?.balance || 0)}</h2>

@@ -103,9 +103,14 @@ export default function CartPage() {
                                             alignItems: 'center', 
                                             justifyContent: 'center', 
                                             fontSize: '28px', 
-                                            color: 'var(--primary-color)' 
+                                            color: 'var(--primary-color)',
+                                            overflow: 'hidden'
                                         }}>
-                                            <i className={`fas ${item.product.image || 'fa-box'}`}></i>
+                                            {item.product.image && (item.product.image.startsWith('http') || item.product.image.startsWith('data:image/') || item.product.image.startsWith('/')) ? (
+                                                <img src={item.product.image} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <i className={`fas ${item.product.image || 'fa-box'}`}></i>
+                                            )}
                                         </div>
                                         <div>
                                             <h3 style={{ fontSize: '16px', fontWeight: 600, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>{item.product.name}</h3>

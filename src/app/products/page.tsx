@@ -449,8 +449,59 @@ export default function ProductsPage() {
                         <p>{tText("Choose from our wide range of investment products", "আমাদের বিস্তৃত বিনিয়োগ পণ্য থেকে বেছে নিন")}</p>
                     </div>
 
-                    <div className="products-controls">
-                        <div className="search-box">
+                    {/* Category Filter Pills */}
+                    <div className="category-pills-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '28px', justifyContent: 'center' }}>
+                        {[
+                            { value: 'all', label: tText("All", "সব") },
+                            { value: 'mobile', label: 'Mobile' },
+                            { value: 'computer', label: 'Computer' },
+                            { value: 'electronics', label: 'Electronics' },
+                            { value: 'accessories', label: 'Accessories' },
+                            { value: 'fashion', label: 'Fashion' },
+                            { value: 'home', label: 'Home' },
+                            { value: 'health', label: 'Health' },
+                            { value: 'offers', label: tText("Offers", "অফার") },
+                            { value: 'other', label: 'Other' }
+                        ].map((cat) => (
+                            <button
+                                key={cat.value}
+                                onClick={() => setCategoryFilter(cat.value)}
+                                className={`category-pill ${categoryFilter === cat.value ? 'active' : ''}`}
+                                style={{
+                                    padding: '8px 18px',
+                                    borderRadius: '999px',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    border: '1px solid',
+                                    borderColor: categoryFilter === cat.value ? 'var(--primary-color)' : 'var(--border-color)',
+                                    background: categoryFilter === cat.value ? 'var(--primary-gradient)' : 'rgba(255,255,255,0.02)',
+                                    color: categoryFilter === cat.value ? 'white' : 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: categoryFilter === cat.value ? 'var(--shadow-primary)' : 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (categoryFilter !== cat.value) {
+                                        e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                                        e.currentTarget.style.borderColor = 'var(--primary-color)';
+                                        e.currentTarget.style.color = 'var(--text-primary)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (categoryFilter !== cat.value) {
+                                        e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                                        e.currentTarget.style.color = 'var(--text-secondary)';
+                                    }
+                                }}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="products-controls" style={{ display: 'flex', gap: '15px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap' }}>
+                        <div className="search-box" style={{ flex: 1, minWidth: '200px' }}>
                             <i className="fas fa-search"></i>
                             <input 
                                 type="text" 
@@ -459,25 +510,7 @@ export default function ProductsPage() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <div className="filter-dropdown">
-                            <select 
-                                value={categoryFilter} 
-                                onChange={(e) => setCategoryFilter(e.target.value)}
-                            >
-                                <option value="all">{tText("All Categories", "সব বিভাগ")}</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="fashion">Fashion</option>
-                                <option value="home">Home & Living</option>
-                                <option value="health">Health & Beauty</option>
-                                <option value="mobile">Mobile</option>
-                                <option value="computer">Computer</option>
-                                <option value="accessories">Accessories</option>
-                                <option value="offers">{tText("Offers", "অফার")}</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="filter-dropdown">
+                        <div className="filter-dropdown" style={{ minWidth: '150px' }}>
                             <select 
                                 value={sortBy} 
                                 onChange={(e) => setSortBy(e.target.value)}
@@ -523,7 +556,11 @@ export default function ProductsPage() {
                                 return (
                                     <div key={product.id} className={`product-card ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                                         <div className="product-image-container" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => openProductDetails(product)}>
-                                            <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                            {product.image && (product.image.startsWith('http') || product.image.startsWith('data:image/') || product.image.startsWith('/')) ? (
+                                                <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                            )}
                                             <div className="product-badges" style={{ display: 'flex', gap: '6px', left: '15px', top: '15px', position: 'absolute' }}>
                                                 {hasOffer && (
                                                     <span className="prod-badge badge-offer" style={{ 
@@ -733,8 +770,8 @@ export default function ProductsPage() {
                 const isOutOfStock = product.stock === 0;
 
                 return (
-                    <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
-                        <div className="modal" style={{ maxWidth: '600px', width: '100%', background: 'var(--bg-primary, #0f1c30)', border: '1px solid var(--border-color, #1e2d4a)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+                    <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+                        <div className="modal" style={{ maxWidth: '600px', width: '100%', background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column' }}>
                             <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <h3 style={{ margin: 0, color: 'white' }}>{tText("Product Details", "পণ্যের বিবরণ")}</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -764,8 +801,12 @@ export default function ProductsPage() {
                             <div className="modal-body" style={{ padding: '20px', maxHeight: '70vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 {/* Image and main pricing/category */}
                                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                                    <div style={{ width: '120px', height: '120px', borderRadius: '12px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px', color: 'var(--primary-color)', flexShrink: 0, border: '1px solid var(--border-color)' }}>
-                                        <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                    <div style={{ width: '120px', height: '120px', borderRadius: '12px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px', color: 'var(--primary-color)', flexShrink: 0, border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                                        {product.image && (product.image.startsWith('http') || product.image.startsWith('data:image/') || product.image.startsWith('/')) ? (
+                                            <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                        )}
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '200px' }}>
                                         <span className="prod-badge badge-category" style={{ width: 'fit-content', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>
@@ -814,17 +855,22 @@ export default function ProductsPage() {
                                                     type="button"
                                                     onClick={() => setDetailsColor(color)}
                                                     style={{
-                                                        padding: '6px 12px',
-                                                        borderRadius: '20px',
+                                                        padding: '8px 16px',
+                                                        borderRadius: '999px',
                                                         border: '1px solid',
                                                         borderColor: detailsColor === color ? 'var(--primary-color)' : 'var(--border-color)',
-                                                        background: detailsColor === color ? 'var(--primary-light)' : 'none',
+                                                        background: detailsColor === color ? 'var(--primary-gradient)' : 'rgba(255,255,255,0.02)',
                                                         color: detailsColor === color ? 'white' : 'var(--text-secondary)',
                                                         fontSize: '12px',
                                                         cursor: 'pointer',
-                                                        fontWeight: detailsColor === color ? 600 : 400
+                                                        fontWeight: 600,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        transition: 'all 0.2s ease'
                                                     }}
                                                 >
+                                                    {detailsColor === color && <i className="fas fa-check-circle text-[10px]"></i>}
                                                     {color}
                                                 </button>
                                             ))}
@@ -947,8 +993,8 @@ export default function ProductsPage() {
 
             {/* Guest Checkout Modal */}
             {checkoutOpen && checkoutProduct && (
-                <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
-                    <div className="modal" style={{ maxWidth: '500px', width: '100%', background: 'var(--bg-primary, #0f1c30)', border: '1px solid var(--border-color, #1e2d4a)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+                <div className="modal-overlay active" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
+                    <div className="modal" style={{ maxWidth: '500px', width: '100%', background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column' }}>
                         <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h3 style={{ margin: 0, color: 'white' }}>{tText("Checkout - Order Product", "চেকআউট - পণ্য অর্ডার করুন")}</h3>
                             <button className="modal-close" onClick={() => setCheckoutOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '18px' }}>
@@ -960,8 +1006,12 @@ export default function ProductsPage() {
                                 
                                 {/* Product Summary */}
                                 <div style={{ display: 'flex', gap: '15px', background: 'var(--bg-secondary)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: 'var(--primary-color)' }}>
-                                        <i className={`fas ${checkoutProduct.image || 'fa-box'}`}></i>
+                                    <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: 'var(--primary-color)', overflow: 'hidden' }}>
+                                        {checkoutProduct.image && (checkoutProduct.image.startsWith('http') || checkoutProduct.image.startsWith('data:image/') || checkoutProduct.image.startsWith('/')) ? (
+                                            <img src={checkoutProduct.image} alt={checkoutProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <i className={`fas ${checkoutProduct.image || 'fa-box'}`}></i>
+                                        )}
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                         <h4 style={{ margin: 0, fontSize: '15px', color: 'white' }}>{checkoutProduct.name}</h4>
@@ -980,17 +1030,22 @@ export default function ProductsPage() {
                                                     type="button"
                                                     onClick={() => setOrderColor(color)}
                                                     style={{
-                                                        padding: '6px 12px',
-                                                        borderRadius: '20px',
+                                                        padding: '8px 16px',
+                                                        borderRadius: '999px',
                                                         border: '1px solid',
                                                         borderColor: orderColor === color ? 'var(--primary-color)' : 'var(--border-color)',
-                                                        background: orderColor === color ? 'var(--primary-light)' : 'none',
+                                                        background: orderColor === color ? 'var(--primary-gradient)' : 'rgba(255,255,255,0.02)',
                                                         color: orderColor === color ? 'white' : 'var(--text-secondary)',
                                                         fontSize: '12px',
                                                         cursor: 'pointer',
-                                                        fontWeight: orderColor === color ? 600 : 400
+                                                        fontWeight: 600,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        transition: 'all 0.2s ease'
                                                     }}
                                                 >
+                                                    {orderColor === color && <i className="fas fa-check-circle text-[10px]"></i>}
                                                     {color}
                                                 </button>
                                             ))}

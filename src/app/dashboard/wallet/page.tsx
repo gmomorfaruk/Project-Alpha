@@ -9,11 +9,13 @@ import db from '@/lib/database';
 
 interface Transaction {
     id: string;
-    type: 'deposit' | 'withdrawal' | 'investment' | 'earning';
+    type: 'deposit' | 'withdrawal' | 'investment' | 'earning' | 'task_earning' | 'admin_adjustment';
     method?: string;
     amount: number;
     txnId?: string;
+    transactionId?: string;
     toNumber?: string;
+    accountNumber?: string;
     status: 'pending' | 'approved' | 'rejected' | 'completed';
     userId: string;
     userEmail: string;
@@ -97,7 +99,9 @@ export default function ClientWalletPage() {
                 method: depositMethod,
                 amount: amount,
                 txnId: depositTxnId.trim(),
+                transactionId: depositTxnId.trim(),
                 toNumber: depositReference.trim() || undefined,
+                accountNumber: depositReference.trim() || undefined,
                 status: 'pending',
                 userId: user.id,
                 userEmail: user.email,
@@ -199,6 +203,7 @@ export default function ClientWalletPage() {
                 method: 'bank',
                 amount: amount,
                 toNumber: withdrawInfo.bankAccount,
+                accountNumber: withdrawInfo.bankAccount,
                 status: 'pending',
                 userId: user.id,
                 userEmail: user.email,

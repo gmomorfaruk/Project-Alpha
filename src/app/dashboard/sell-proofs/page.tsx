@@ -20,6 +20,7 @@ interface SelfSellInvestment {
 
 interface SellProof {
     id: string;
+    userId?: string;
     investmentId: string;
     productName: string;
     productValue: number;
@@ -163,6 +164,7 @@ function SellProofsContent() {
 
             const newProof: SellProof = {
                 id: db.generateId(),
+                userId: user.id,
                 investmentId: selectedInvId,
                 productName: inv.productName,
                 productValue: productValue,

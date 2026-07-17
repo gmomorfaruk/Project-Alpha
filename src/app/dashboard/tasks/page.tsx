@@ -367,7 +367,12 @@ export default function ClientTasksPage() {
                     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
                 }
                 .duo-task-card.completed-state {
-                    opacity: 0.5;
+                    border-color: rgba(16, 185, 129, 0.2);
+                    background: rgba(16, 185, 129, 0.01);
+                }
+                .duo-task-card.completed-state .duo-icon-box {
+                    filter: grayscale(0.5);
+                    opacity: 0.7;
                 }
                 .duo-icon-box {
                     width: 50px;

@@ -290,6 +290,9 @@ export default function ClientProductsPage() {
                     border: 1px solid var(--border-color);
                     max-width: 550px;
                     width: 100%;
+                    max-height: 90vh;
+                    display: flex;
+                    flex-direction: column;
                     overflow: hidden;
                 }
                 .modal-header {
@@ -324,6 +327,8 @@ export default function ClientProductsPage() {
                 }
                 .modal-body {
                     padding: 25px;
+                    overflow-y: auto;
+                    flex-grow: 1;
                 }
                 .product-summary {
                     padding: 15px;

@@ -122,9 +122,13 @@ export default function Home() {
                                     <div className="product-badge">
                                         {badgeText}
                                     </div>
-                                    <div className="product-image" style={{ cursor: 'pointer' }}>
-                                        <Link href={`/products?productId=${product.id}`}>
-                                            <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                    <div className="product-image" style={{ cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Link href={`/products?productId=${product.id}`} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {product.image && (product.image.startsWith('http') || product.image.startsWith('data:image/') || product.image.startsWith('/')) ? (
+                                                <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <i className={`fas ${product.image || 'fa-box'}`}></i>
+                                            )}
                                         </Link>
                                     </div>
                                     <h3 style={{ cursor: 'pointer' }}>

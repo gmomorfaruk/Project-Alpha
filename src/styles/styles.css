@@ -305,6 +305,36 @@ input, textarea, select {
     min-height: 100vh;
     display: flex;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glowing orbs details */
+.hero::before,
+.hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(150px);
+    z-index: 1;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.hero::before {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-color);
+    top: 10%;
+    right: -100px;
+}
+
+.hero::after {
+    width: 300px;
+    height: 300px;
+    background: var(--accent-color);
+    bottom: 10%;
+    left: -100px;
 }
 
 .hero .container {
@@ -312,6 +342,8 @@ input, textarea, select {
     grid-template-columns: 1fr 1fr;
     gap: 80px;
     align-items: center;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-content h1 {
@@ -377,26 +409,47 @@ input, textarea, select {
 .hero-illustration {
     width: 350px;
     height: 350px;
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 150px;
     color: white;
-    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.25), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.hero-illustration::after {
+    content: '';
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
 }
 
 .floating-card {
     position: absolute;
-    background: var(--bg-primary);
-    padding: 15px 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
+    background: rgba(30, 41, 59, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 16px 28px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
-    gap: 10px;
-    animation: float 3s ease-in-out infinite;
+    gap: 12px;
+    animation: float 4s ease-in-out infinite;
+}
+
+[data-theme="light"] .floating-card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 .floating-card i {
@@ -407,6 +460,7 @@ input, textarea, select {
 .floating-card span {
     font-weight: 600;
     font-size: 18px;
+    color: var(--text-primary);
 }
 
 .card-1 {
@@ -418,7 +472,7 @@ input, textarea, select {
 .card-2 {
     bottom: 20%;
     right: 0;
-    animation-delay: 1.5s;
+    animation-delay: 2s;
 }
 
 @keyframes float {
@@ -460,21 +514,35 @@ input, textarea, select {
 }
 
 .product-card {
-    background: var(--bg-primary);
-    border-radius: 16px;
+    background: var(--bg-card);
+    border-radius: 18px;
     padding: 30px;
     position: relative;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px);
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.08);
 }
 
 .product-card.featured {
     border: 2px solid var(--primary-color);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+}
+
+.product-card.featured::after {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-radius: 18px;
+    z-index: -1;
+    opacity: 0.08;
+    pointer-events: none;
 }
 
 .product-badge {
@@ -485,12 +553,16 @@ input, textarea, select {
     color: white;
     padding: 5px 12px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
 .product-badge.special {
     background: var(--primary-gradient);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
 .product-image {
@@ -504,6 +576,14 @@ input, textarea, select {
     font-size: 36px;
     color: var(--primary-color);
     margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .product-card h3 {

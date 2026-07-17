@@ -174,12 +174,14 @@ export class SupabaseAdapter extends DatabaseAdapter {
     client: any;
     reconnectAttempts: number;
     maxReconnectAttempts: number;
+    schemaColumns: Record<string, string[]> | null;
 
     constructor() {
         super('supabase');
         this.client = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 3;
+        this.schemaColumns = null;
     }
 
     async connect(config: any) {
@@ -233,6 +235,25 @@ export class SupabaseAdapter extends DatabaseAdapter {
                     }
                 });
                 
+                if (testResponse.ok) {
+                    try {
+                        const spec = await testResponse.json();
+                        if (spec && spec.definitions) {
+                            const schemaCols: Record<string, string[]> = {};
+                            for (const tableName in spec.definitions) {
+                                const properties = spec.definitions[tableName]?.properties;
+                                if (properties) {
+                                    schemaCols[tableName] = Object.keys(properties);
+                                }
+                            }
+                            this.schemaColumns = schemaCols;
+                            console.log('📖 Successfully cached Supabase schema columns:', Object.keys(schemaCols));
+                        }
+                    } catch (schemaErr) {
+                        console.warn('Failed to parse OpenAPI schema from Supabase:', schemaErr);
+                    }
+                }
+                
                 if (!testResponse.ok) {
                     const errorText = await testResponse.text();
                     const isKeyTypeWarning = errorText.includes('service_role') || testResponse.headers.get('sb-error-code') === 'UNAUTHORIZED_INVALID_API_KEY_TYPE';
@@ -246,10 +267,7 @@ export class SupabaseAdapter extends DatabaseAdapter {
                     console.log('ℹ️ REST API gateway accepted key (root endpoint restricted to service_role).');
                 }
             } catch (fetchError: any) {
-                console.error('REST API test failed:', fetchError);
-                if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('NetworkError')) {
-                    return { success: false, message: 'Network error. Check your internet connection and Supabase URL.' };
-                }
+                console.warn('REST API OpenApi schema fetch failed (likely CORS on root), falling back to dynamic column caching:', fetchError.message);
             }
             
             // Try query with corrected 'id' column select
@@ -310,21 +328,43 @@ export class SupabaseAdapter extends DatabaseAdapter {
     async create(table: string, record: any) {
         if (!this.connected) await this.reconnect();
         try {
+            // Initialize schemaColumns cache dynamically if it is null
+            if (!this.schemaColumns) {
+                this.schemaColumns = {};
+            }
+            if (!this.schemaColumns[table]) {
+                this.schemaColumns[table] = Object.keys(record);
+            }
+
             let safeRecord = { ...record };
+            
+            // Filter columns if schema columns are cached
+            const validCols = this.schemaColumns[table];
+            for (const key in safeRecord) {
+                if (!validCols.includes(key)) {
+                    delete safeRecord[key];
+                }
+            }
+
             let retries = 0;
             while (retries < 10) {
                 const { data, error } = await this.client.from(table).insert([safeRecord]).select();
                 if (!error) return { success: true, data: data[0] };
 
-                // PGRST204: column not found in schema cache. Strip the bad field and retry.
+                // PGRST204: column not found in schema cache. Strip the bad field, update cache, and retry.
                 if (error.code === 'PGRST204') {
                     const match = error.message.match(/column "([^"]+)"/) || error.message.match(/'([^']+)'/);
                     const badField = match ? match[1] : null;
-                    if (badField && safeRecord.hasOwnProperty(badField)) {
-                        console.warn(`Supabase: stripping unknown column '${badField}' from '${table}' and retrying.`);
-                        delete safeRecord[badField];
-                        retries++;
-                        continue;
+                    if (badField) {
+                        // Remove from the schema cache so we never attempt to write it again
+                        this.schemaColumns[table] = this.schemaColumns[table].filter(col => col !== badField);
+                        
+                        if (safeRecord.hasOwnProperty(badField)) {
+                            console.warn(`Supabase: stripping unknown column '${badField}' from '${table}' and retrying.`);
+                            delete safeRecord[badField];
+                            retries++;
+                            continue;
+                        }
                     }
                 }
                 // Any other error
@@ -375,7 +415,24 @@ export class SupabaseAdapter extends DatabaseAdapter {
     async update(table: string, id: string, updates: any) {
         if (!this.connected) await this.reconnect();
         try {
+            // Initialize schemaColumns cache dynamically if it is null
+            if (!this.schemaColumns) {
+                this.schemaColumns = {};
+            }
+            if (!this.schemaColumns[table]) {
+                this.schemaColumns[table] = Object.keys(updates);
+            }
+
             let safeUpdates = { ...updates, updatedAt: new Date().toISOString() };
+            
+            // Filter columns if schema columns are cached
+            const validCols = this.schemaColumns[table];
+            for (const key in safeUpdates) {
+                if (!validCols.includes(key)) {
+                    delete safeUpdates[key];
+                }
+            }
+
             let retries = 0;
             while (retries < 10) {
                 const { data, error } = await this.client
@@ -385,15 +442,20 @@ export class SupabaseAdapter extends DatabaseAdapter {
                     .select();
                 if (!error) return { success: true, data: data[0] };
 
-                // PGRST204: column not found in schema cache. Strip the bad field and retry.
+                // PGRST204: column not found in schema cache. Strip the bad field, update cache, and retry.
                 if (error.code === 'PGRST204') {
                     const match = error.message.match(/column "([^"]+)"/) || error.message.match(/'([^']+)'/);
                     const badField = match ? match[1] : null;
-                    if (badField && safeUpdates.hasOwnProperty(badField)) {
-                        console.warn(`Supabase: stripping unknown column '${badField}' from '${table}' update and retrying.`);
-                        delete safeUpdates[badField];
-                        retries++;
-                        continue;
+                    if (badField) {
+                        // Remove from the schema cache so we never attempt to write it again
+                        this.schemaColumns[table] = this.schemaColumns[table].filter(col => col !== badField);
+                        
+                        if (safeUpdates.hasOwnProperty(badField)) {
+                            console.warn(`Supabase: stripping unknown column '${badField}' from '${table}' update and retrying.`);
+                            delete safeUpdates[badField];
+                            retries++;
+                            continue;
+                        }
                     }
                 }
                 console.error('Supabase update error:', error.message || error, 'Code:', error.code, 'Details:', error.details);
@@ -458,24 +520,22 @@ export class SupabaseAdapter extends DatabaseAdapter {
             return { success: false, message: 'Not connected to Supabase' };
         }
         try {
-            const testUrl = `${this.config.url}/rest/v1/`;
-            const testResponse = await fetch(testUrl, {
-                method: 'GET',
-                headers: {
-                    'apikey': this.config.anonKey,
-                    'Authorization': `Bearer ${this.config.anonKey}`
+            // Use Supabase client to select from products table with head: true (no content, just test connection)
+            // This avoids any browser CORS block on the root endpoint.
+            const { error } = await this.client
+                .from('products')
+                .select('id', { head: true, count: 'exact' })
+                .limit(1);
+
+            if (error) {
+                // If it is a network error (like failed to fetch)
+                if (error.message.includes('FetchError') || error.message.includes('Failed to fetch') || error.message.includes('Network Error')) {
+                    return { success: false, message: error.message };
                 }
-            });
-            // 200, 400, 401, 403 all mean the server is reachable and responding.
-            // Supabase root /rest/v1/ legitimately returns 401 for anon keys.
-            // Only treat network-level failures as unhealthy.
-            if (testResponse.status < 500) {
-                return { success: true, message: `Supabase reachable (HTTP ${testResponse.status})` };
             }
-            return { success: false, message: `Server error HTTP ${testResponse.status}` };
+            return { success: true, message: 'Supabase reachable' };
         } catch (error: any) {
-            // Only a true network failure (fetch throws) means we're unreachable
-            return { success: false, message: error.message };
+            return { success: false, message: error.message || 'Failed to fetch' };
         }
     }
 
@@ -1055,23 +1115,25 @@ export class UnifiedDatabase {
     }
 
     async testConnection(type: string, config: any) {
-        const adapter = this.adapters[type];
-        
-        if (!adapter) {
-            return { success: false, message: `Unknown database type: ${type}` };
-        }
+        let testAdapter;
+        if (type === 'supabase') testAdapter = new SupabaseAdapter();
+        else if (type === 'firebase') testAdapter = new FirebaseAdapter();
+        else if (type === 'mongodb') testAdapter = new MongoDBAdapter();
+        else if (type === 'restapi') testAdapter = new RestAPIAdapter();
+        else if (type === 'localStorage') testAdapter = new LocalStorageAdapter();
+        else return { success: false, message: `Unknown database type: ${type}` };
 
         try {
-            const connectResult = await adapter.connect(config);
+            const connectResult = await testAdapter.connect(config);
             if (!connectResult.success) return connectResult;
 
             if (type === 'supabase') {
-                await adapter.disconnect();
+                await testAdapter.disconnect();
                 return connectResult;
             }
 
-            const testResult = await adapter.testConnection();
-            await adapter.disconnect();
+            const testResult = await testAdapter.testConnection();
+            await testAdapter.disconnect();
             return testResult;
         } catch (error: any) {
             console.error('❌ Test connection error:', error);
@@ -1450,6 +1512,13 @@ export class UnifiedDatabase {
         }
         this.healthCheckInterval = setInterval(async () => {
             if (this.type !== 'localStorage' && this.isOnline) {
+                // If the adapter is disconnected, attempt to heal/reconnect first
+                if (!this.connected || !this.currentAdapter.client) {
+                    console.log(`🔄 Health monitor: Auto-reconnecting to ${this.type}...`);
+                    this.currentAdapter.reconnectAttempts = 0; // Reset reconnection attempts to force retry
+                    await this.currentAdapter.reconnect();
+                }
+
                 const result = await this.currentAdapter.testConnection();
                 if (!result.success) {
                     // Only log a warning — NEVER auto-disconnect or fall back to localStorage.

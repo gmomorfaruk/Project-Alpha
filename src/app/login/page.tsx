@@ -38,7 +38,13 @@ export default function LoginPage() {
         setMounted(true);
         if (user) {
             if (user.role === 'admin') {
-                router.push('/admin');
+                const redirectPath = sessionStorage.getItem('adminRedirectPath');
+                if (redirectPath) {
+                    sessionStorage.removeItem('adminRedirectPath');
+                    router.push(redirectPath);
+                } else {
+                    router.push('/dashboard');
+                }
             } else if (user.role === 'buyer') {
                 router.push('/buyer/dashboard');
             } else {
@@ -62,7 +68,13 @@ export default function LoginPage() {
                 showToast('Login successful! Redirecting...', 'success');
                 setTimeout(() => {
                     if (res.role === 'admin') {
-                        router.push('/admin');
+                        const redirectPath = sessionStorage.getItem('adminRedirectPath');
+                        if (redirectPath) {
+                            sessionStorage.removeItem('adminRedirectPath');
+                            router.push(redirectPath);
+                        } else {
+                            router.push('/dashboard');
+                        }
                     } else if (res.role === 'buyer') {
                         router.push('/buyer/dashboard');
                     } else {
