@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/context/ToastContext';
 import Storage from '@/lib/storage';
 import db from '@/lib/database';
+import { supabase } from '@/lib/supabase';
 
 interface UserRecord {
     id: string;
@@ -76,19 +77,38 @@ export default function AdminUsersPage() {
         loadUsersData();
     }, []);
 
-    const loadUsersData = () => {
-        const allUsers: UserRecord[] = Storage.get('users') || [];
-        const regularUsers = allUsers.filter((u) => u.role !== 'admin');
-        
-        setUsers(allUsers);
+    const loadUsersData = async () => {
+        // 1. Try Supabase first
+        let allUsers: UserRecord[] = [];
+        try {
+            const { data, error } = await supabase.from('users').select('*');
+            if (!error && data && data.length > 0) {
+                // Map snake_case → camelCase
+                allUsers = data.map((u: any) => ({
+                    ...u,
+                    name: u.name || u.fullName || '',
+                    referralCode: u.referral_code || u.referralCode || '',
+                    totalInvested: u.total_invested ?? u.totalInvested ?? 0,
+                    totalProfit: u.total_profit ?? u.totalProfit ?? 0,
+                    createdAt: u.created_at || u.createdAt || '',
+                }));
 
-        // Stats
+                // Merge into localStorage so other pages can read it without network
+                Storage.set('users', allUsers);
+            } else {
+                // Supabase empty or error — fall back to localStorage
+                allUsers = Storage.get('users') || [];
+            }
+        } catch {
+            allUsers = Storage.get('users') || [];
+        }
+
+        const regularUsers = allUsers.filter((u) => u.role !== 'admin');
+        setUsers(allUsers);
         setTotalCount(regularUsers.length);
         setActiveCount(regularUsers.filter((u) => u.status !== 'blocked').length);
-        
         const todayStr = new Date().toDateString();
         setTodaySignups(regularUsers.filter((u) => new Date(u.createdAt).toDateString() === todayStr).length);
-        
         const bal = regularUsers.reduce((sum, u) => sum + (u.balance || 0), 0);
         setTotalPlatformBalance(bal);
     };

@@ -1143,6 +1143,19 @@ export class UnifiedDatabase {
 
     async loadSavedConnection() {
         if (!isBrowser) return { success: true };
+
+        // 1. Try environment variables first (allows auto-connection for all clients/users globally)
+        const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const envKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        if (envUrl && envKey) {
+            console.log('🔄 Auto-connecting to Supabase from env variables...');
+            const result = await this.connect('supabase', { url: envUrl, anonKey: envKey });
+            if (result.success) {
+                return result;
+            }
+            console.warn('⚠️ Startup Supabase auto-connect from env variables failed:', result.message);
+        }
+        
         const saved = localStorage.getItem(DB_PREFIX + 'dbConfig');
         
         if (saved) {
