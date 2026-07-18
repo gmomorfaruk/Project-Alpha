@@ -34,6 +34,7 @@ export default function AdminTransactionsPage() {
     const [pendingCount, setPendingCount] = useState(0);
     const [totalDeposits, setTotalDeposits] = useState(0);
     const [totalWithdrawals, setTotalWithdrawals] = useState(0);
+    const [totalInvestments, setTotalInvestments] = useState(0);
 
     // Modal details state
     const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
@@ -58,6 +59,10 @@ export default function AdminTransactionsPage() {
         const approvedWithdrawals = allTx.filter((t) => t.type === 'withdrawal' && (t.status === 'approved' || t.status === 'completed'));
         const wdSum = approvedWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
         setTotalWithdrawals(wdSum);
+
+        const investments = allTx.filter((t) => t.type === 'investment');
+        const invSum = investments.reduce((sum, t) => sum + (t.amount || 0), 0);
+        setTotalInvestments(invSum);
     };
 
     const handleApprove = (txId: string) => {
@@ -163,21 +168,26 @@ export default function AdminTransactionsPage() {
             </div>
 
             {/* Stats Row */}
-            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-                <div className="stat-card" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '20px' }}>
-                    <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '12px' }}><i className="fas fa-clock"></i></div>
-                    <h3 style={{ margin: '0 0 5px 0', fontSize: '24px' }}>{pendingCount}</h3>
-                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>Pending Approvals</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-clock"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>{pendingCount}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Pending Approvals</p>
                 </div>
-                <div className="stat-card" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '20px' }}>
-                    <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '45px', height: '45px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '12px' }}><i className="fas fa-arrow-down"></i></div>
-                    <h3 style={{ margin: '0 0 5px 0', fontSize: '24px' }}>৳{totalDeposits.toLocaleString()}</h3>
-                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>Total Approved Deposits</p>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-arrow-down"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>৳{totalDeposits.toLocaleString()}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Approved Deposits</p>
                 </div>
-                <div className="stat-card" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '20px' }}>
-                    <div className="stat-icon" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', width: '45px', height: '45px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '12px' }}><i className="fas fa-arrow-up"></i></div>
-                    <h3 style={{ margin: '0 0 5px 0', fontSize: '24px' }}>৳{totalWithdrawals.toLocaleString()}</h3>
-                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>Total Approved Withdrawals</p>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-arrow-up"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>৳{totalWithdrawals.toLocaleString()}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Approved Withdrawals</p>
+                </div>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-chart-line"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>৳{totalInvestments.toLocaleString()}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Total Investments</p>
                 </div>
             </div>
 
@@ -203,6 +213,9 @@ export default function AdminTransactionsPage() {
                             <option value="all">All Types</option>
                             <option value="deposit">Deposits</option>
                             <option value="withdrawal">Withdrawals</option>
+                            <option value="investment">Investments</option>
+                            <option value="task_earning">Task Earnings</option>
+                            <option value="admin_adjustment">Admin Adjustments</option>
                         </select>
                         <select 
                             value={filterStatus}
@@ -242,18 +255,18 @@ export default function AdminTransactionsPage() {
                                 </tr>
                             ) : (
                                 filteredTxns.map((t) => {
-                                    const isDeposit = t.type === 'deposit';
                                     const isApproved = t.status === 'approved' || t.status === 'completed';
                                     const isRejected = t.status === 'rejected';
                                     const statusBadge = isApproved ? 'badge-success' : isRejected ? 'badge-danger' : 'badge-warning';
+                                    const typeBadgeColor = t.type === 'deposit' ? '#10b981' : t.type === 'withdrawal' ? '#ef4444' : t.type === 'investment' ? '#8b5cf6' : t.type === 'task_earning' ? '#3b82f6' : '#6b7280';
 
                                     return (
                                         <tr key={t.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '12px 8px' }}><code style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{t.id.slice(0, 8)}...</code></td>
                                             <td>{t.userEmail}</td>
                                             <td>
-                                                <span className={`badge ${isDeposit ? 'badge-success' : 'badge-danger'}`} style={{ textTransform: 'uppercase', fontSize: '9px' }}>
-                                                    {t.type}
+                                                <span style={{ background: `${typeBadgeColor}20`, color: typeBadgeColor, padding: '3px 8px', borderRadius: '20px', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                                    {t.type.replace('_', ' ')}
                                                 </span>
                                             </td>
                                             <td>

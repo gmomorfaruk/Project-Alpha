@@ -37,6 +37,7 @@ export default function AdminDashboardPage() {
     const [pendingMemberships, setPendingMemberships] = useState(0);
     const [pendingProofs, setPendingProofs] = useState(0);
     const [newUsersToday, setNewUsersToday] = useState(0);
+    const [activeInvestments, setActiveInvestments] = useState(0);
 
     // Lists
     const [recentTxns, setRecentTxns] = useState<Txn[]>([]);
@@ -64,6 +65,7 @@ export default function AdminDashboardPage() {
         // Investments
         const investments = Storage.get('investments') || [];
         setTotalInvestments(investments.length);
+        setActiveInvestments(investments.filter((inv: any) => inv.status === 'active').length);
 
         // Revenue
         const revenue = investments.reduce((sum: number, inv: any) => sum + (inv.amount || 0), 0);
@@ -270,6 +272,13 @@ export default function AdminDashboardPage() {
                             <p className="pending-item-lbl">New Signups Today</p>
                         </div>
                     </Link>
+                    <Link href={`${adminPrefix}/investments`} className="pending-item-card" style={{ borderLeftColor: '#06b6d4' }}>
+                        <div className="pending-icon-wrap" style={{ background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}><i className="fas fa-chart-line"></i></div>
+                        <div>
+                            <h4 className="pending-item-title">{activeInvestments}</h4>
+                            <p className="pending-item-lbl">Active Investments</p>
+                        </div>
+                    </Link>
                 </div>
             </div>
 
@@ -347,6 +356,7 @@ export default function AdminDashboardPage() {
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', color: 'white' }}><i className="fas fa-bolt" style={{ color: 'var(--primary-color)', marginRight: '10px' }}></i>System Quick Actions</h3>
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                     <Link href={`${adminPrefix}/products`} className="btn btn-primary"><i className="fas fa-plus" style={{ marginRight: '6px' }}></i> Add Product</Link>
+                    <Link href={`${adminPrefix}/investments`} className="btn btn-outline" style={{ color: '#06b6d4', borderColor: '#06b6d4' }}><i className="fas fa-chart-line" style={{ marginRight: '6px' }}></i> View Investments</Link>
                     <Link href={`${adminPrefix}/users`} className="btn btn-outline"><i className="fas fa-users" style={{ marginRight: '6px' }}></i> Manage Users</Link>
                     <Link href={`${adminPrefix}/settings`} className="btn btn-outline"><i className="fas fa-cog" style={{ marginRight: '6px' }}></i> Settings</Link>
                 </div>

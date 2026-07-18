@@ -269,6 +269,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { path: adminPrefix || '/', name: 'Overview', icon: 'fa-tachometer-alt' },
         { path: `${adminPrefix}/users`, name: 'Users', icon: 'fa-users' },
+        { path: `${adminPrefix}/investments`, name: 'Investments', icon: 'fa-chart-line' },
         { path: `${adminPrefix}/orders`, name: 'Orders', icon: 'fa-shopping-cart' },
         { path: `${adminPrefix}/transactions`, name: 'Transactions', icon: 'fa-exchange-alt' },
         { path: `${adminPrefix}/memberships`, name: 'Memberships', icon: 'fa-crown' },
@@ -485,9 +486,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Sidebar Navigation */}
             <aside className={`admin-sidebar ${mobileMenuOpen ? 'active' : ''}`}>
                 <div className="admin-sidebar-header">
-                    <Link href={adminPrefix || '/'} className="admin-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
-                        <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
+                    <Link href={adminPrefix || '/'} className="admin-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src="/logo_transparent.png" alt="SmartEarnBD Logo" style={{ height: '32px', width: '32px', objectFit: 'contain' }} />
+                        <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '18px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
                     </Link>
                     <button className="admin-hamburger" onClick={() => setMobileMenuOpen(false)}>
                         <i className="fas fa-times"></i>

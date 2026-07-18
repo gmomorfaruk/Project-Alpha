@@ -50,6 +50,11 @@ export default function AdminMembershipsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
+    // Stats
+    const [pendingCount, setPendingCount] = useState(0);
+    const [approvedCount, setApprovedCount] = useState(0);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+
     // Modal details state
     const [selectedReq, setSelectedReq] = useState<MembershipRequest | null>(null);
     const [viewOpen, setViewOpen] = useState(false);
@@ -61,6 +66,10 @@ export default function AdminMembershipsPage() {
     const loadRequestsData = () => {
         const allReqs = Storage.get('membershipRequests') || [];
         setRequests(allReqs);
+        setPendingCount(allReqs.filter((r: any) => r.status === 'pending').length);
+        setApprovedCount(allReqs.filter((r: any) => r.status === 'approved').length);
+        const revenue = allReqs.filter((r: any) => r.status === 'approved').reduce((s: number, r: any) => s + (r.amount || 0), 0);
+        setTotalRevenue(revenue);
     };
 
     const handleApprove = (reqId: string) => {
@@ -176,6 +185,25 @@ export default function AdminMembershipsPage() {
             <div className="page-header">
                 <h1>Membership Upgrade Requests</h1>
                 <p>Verify manual mobile payments and unlock client earnings multipliers</p>
+            </div>
+
+            {/* Stats Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-clock"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>{pendingCount}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Pending Upgrades</p>
+                </div>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-crown"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>{approvedCount}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Approved Upgrades</p>
+                </div>
+                <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '20px 22px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginBottom: '12px' }}><i className="fas fa-wallet"></i></div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', color: 'white' }}>৳{totalRevenue.toLocaleString()}</h3>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>Membership Revenue</p>
+                </div>
             </div>
 
             {/* List Box */}
