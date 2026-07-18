@@ -418,6 +418,7 @@ input, textarea, select {
     color: white;
     box-shadow: 0 20px 60px rgba(37, 99, 235, 0.25), inset 0 2px 5px rgba(255, 255, 255, 0.2);
     position: relative;
+    z-index: 1;
 }
 
 .hero-illustration::after {
@@ -444,6 +445,7 @@ input, textarea, select {
     align-items: center;
     gap: 12px;
     animation: float 4s ease-in-out infinite;
+    z-index: 10;
 }
 
 [data-theme="light"] .floating-card {
@@ -898,6 +900,26 @@ input, textarea, select {
 }
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1280px) {
+    .hero .container {
+        gap: 40px;
+    }
+    .hero-illustration {
+        width: 280px;
+        height: 280px;
+        font-size: 110px;
+    }
+    .hero-content h1 {
+        font-size: 44px;
+    }
+    .card-1 {
+        top: 15%;
+    }
+    .card-2 {
+        bottom: 15%;
+    }
+}
+
 @media (max-width: 1024px) {
     .hero .container {
         grid-template-columns: 1fr;
