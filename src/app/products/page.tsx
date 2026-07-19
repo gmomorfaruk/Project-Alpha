@@ -165,12 +165,12 @@ export default function ProductsPage() {
     useEffect(() => {
         setMounted(true);
         // Force reset products list to load updated discounts
-        const hasReset = Storage.get('products_reset_v5');
+        const hasReset = Storage.get('products_reset_v8');
         let list = Storage.get('products');
         if (!hasReset || !list || !Array.isArray(list) || list.length === 0) {
             list = defaultProductsList;
-            Storage.set('products', list);
-            Storage.set('products_reset_v5', true);
+            Storage.setLocalOnly('products', list);
+            Storage.set('products_reset_v8', true);
         }
         setProducts(list);
 

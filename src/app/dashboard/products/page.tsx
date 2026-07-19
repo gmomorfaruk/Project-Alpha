@@ -16,6 +16,7 @@ export default function ClientProductsPage() {
 
     // Data states
     const [products, setProducts] = useState<Product[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [investModalOpen, setInvestModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -105,12 +106,12 @@ export default function ClientProductsPage() {
     // Load products on mount
     useEffect(() => {
         // Force reset products list to load updated discounts
-        const hasReset = Storage.get('products_reset_v5');
+        const hasReset = Storage.get('products_reset_v8');
         let list = Storage.get('products');
         if (!hasReset || !list || !Array.isArray(list) || list.length === 0) {
             list = defaultProducts;
-            Storage.set('products', list);
-            Storage.set('products_reset_v5', true);
+            Storage.setLocalOnly('products', list);
+            Storage.set('products_reset_v8', true);
         }
         setProducts(list);
     }, []);
@@ -263,7 +264,8 @@ export default function ClientProductsPage() {
         }
     };
 
-    const activeProducts = products.filter(p => p.stock > 0 && p.active !== false);
+    const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
+    const activeProducts = products.filter(p => p.stock > 0 && p.active !== false && (selectedCategory === 'all' || p.category === selectedCategory));
 
     return (
         <div className="content">
@@ -401,6 +403,30 @@ export default function ClientProductsPage() {
             <div className="page-header">
                 <h1>{tText("Invest in Products", "পণ্যে বিনিয়োগ করুন")}</h1>
                 <p>{tText("Balance: ", "ব্যালেন্স: ")}<strong>৳{(user?.balance || 0).toLocaleString()}</strong></p>
+            </div>
+
+            {/* Category Filter */}
+            <div className="category-tabs" style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '15px', marginBottom: '20px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                {categories.map(cat => (
+                    <button 
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        style={{
+                            padding: '8px 20px',
+                            borderRadius: '20px',
+                            background: selectedCategory === cat ? 'var(--primary-color)' : 'var(--bg-secondary)',
+                            color: selectedCategory === cat ? 'white' : 'var(--text-primary)',
+                            border: `1px solid ${selectedCategory === cat ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                            cursor: 'pointer',
+                            textTransform: 'capitalize',
+                            fontWeight: selectedCategory === cat ? '600' : 'normal',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        {cat === 'all' ? tText("All", "সব") : cat}
+                    </button>
+                ))}
             </div>
 
             {/* Products Grid */}

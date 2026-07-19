@@ -70,6 +70,17 @@ export const Storage = {
         }
     },
 
+    setLocalOnly(key: string, value: any) {
+        if (!isBrowser) return false;
+        try {
+            localStorage.setItem(APP_PREFIX + key, JSON.stringify(value));
+            return true;
+        } catch (e) {
+            console.error('Error writing to localStorage:', e);
+            return false;
+        }
+    },
+
     syncToCloud(key: string, value: any) {
         if (!this.isCloudConnected()) return;
         

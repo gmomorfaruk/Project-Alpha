@@ -21,38 +21,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // ── Supabase helpers ──────────────────────────────────────────────────────────
 
+import { serverSupabaseInsertUser } from '@/app/actions/auth';
+
 /** Insert a new user row into Supabase `users` table. Returns true on success. */
 async function supabaseInsertUser(userData: any): Promise<boolean> {
     try {
-        // Only keep columns that exist in the Supabase users table
-        const row = {
-            id: userData.id,
-            name: userData.name || userData.fullName || '',
-            fullName: userData.fullName || userData.name || '',
-            email: userData.email,
-            phone: userData.phone || '',
-            password: userData.password || '',
-            role: userData.role || 'user',
-            balance: userData.balance || 0,
-            points: userData.points || 0,
-            membership: userData.membership || 'free',
-            status: userData.status || 'active',
-            referralCode: userData.referralCode || '',
-            referredBy: userData.referredBy || null,
-            totalInvested: userData.totalInvested || 0,
-            totalProfit: userData.totalProfit || 0,
-            referralEarnings: userData.referralEarnings || 0,
-            bkashNumber: userData.bkashNumber || '',
-            nagadNumber: userData.nagadNumber || '',
-            createdAt: userData.createdAt || new Date().toISOString(),
-        };
-
-        const { error } = await supabase.from('users').upsert(row, { onConflict: 'id' });
-        if (error) {
-            console.warn('Supabase insert user error:', error.message);
+        const result = await serverSupabaseInsertUser(userData);
+        if (!result.success) {
+            console.warn('Supabase insert user error:', result.message);
             return false;
         }
-        console.log('✅ User saved to Supabase:', row.email);
+        console.log('✅ User saved to Supabase via server action:', userData.email);
         return true;
     } catch (e) {
         console.warn('Supabase insert user exception:', e);
@@ -150,7 +129,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         }
                         return mapped;
                     });
-                    localStorage.setItem('projectAlpha_' + table, JSON.stringify(mappedData));
+                    
+                    // Merge with existing local data so offline-created items aren't lost
+                    const localData = JSON.parse(localStorage.getItem('projectAlpha_' + table) || '[]');
+                    const localMap = new Map(localData.map((item: any) => [item.id, item]));
+                    mappedData.forEach(item => localMap.set(item.id, item));
+                    
+                    localStorage.setItem('projectAlpha_' + table, JSON.stringify(Array.from(localMap.values())));
                 }
             }
 

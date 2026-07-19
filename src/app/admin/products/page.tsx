@@ -64,12 +64,12 @@ export default function AdminProductsPage() {
 
     const loadProductsData = () => {
         // Force reset products list to load updated discounts
-        const hasReset = Storage.get('products_reset_v5');
+        const hasReset = Storage.get('products_reset_v8');
         let allProducts: Product[] = Storage.get('products') || [];
         if (!hasReset || !allProducts || !Array.isArray(allProducts) || allProducts.length === 0) {
             allProducts = defaultProductsList;
-            Storage.set('products', allProducts);
-            Storage.set('products_reset_v5', true);
+            Storage.setLocalOnly('products', allProducts);
+            Storage.set('products_reset_v8', true);
         }
 
         setProducts(allProducts);

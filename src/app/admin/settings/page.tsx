@@ -9,6 +9,8 @@ interface AppSettings {
     platformName: string;
     defaultLanguage: string;
     maintenanceMode: boolean;
+    telegramLink?: string;
+    whatsappLink?: string;
     minDeposit: number;
     minWithdrawal: number;
     maxWithdrawal: number;
@@ -43,6 +45,8 @@ const defaultSettings: AppSettings = {
     platformName: 'SmartEarnBD',
     defaultLanguage: 'en',
     maintenanceMode: false,
+    telegramLink: 'https://t.me/placeholder',
+    whatsappLink: 'https://chat.whatsapp.com/placeholder',
     minDeposit: 500,
     minWithdrawal: 1000,
     maxWithdrawal: 50000,
@@ -84,6 +88,8 @@ export default function AdminSettingsPage() {
     const [platformName, setPlatformName] = useState('');
     const [defaultLanguage, setDefaultLanguage] = useState('en');
     const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [telegramLink, setTelegramLink] = useState('');
+    const [whatsappLink, setWhatsappLink] = useState('');
 
     // Financial
     const [minDeposit, setMinDeposit] = useState('500');
@@ -138,6 +144,8 @@ export default function AdminSettingsPage() {
         setPlatformName(settings.platformName || defaultSettings.platformName);
         setDefaultLanguage(settings.defaultLanguage || defaultSettings.defaultLanguage);
         setMaintenanceMode(settings.maintenanceMode || false);
+        setTelegramLink(settings.telegramLink || defaultSettings.telegramLink || '');
+        setWhatsappLink(settings.whatsappLink || defaultSettings.whatsappLink || '');
 
         setMinDeposit((settings.minDeposit ?? defaultSettings.minDeposit).toString());
         setMinWithdrawal((settings.minWithdrawal ?? defaultSettings.minWithdrawal).toString());
@@ -183,6 +191,8 @@ export default function AdminSettingsPage() {
                 platformName: platformName.trim(),
                 defaultLanguage,
                 maintenanceMode,
+                telegramLink: telegramLink.trim(),
+                whatsappLink: whatsappLink.trim(),
                 minDeposit: Number(minDeposit) || 500,
                 minWithdrawal: Number(minWithdrawal) || 1000,
                 maxWithdrawal: Number(maxWithdrawal) || 50000,
@@ -276,6 +286,14 @@ export default function AdminSettingsPage() {
                                 <option value="en">English (US)</option>
                                 <option value="bn">বাংলা (Bengali)</option>
                             </select>
+                        </div>
+                        <div className="form-group" style={{ marginBottom: '15px' }}>
+                            <label htmlFor="telegramInput">Telegram Group Link</label>
+                            <input type="text" id="telegramInput" value={telegramLink} onChange={e => setTelegramLink(e.target.value)} style={inputStyle} />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: '15px' }}>
+                            <label htmlFor="whatsappInput">WhatsApp Group Link</label>
+                            <input type="text" id="whatsappInput" value={whatsappLink} onChange={e => setWhatsappLink(e.target.value)} style={inputStyle} />
                         </div>
                         <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <input type="checkbox" id="maintModeCheckbox" checked={maintenanceMode} onChange={e => setMaintenanceMode(e.target.checked)} />

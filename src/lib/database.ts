@@ -520,11 +520,11 @@ export class SupabaseAdapter extends DatabaseAdapter {
             return { success: false, message: 'Not connected to Supabase' };
         }
         try {
-            // Use Supabase client to select from products table with head: true (no content, just test connection)
-            // This avoids any browser CORS block on the root endpoint.
+            // Use a standard GET request. HEAD requests can sometimes trigger CORS 
+            // or AdBlocker fetch errors in browsers.
             const { error } = await this.client
                 .from('products')
-                .select('id', { head: true, count: 'exact' })
+                .select('id')
                 .limit(1);
 
             if (error) {
@@ -1534,12 +1534,8 @@ export class UnifiedDatabase {
 
                 const result = await this.currentAdapter.testConnection();
                 if (!result.success) {
-                    // Only log a warning — NEVER auto-disconnect or fall back to localStorage.
-                    // The user explicitly chose a cloud database; honour that choice.
-                    // A transient network blip or server hiccup should not lose the connection.
-                    console.warn(`⚠️ Database health check failed (${this.type}): ${result.message}. Will retry next interval.`);
+                    // Mute health check warnings to avoid spamming the console
                     this.emit('error', { message: result.message || 'Connection unhealthy' });
-                    // Do NOT call this.disconnect() here — ever.
                 } else {
                     // Restore connected flag if it was previously false
                     if (!this.connected) {

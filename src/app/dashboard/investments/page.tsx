@@ -238,10 +238,83 @@ export default function ClientInvestmentsPage() {
                 }
             `}</style>
 
-            <div className="page-header">
-                <h1>{tText("My Investments", "আমার বিনিয়োগ")}</h1>
-                <p>{tText("Track and manage your active portfolio packages", "আপনার সক্রিয় পোর্টফোলিও প্যাকেজ ট্র্যাক এবং পরিচালনা করুন")}</p>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
+                <div>
+                    <h1>{tText("My Investments", "আমার বিনিয়োগ")}</h1>
+                    <p>{tText("Track and manage your active portfolio packages", "আপনার সক্রিয় পোর্টফোলিও প্যাকেজ ট্র্যাক এবং পরিচালনা করুন")}</p>
+                </div>
+                <Link href="/dashboard/products" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '8px' }}>
+                    <i className="fas fa-shopping-cart"></i>
+                    {tText("Invest Again", "পুনরায় বিনিয়োগ করুন")}
+                </Link>
             </div>
+
+            {/* How It Works Section */}
+            <div className="instructions-card" style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '30px 20px', marginBottom: '24px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '20px', color: 'var(--primary-color)', margin: '0 0 30px 0' }}>
+                    {tText("How It Works", "কীভাবে কাজ করে")}
+                </h3>
+                
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '15px', alignItems: 'stretch', overflowX: 'auto', paddingBottom: '20px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    
+                    {/* Step 1 */}
+                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
+                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>💰</div>
+                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                            {tText("Step 1: Start with a Small Investment", "ধাপ ১: অল্প টাকা দিয়ে শুরু করুন")}
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                            {tText("Invest any amount you can afford.", "আপনার সামর্থ্য অনুযায়ী বিনিয়োগ করুন।")}
+                        </p>
+                    </div>
+
+                    {/* Arrow */}
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+
+                    {/* Step 2 */}
+                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
+                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>📦</div>
+                        <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                            {tText("Step 2: Choose How to Earn", "ধাপ ২: যেভাবে আয় করতে চান, বেছে নিন")}
+                        </h4>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'left', display: 'inline-block', lineHeight: '1.5' }}>
+                            <div>• {tText("Sell yourself & earn profit", "নিজে বিক্রি করে লাভ করুন")}</div>
+                            <div style={{ margin: '8px 0', textAlign: 'center', fontWeight: 'bold', color: 'var(--primary-color)' }}>{tText("OR", "অথবা")}</div>
+                            <div>• {tText("Let us sell & receive a share of the profit", "আমরা বিক্রি করব, আপনি লাভের অংশ পাবেন")}</div>
+                        </div>
+                    </div>
+
+                    {/* Arrow */}
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+
+                    {/* Step 3 */}
+                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
+                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>📈</div>
+                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                            {tText("Step 3: Receive Your Profit", "ধাপ ৩: লাভ গ্রহণ করুন")}
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                            {tText("Your profit is added to your investment and returned at the end of the investment period.", "নির্ধারিত সময় শেষে মূল টাকা ও লাভ একসাথে ফেরত পাবেন।")}
+                        </p>
+                    </div>
+
+                    {/* Arrow */}
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+
+                    {/* Step 4 */}
+                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--primary-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
+                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>🚀</div>
+                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                            {tText("Step 4: Grow Your Investment", "ধাপ ৪: ধীরে ধীরে এগিয়ে যান")}
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                            {tText("Start small today and increase your earnings over time.", "আজ অল্প দিয়ে শুরু করুন, ভবিষ্যতে আরও বড় করুন।")}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
 
             {/* Redesigned 3 Stats Columns */}
             <div className="fintech-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>

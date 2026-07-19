@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
+import Storage from '@/lib/storage';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { user, loading, logout } = useAuth();
@@ -19,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [searchExpanded, setSearchExpanded] = useState(false);
+    const [settings, setSettings] = useState<any>(null);
 
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -39,6 +41,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             setDesktopMenuOpen(false);
         };
         window.addEventListener('click', handleOutsideClick);
+        
+        // Load settings for social links
+        setSettings(Storage.get('settings') || {});
+        
         return () => window.removeEventListener('click', handleOutsideClick);
     }, []);
 
@@ -80,17 +86,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const coreNavItems = [
         { href: '/dashboard', label: tText('Dashboard', 'ড্যাশবোর্ড'), icon: 'fa-home' },
         { href: '/dashboard/wallet', label: tText('Wallet', 'ওয়ালেট'), icon: 'fa-wallet' },
-        { href: '/dashboard/products', label: tText('Packages', 'প্যাকেজ'), icon: 'fa-box' },
+        { href: '/dashboard/products', label: tText('Products', 'পণ্য'), icon: 'fa-box' },
         { href: '/dashboard/investments', label: tText('Investments', 'বিনিয়োগ'), icon: 'fa-chart-line' },
         { href: '/dashboard/tasks', label: tText('Tasks', 'কাজ'), icon: 'fa-tasks' }
     ];
 
-    const drawerItems = [
+    const drawerItems: any[] = [
         { href: '/dashboard/referrals', label: tText('Referrals', 'রেফারেলস'), icon: 'fa-users' },
         { href: '/dashboard/membership', label: tText('Membership', 'মেম্বারশিপ'), icon: 'fa-crown' },
         { href: '/dashboard/sell-proofs', label: tText('Sell Proofs', 'বিক্রয় প্রমাণ'), icon: 'fa-receipt' },
         { href: '/dashboard/profile', label: tText('Settings', 'সেটিংস'), icon: 'fa-cog' }
     ];
+
+    if (settings?.telegramLink) {
+        drawerItems.push({ href: settings.telegramLink, label: tText('Telegram Group', 'টেলিগ্রাম গ্রুপ'), icon: 'fab fa-telegram', external: true });
+    }
+    
+    if (settings?.whatsappLink) {
+        drawerItems.push({ href: settings.whatsappLink, label: tText('WhatsApp Group', 'হোয়াটসঅ্যাপ গ্রুপ'), icon: 'fab fa-whatsapp', external: true });
+    }
 
     // For mobile menu drawer
     const navItems = [
@@ -121,14 +135,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <hr className="sidebar-divider" />
                     
                     <nav className="drawer-menu">
-                        {drawerItems.map((item) => (
+                        {drawerItems.map((item: any) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                target={item.external ? "_blank" : undefined}
                                 className={`sidebar-item ${pathname === item.href ? 'active' : ''}`}
                                 onClick={() => setDesktopMenuOpen(false)}
                             >
-                                <i className={`fas ${item.icon}`}></i>
+                                <i className={item.icon.includes('fab') ? item.icon : `fas ${item.icon}`}></i>
                                 <span>{item.label}</span>
                             </Link>
                         ))}
@@ -160,14 +175,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <hr className="sidebar-divider" />
                     
                     <nav className="drawer-menu">
-                        {navItems.map((item) => (
+                        {navItems.map((item: any) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                target={item.external ? "_blank" : undefined}
                                 className={`sidebar-item ${pathname === item.href ? 'active' : ''}`}
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                <i className={`fas ${item.icon}`}></i>
+                                <i className={item.icon.includes('fab') ? item.icon : `fas ${item.icon}`}></i>
                                 <span>{item.label}</span>
                             </Link>
                         ))}
@@ -282,6 +298,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     )}
                                 </div>
                             </div>
+
+                            <Link href="/dashboard/profile" className="header-user-avatar desktop-avatar-btn" style={{ marginLeft: '12px', marginRight: '8px' }} title={tText("Profile", "প্রোফাইল")}>
+                                {user.avatar ? (
+                                    <img src={user.avatar} alt="avatar" />
+                                ) : (
+                                    <i className="fas fa-user"></i>
+                                )}
+                            </Link>
 
                             <button className="header-icon-btn hamburger-menu-btn" onClick={toggleDesktopMenu} title="Menu">
                                 <i className="fas fa-bars"></i>

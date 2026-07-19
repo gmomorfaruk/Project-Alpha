@@ -84,7 +84,7 @@ export default function AdminUsersPage() {
             const { data, error } = await supabase.from('users').select('*');
             if (!error && data && data.length > 0) {
                 // Map snake_case → camelCase
-                allUsers = data.map((u: any) => ({
+                const fetchedUsers = data.map((u: any) => ({
                     ...u,
                     name: u.name || u.fullName || '',
                     referralCode: u.referral_code || u.referralCode || '',
@@ -92,6 +92,12 @@ export default function AdminUsersPage() {
                     totalProfit: u.total_profit ?? u.totalProfit ?? 0,
                     createdAt: u.created_at || u.createdAt || '',
                 }));
+
+                // Merge with localStorage so offline users aren't lost
+                const localUsers = Storage.get('users') || [];
+                const localMap = new Map(localUsers.map((u: any) => [u.id, u]));
+                fetchedUsers.forEach((u: any) => localMap.set(u.id, u));
+                allUsers = Array.from(localMap.values()) as UserRecord[];
 
                 // Merge into localStorage so other pages can read it without network
                 Storage.set('users', allUsers);
