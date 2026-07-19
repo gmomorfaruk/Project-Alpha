@@ -383,8 +383,7 @@ export default function Home() {
                     <div className="footer-grid">
                         <div className="footer-brand">
                             <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <img src="/new_logo.png" alt="SmartEarnBD Logo" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
+                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
                             </Link>
                             <p>{tText("Your trusted investment platform for secure and profitable investments.", "নিরাপদ এবং লাভজনক বিনিয়োগের জন্য আপনার বিশ্বস্ত বিনিয়োগ প্ল্যাটফর্ম।")}</p>
                             <div className="social-links">
