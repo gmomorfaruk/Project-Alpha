@@ -134,9 +134,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         });
                         
                         // Merge with existing local data so offline-created items aren't lost
-                        const localData = JSON.parse(localStorage.getItem('projectAlpha_' + table) || '[]');
-                        const localMap = new Map(localData.map((item: any) => [item.id, item]));
-                        mappedData.forEach(item => localMap.set(item.id, item));
+                        const rawLocal = localStorage.getItem('projectAlpha_' + table);
+                        let localData: any[] = [];
+                        try {
+                            const parsed = JSON.parse(rawLocal || '[]');
+                            localData = Array.isArray(parsed) ? parsed : [];
+                        } catch (e) {
+                            localData = [];
+                        }
+                        
+                        const localMap = new Map(localData.map((item: any) => [item?.id || '', item]));
+                        mappedData.forEach(item => {
+                            if (item && item.id) {
+                                localMap.set(item.id, item);
+                            }
+                        });
                         
                         localStorage.setItem('projectAlpha_' + table, JSON.stringify(Array.from(localMap.values())));
                     } else if (error) {
