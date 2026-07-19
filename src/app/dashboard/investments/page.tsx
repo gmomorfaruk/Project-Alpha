@@ -112,14 +112,8 @@ export default function ClientInvestmentsPage() {
                 /* Visual cards grid */
                 .investments-grid {
                     display: grid;
-                    grid-template-columns: repeat(2, 1fr);
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                     gap: 24px;
-                }
-
-                @media (max-width: 768px) {
-                    .investments-grid {
-                        grid-template-columns: 1fr;
-                    }
                 }
 
                 .investment-card {
@@ -255,7 +249,7 @@ export default function ClientInvestmentsPage() {
                     {tText("How It Works", "কীভাবে কাজ করে")}
                 </h3>
                 
-                <div className="how-it-works-steps">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', alignItems: 'stretch' }}>
                     
                     {/* Step 1 */}
                     <div className="step-card">
@@ -268,8 +262,7 @@ export default function ClientInvestmentsPage() {
                         </p>
                     </div>
 
-                    {/* Arrow */}
-                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
+
 
                     {/* Step 2 */}
                     <div className="step-card">
@@ -284,8 +277,7 @@ export default function ClientInvestmentsPage() {
                         </div>
                     </div>
 
-                    {/* Arrow */}
-                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
+
 
                     {/* Step 3 */}
                     <div className="step-card">
@@ -298,8 +290,7 @@ export default function ClientInvestmentsPage() {
                         </p>
                     </div>
 
-                    {/* Arrow */}
-                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
+
 
                     {/* Step 4 */}
                     <div className="step-card">
@@ -317,7 +308,7 @@ export default function ClientInvestmentsPage() {
 
 
             {/* Redesigned 3 Stats Columns */}
-            <div className="fintech-stats-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '32px' }}>
                 <div className="stat-card">
                     <div className="stat-card-header">
                         <div className="stat-icon-wrapper investments">

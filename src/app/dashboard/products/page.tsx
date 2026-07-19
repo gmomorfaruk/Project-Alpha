@@ -264,8 +264,11 @@ export default function ClientProductsPage() {
         }
     };
 
+    // Show all categories that have at least one product
     const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
-    const activeProducts = products.filter(p => p.stock > 0 && p.active !== false && (selectedCategory === 'all' || p.category === selectedCategory));
+    
+    // Show all products matching the selected category (removed stock/active filter so they don't disappear)
+    const activeProducts = products.filter(p => selectedCategory === 'all' || p.category === selectedCategory);
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
@@ -405,41 +408,77 @@ export default function ClientProductsPage() {
                 <p>{tText("Balance: ", "ব্যালেন্স: ")}<strong>৳{(user?.balance || 0).toLocaleString()}</strong></p>
             </div>
 
-            {/* Category Filter - scrollable on mobile */}
-            <div style={{ 
-                display: 'flex', 
-                gap: '8px', 
-                overflowX: 'auto', 
-                paddingBottom: '12px', 
-                marginBottom: '20px', 
-                scrollbarWidth: 'none',
-                WebkitOverflowScrolling: 'touch',
-                msOverflowStyle: 'none',
-                width: '100%',
-                maxWidth: '100%'
-            }}>
-                {categories.map(cat => (
-                    <button 
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        style={{
-                            padding: '7px 16px',
-                            borderRadius: '20px',
-                            background: selectedCategory === cat ? 'var(--primary-color)' : 'var(--bg-secondary)',
-                            color: selectedCategory === cat ? 'white' : 'var(--text-primary)',
-                            border: `1px solid ${selectedCategory === cat ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                            cursor: 'pointer',
-                            textTransform: 'capitalize',
-                            fontWeight: selectedCategory === cat ? '600' : 'normal',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0,
-                            fontSize: '13px',
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        {cat === 'all' ? tText("All", "সব") : cat}
-                    </button>
-                ))}
+            {/* Category Filter - Custom Premium Dropdown */}
+            <div style={{ marginBottom: '24px', position: 'relative', maxWidth: '300px', zIndex: 10 }}>
+                <div 
+                    onClick={() => {
+                        const menu = document.getElementById('category-dropdown-menu');
+                        if (menu) {
+                            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                        }
+                    }}
+                    style={{
+                        width: '100%',
+                        padding: '12px 40px 12px 16px',
+                        borderRadius: '12px',
+                        background: 'var(--bg-secondary)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-color)',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        textTransform: 'capitalize',
+                        boxShadow: 'var(--shadow-sm)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <span>{selectedCategory === 'all' ? tText("All Categories", "সব ক্যাটাগরি") : selectedCategory}</span>
+                    <i className="fas fa-chevron-down" style={{ color: 'var(--text-secondary)' }}></i>
+                </div>
+                
+                <div 
+                    id="category-dropdown-menu"
+                    style={{
+                        display: 'none',
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        marginTop: '8px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                        zIndex: 100
+                    }}
+                >
+                    {categories.map(cat => (
+                        <div 
+                            key={cat}
+                            onClick={() => {
+                                setSelectedCategory(cat);
+                                const menu = document.getElementById('category-dropdown-menu');
+                                if (menu) menu.style.display = 'none';
+                            }}
+                            style={{
+                                padding: '12px 16px',
+                                cursor: 'pointer',
+                                textTransform: 'capitalize',
+                                fontSize: '14px',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                background: selectedCategory === cat ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                                color: selectedCategory === cat ? 'var(--primary-color)' : 'var(--text-primary)',
+                                fontWeight: selectedCategory === cat ? '600' : 'normal',
+                                transition: 'background 0.2s ease'
+                            }}
+                        >
+                            {cat === 'all' ? tText("All Categories", "সব ক্যাটাগরি") : cat}
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Products Grid */}

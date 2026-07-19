@@ -108,36 +108,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 'tasks'
             ];
 
-            for (const table of tablesToSync) {
-                const dbTable = db.getTableName(table);
-                const { data, error } = await supabase.from(dbTable).select('*');
-                if (!error && data) {
-                    const mappedData = data.map((row: any) => {
-                        const mapped: any = {};
-                        for (const col in row) {
-                            if (col === 'fullName') mapped.fullName = row[col];
-                            else if (col === 'totalInvested') mapped.totalInvested = row[col];
-                            else if (col === 'totalProfit') mapped.totalProfit = row[col];
-                            else if (col === 'referralEarnings') mapped.referralEarnings = row[col];
-                            else if (col === 'referralCode') mapped.referralCode = row[col];
-                            else if (col === 'referredBy') mapped.referredBy = row[col];
-                            else if (col === 'bkashNumber') mapped.bkashNumber = row[col];
-                            else if (col === 'nagadNumber') mapped.nagadNumber = row[col];
-                            else if (col === 'createdAt') mapped.createdAt = row[col];
-                            else if (col === 'updatedAt') mapped.updatedAt = row[col];
-                            else mapped[col] = row[col];
-                        }
-                        return mapped;
-                    });
+            // Run all queries concurrently for massive speed boost
+            await Promise.allSettled(tablesToSync.map(async (table) => {
+                try {
+                    const dbTable = db.getTableName(table);
+                    const { data, error } = await supabase.from(dbTable).select('*');
                     
-                    // Merge with existing local data so offline-created items aren't lost
-                    const localData = JSON.parse(localStorage.getItem('projectAlpha_' + table) || '[]');
-                    const localMap = new Map(localData.map((item: any) => [item.id, item]));
-                    mappedData.forEach(item => localMap.set(item.id, item));
-                    
-                    localStorage.setItem('projectAlpha_' + table, JSON.stringify(Array.from(localMap.values())));
+                    if (!error && data && Array.isArray(data)) {
+                        const mappedData = data.map((row: any) => {
+                            const mapped: any = {};
+                            for (const col in row) {
+                                if (col === 'fullName') mapped.fullName = row[col];
+                                else if (col === 'totalInvested') mapped.totalInvested = row[col];
+                                else if (col === 'totalProfit') mapped.totalProfit = row[col];
+                                else if (col === 'referralEarnings') mapped.referralEarnings = row[col];
+                                else if (col === 'referralCode') mapped.referralCode = row[col];
+                                else if (col === 'referredBy') mapped.referredBy = row[col];
+                                else if (col === 'bkashNumber') mapped.bkashNumber = row[col];
+                                else if (col === 'nagadNumber') mapped.nagadNumber = row[col];
+                                else if (col === 'createdAt') mapped.createdAt = row[col];
+                                else if (col === 'updatedAt') mapped.updatedAt = row[col];
+                                else mapped[col] = row[col];
+                            }
+                            return mapped;
+                        });
+                        
+                        // Merge with existing local data so offline-created items aren't lost
+                        const localData = JSON.parse(localStorage.getItem('projectAlpha_' + table) || '[]');
+                        const localMap = new Map(localData.map((item: any) => [item.id, item]));
+                        mappedData.forEach(item => localMap.set(item.id, item));
+                        
+                        localStorage.setItem('projectAlpha_' + table, JSON.stringify(Array.from(localMap.values())));
+                    } else if (error) {
+                        console.warn(`⚠️ Background sync error for table ${table}:`, error.message);
+                    }
+                } catch (err) {
+                    console.warn(`⚠️ Error processing table ${table}:`, err);
                 }
-            }
+            }));
 
             // Sync current user context
             if (currentUserId) {

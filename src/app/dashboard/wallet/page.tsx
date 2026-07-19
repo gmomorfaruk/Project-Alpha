@@ -350,10 +350,10 @@ export default function ClientWalletPage() {
                 }
 
                 /* Payment Gateways visual cards */
-                .gateways-grid {
+                .gateway-grid {
                     display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 16px;
+                    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                    gap: 12px;
                     margin-bottom: 24px;
                 }
 

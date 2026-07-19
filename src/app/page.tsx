@@ -23,9 +23,11 @@ export default function Home() {
     useEffect(() => {
         setMounted(true);
 
+        // If auth is still loading, don't do anything yet
+        // If we have a user, redirect them to their respective dashboard
         if (user) {
             if (user.role === 'admin') {
-                router.push('/dashboard'); // Admin could also go to /admin depending on requirements, but /dashboard is standard
+                router.push('/dashboard'); 
             } else if (user.role === 'buyer') {
                 router.push('/buyer/dashboard');
             } else {
@@ -34,7 +36,7 @@ export default function Home() {
             return;
         }
 
-        // Force reset products list to load updated discounts
+        // Only load landing page products if there's no user
         const hasReset = Storage.get('products_reset_v8');
         let list = Storage.get('products');
 
@@ -44,7 +46,7 @@ export default function Home() {
             Storage.set('products_reset_v8', true);
         }
         setProducts(list.slice(0, 3));
-    }, []);
+    }, [user, router]);
 
     if (!mounted) return null;
 

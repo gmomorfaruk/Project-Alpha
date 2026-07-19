@@ -760,14 +760,18 @@ body {
         font-size: 13px !important;
     }
     
-    /* All grids become single column on phones */
+    /* Let grids handle their own responsive wrapping where possible */
+    .dashboard-double-column {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Maintain 2x2 grid for stats and quick actions on phones */
     .fintech-stats-grid,
     .stats-grid,
-    .quick-actions,
-    .investments-grid,
-    .dashboard-double-column {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
 
     /* Stat cards compact on mobile */
@@ -2812,22 +2816,23 @@ body {
 
 /* How It Works Steps Component */
 .how-it-works-steps {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
     align-items: stretch;
     padding-bottom: 20px;
 }
 
 .step-card {
-    flex: 1;
-    min-width: 0;
     background: var(--bg-primary);
     padding: 20px;
     border-radius: 12px;
     border: 2px solid var(--border-light);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .step-card:hover {
@@ -2853,35 +2858,84 @@ body {
 }
 
 .step-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    font-size: 24px;
-    flex-shrink: 0;
+    display: none; /* Hide arrows entirely when using grid, they mess up responsive flow */
 }
 
-.step-arrow .mobile-arrow {
-    display: none;
+/* FORCE NO HORIZONTAL OVERFLOW ON ALL DASHBOARD AND MAIN CONTAINER ELEMENTS */
+html, body, .dashboard-container, .dashboard-main, .dashboard-content {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
 }
 
-@media (max-width: 900px) {
-    .how-it-works-steps {
-        flex-direction: column;
-        align-items: center;
+@media (max-width: 576px) {
+    /* Compact Top Header elements on mobile to prevent layout stretch */
+    .header-top {
+        padding: 8px 10px !important;
     }
     
-    .step-card {
-        width: 100%;
-        max-width: 400px;
+    .header-row-main {
+        gap: 8px !important;
+    }
+    
+    .header-left {
+        gap: 8px !important;
+    }
+    
+    .mobile-hamburger {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+    }
+    
+    .header-left img {
+        height: 18px !important; /* Slightly smaller logo to fit small viewports */
+    }
+    
+    .mobile-only-utilities {
+        gap: 6px !important;
+    }
+    
+    .mobile-only-utilities .header-icon-btn,
+    .mobile-only-utilities .header-user-avatar {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 13px !important;
     }
 
-    .step-arrow .desktop-arrow {
-        display: none;
+    /* Prevent stat cards text from stretching on extremely small screens */
+    .stat-card-title {
+        font-size: 11px !important;
     }
     
-    .step-arrow .mobile-arrow {
-        display: block;
-        margin: 10px 0;
+    .stat-card-value {
+        font-size: 18px !important;
+    }
+    
+    .stat-icon-wrapper {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 13px !important;
+    }
+    
+    .stat-card-header {
+        gap: 8px !important;
+    }
+    
+    /* Make quick action items compact */
+    .quick-action-item {
+        padding: 12px 8px !important;
+        gap: 8px !important;
+    }
+    
+    .action-circle {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 14px !important;
+    }
+    
+    .action-text {
+        font-size: 11px !important;
     }
 }
