@@ -408,8 +408,8 @@ export default function Navbar() {
                     <div className="navbar-logo-wrapper">
                         <Link href="/" className="flex items-center gap-2 group cursor-pointer" style={{ textDecoration: 'none' }}>
                             <div className="relative transform group-hover:scale-105 transition-transform duration-300 flex items-center gap-2">
-                                <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
-                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
+                                <img src="/name_transparent.png" alt="SmartEarnBD" style={{ height: '33px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-light" />
+                                <img src="/name_white.png" alt="SmartEarnBD" style={{ height: '33px', width: 'auto', objectFit: 'contain' }} className="select-none navbar-logo-dark" />
                             </div>
                         </Link>
                     </div>
