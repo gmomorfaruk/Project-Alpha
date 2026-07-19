@@ -625,8 +625,15 @@ export default function SignupPage() {
         <Suspense fallback={
             <div className="page-loader" style={{ display: 'flex' }}>
                 <div className="loader-content">
-                    <div className="loader-spinner"></div>
-                    <span>Loading...</span>
+                    <div className="logo-loader-wrapper">
+                        <div className="logo-loader-pulse"></div>
+                        <div className="logo-loader-ring"></div>
+                        <img src="/name_white.png" alt="SmartEarnBD" className="logo-loader-img" />
+                    </div>
+                    <div className="logo-loader-progress-track">
+                        <div className="logo-loader-progress-bar"></div>
+                    </div>
+                    <span className="logo-loader-text">SmartEarnBD</span>
                 </div>
             </div>
         }>

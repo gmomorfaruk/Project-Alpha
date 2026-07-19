@@ -103,8 +103,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return (
             <div className="page-loader" style={{ display: 'flex' }}>
                 <div className="loader-content">
-                    <div className="loader-spinner"></div>
-                    <span>{tText("Loading...", "লোড হচ্ছে...")}</span>
+                    <div className="logo-loader-wrapper">
+                        <div className="logo-loader-pulse"></div>
+                        <div className="logo-loader-ring"></div>
+                        <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" className="logo-loader-img" />
+                    </div>
+                    <div className="logo-loader-progress-track">
+                        <div className="logo-loader-progress-bar"></div>
+                    </div>
+                    <span className="logo-loader-text">{tText("SmartEarnBD", "স্মার্টআর্নবিডি")}</span>
                 </div>
             </div>
         );
