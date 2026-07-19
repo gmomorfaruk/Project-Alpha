@@ -21,6 +21,7 @@ interface Task {
     taskType?: 'mandatory' | 'social' | 'bonus';
     socialAction?: 'view' | 'follow';
     type?: string;
+    verification?: 'auto' | 'manual';
 }
 
 interface PlanDetails {
@@ -66,7 +67,7 @@ export default function ClientTasksPage() {
 
     const [tasks, setTasks] = useState<Task[]>([]);
     const [completions, setCompletions] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<'social' | 'mandatory' | 'bonus'>('social');
+    const [activeTab, setActiveTab] = useState<'social' | 'mandatory' | 'bonus' | 'history'>('social');
 
     const [todayEarnings, setTodayEarnings] = useState(0);
     const [todayCompleted, setTodayCompleted] = useState(0);
