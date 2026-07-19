@@ -964,6 +964,11 @@ input, textarea, select {
 }
 
 @media (max-width: 768px) {
+    .hero {
+        padding: 100px 0 60px;
+        min-height: auto;
+    }
+
     .hero-stats {
         flex-direction: column;
         gap: 24px;
@@ -994,7 +999,22 @@ input, textarea, select {
     }
 
     .hero-content h1 {
-        font-size: 36px;
+        font-size: 32px;
+    }
+
+    .hero-content p {
+        font-size: 15px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .hero-buttons .btn {
+        text-align: center;
+        justify-content: center;
     }
 
     .products-grid {
@@ -1018,7 +1038,39 @@ input, textarea, select {
     }
 
     .section-header h2 {
-        font-size: 28px;
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 90px 0 50px;
+    }
+
+    .hero-content h1 {
+        font-size: 26px;
+        line-height: 1.3;
+    }
+
+    .hero-content p {
+        font-size: 14px;
+    }
+
+    .stat-number {
+        font-size: 26px;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+
+    .section-header p {
+        font-size: 13px;
+    }
+
+    .btn-lg {
+        padding: 12px 20px;
+        font-size: 14px;
     }
 }
 
@@ -2044,4 +2096,40 @@ textarea::placeholder {
 }
 [data-theme="dark"] .navbar-logo-dark {
     display: block;
+}
+
+/* ===== SMALL MOBILE (480px and below) ===== */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 14px;
+    }
+
+    .hero-content h1 {
+        font-size: 26px;
+    }
+
+    .hero-content p {
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr !important;
+    }
 }

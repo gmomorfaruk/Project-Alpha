@@ -268,7 +268,7 @@ export default function ClientProductsPage() {
     const activeProducts = products.filter(p => p.stock > 0 && p.active !== false && (selectedCategory === 'all' || p.category === selectedCategory));
 
     return (
-        <div className="content">
+        <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
             <style jsx global>{`
                 .modal-overlay {
                     position: fixed;
@@ -405,14 +405,25 @@ export default function ClientProductsPage() {
                 <p>{tText("Balance: ", "ব্যালেন্স: ")}<strong>৳{(user?.balance || 0).toLocaleString()}</strong></p>
             </div>
 
-            {/* Category Filter */}
-            <div className="category-tabs" style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '15px', marginBottom: '20px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+            {/* Category Filter - scrollable on mobile */}
+            <div style={{ 
+                display: 'flex', 
+                gap: '8px', 
+                overflowX: 'auto', 
+                paddingBottom: '12px', 
+                marginBottom: '20px', 
+                scrollbarWidth: 'none',
+                WebkitOverflowScrolling: 'touch',
+                msOverflowStyle: 'none',
+                width: '100%',
+                maxWidth: '100%'
+            }}>
                 {categories.map(cat => (
                     <button 
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
                         style={{
-                            padding: '8px 20px',
+                            padding: '7px 16px',
                             borderRadius: '20px',
                             background: selectedCategory === cat ? 'var(--primary-color)' : 'var(--bg-secondary)',
                             color: selectedCategory === cat ? 'white' : 'var(--text-primary)',
@@ -421,6 +432,8 @@ export default function ClientProductsPage() {
                             textTransform: 'capitalize',
                             fontWeight: selectedCategory === cat ? '600' : 'normal',
                             whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            fontSize: '13px',
                             transition: 'all 0.3s ease'
                         }}
                     >
@@ -430,12 +443,12 @@ export default function ClientProductsPage() {
             </div>
 
             {/* Products Grid */}
-            <div className="products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: '16px' }}>
                 {activeProducts.length === 0 ? (
-                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px 20px' }}>
-                        <i className="fas fa-box-open" style={{ fontSize: '60px', color: 'var(--text-muted)', marginBottom: '20px' }}></i>
-                        <h3 style={{ color: 'var(--text-secondary)' }}>{tText("No Products Available", "কোন পণ্য উপলব্ধ নেই")}</h3>
-                        <p style={{ color: 'var(--text-muted)' }}>{tText("Check back later for new investment opportunities", "নতুন বিনিয়োগের সুযোগের জন্য পরে আবার দেখুন")}</p>
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '48px 12px' }}>
+                        <i className="fas fa-box-open" style={{ fontSize: '50px', color: 'var(--text-muted)', marginBottom: '16px', display: 'block' }}></i>
+                        <h3 style={{ color: 'var(--text-secondary)', fontSize: '16px', marginBottom: '8px' }}>{tText("No Products Available", "কোন পণ্য উপলব্ধ নেই")}</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '13px', wordBreak: 'break-word', lineHeight: '1.5' }}>{tText("Check back later for new investment opportunities", "নতুন বিনিয়োগের সুযোগের জন্য পরে আবার দেখুন")}</p>
                     </div>
                 ) : (
                     activeProducts.map((product) => {

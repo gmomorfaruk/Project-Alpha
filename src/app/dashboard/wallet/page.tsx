@@ -358,8 +358,39 @@ export default function ClientWalletPage() {
                 }
 
                 @media (max-width: 576px) {
+                    .fintech-wallet-view {
+                        gap: 16px;
+                    }
+                    .wallet-hero-card {
+                        padding: 24px 16px;
+                    }
+                    .hero-balance-value {
+                        font-size: 38px;
+                    }
+                    .tab-content-card {
+                        padding: 20px 16px;
+                    }
                     .gateways-grid {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 8px;
+                    }
+                    .gateway-card {
+                        padding: 12px 8px;
+                    }
+                    .gateway-logo {
+                        width: 36px;
+                        height: 36px;
+                        font-size: 14px;
+                    }
+                    .gateway-name {
+                        font-size: 12px;
+                    }
+                    .wallet-tabs-bar {
+                        gap: 4px;
+                    }
+                    .wallet-tab-btn {
+                        padding: 10px 6px;
+                        font-size: 12px;
                     }
                 }
 

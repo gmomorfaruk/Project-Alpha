@@ -614,8 +614,12 @@ body {
 /* Main content workspace container */
 .dashboard-content {
     flex: 1;
-    padding: 40px;
+    padding: 24px;
     background: var(--bg-secondary);
+    overflow-x: hidden;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Mobile Bottom Navigation Tabs Bar */
@@ -733,22 +737,59 @@ body {
 }
 
 @media (max-width: 576px) {
+    .header-top {
+        padding: 10px 14px;
+    }
+
     .dashboard-content {
-        padding: 16px;
-        padding-bottom: 90px;
+        padding: 10px 10px 90px;
     }
     
-    .top-navbar {
-        padding: 0 15px;
+    /* Fix page headers on small phones */
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .page-header h1 {
+        font-size: 20px !important;
+    }
+
+    .page-header p {
+        font-size: 13px !important;
     }
     
-    .navbar-brand span {
-        display: none;
+    /* All grids become single column on phones */
+    .fintech-stats-grid,
+    .stats-grid,
+    .quick-actions,
+    .investments-grid,
+    .dashboard-double-column {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
     }
-    
-    .navbar-icon-btn {
-        width: 36px;
-        height: 36px;
+
+    /* Stat cards compact on mobile */
+    .stat-card {
+        padding: 16px !important;
+    }
+
+    /* Hero balance card compact */
+    .wallet-actions {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+/* Tablet (768px) tweaks */
+@media (max-width: 768px) {
+    .fintech-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .header-top {
+        padding: 10px 20px;
     }
 }
 
@@ -785,9 +826,11 @@ body {
 }
 
 /* ===== CONTENT AREA ===== */
+/* Remove double padding - dashboard-content already pads */
 .content {
-    padding: 30px;
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
     overflow-x: hidden;
 }
 
@@ -1263,7 +1306,7 @@ body {
 
 @media (max-width: 768px) {
     .content {
-        padding: 20px;
+        padding: 14px;
     }
 
     .stats-grid {
@@ -1285,7 +1328,7 @@ body {
     }
     
     .content {
-        padding: 15px;
+        padding: 10px;
     }
     
     .stat-card {
@@ -2103,15 +2146,40 @@ body {
 .balance-card-wrapper {
     background: var(--primary-gradient);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 28px;
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 240px;
+    min-height: 220px;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
+}
+
+@media (max-width: 576px) {
+    .balance-card-wrapper {
+        padding: 20px 18px;
+        min-height: 180px;
+    }
+    
+    .balance-amount {
+        font-size: 30px !important;
+    }
+    
+    .balance-card-actions {
+        gap: 8px !important;
+    }
+    
+    .balance-action-btn {
+        flex: 1;
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+    }
+    
+    .balance-action-btn span {
+        display: block;
+    }
 }
 
 .balance-card-wrapper::after {

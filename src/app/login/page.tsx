@@ -493,15 +493,31 @@ export default function LoginPage() {
                 .form-modal-body {
                     padding: 25px;
                 }
-                @media (max-width: 768px) {
+                @media (max-width: 640px) {
+                    .auth-section-pro {
+                        padding: 80px 14px 30px;
+                        align-items: flex-start;
+                    }
                     .auth-wrapper-pro {
                         grid-template-columns: 1fr;
+                        border-radius: 16px;
                     }
                     .auth-brand-side {
                         display: none;
                     }
                     .auth-form-side {
-                        padding: 32px 24px;
+                        padding: 28px 20px;
+                    }
+                    .auth-form-header h1 {
+                        font-size: 20px;
+                    }
+                }
+                @media (max-width: 400px) {
+                    .auth-section-pro {
+                        padding: 70px 10px 24px;
+                    }
+                    .auth-form-side {
+                        padding: 22px 16px;
                     }
                 }
             `}</style>
