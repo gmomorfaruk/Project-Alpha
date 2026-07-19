@@ -150,9 +150,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             }
                         });
                         
-                        localStorage.setItem('projectAlpha_' + table, JSON.stringify(Array.from(localMap.values())));
                     } else if (error) {
-                        console.warn(`⚠️ Background sync error for table ${table}:`, error.message);
+                        if (!error.message.includes('Could not find the table') && !error.message.includes('schema cache')) {
+                            console.warn(`⚠️ Background sync notice for ${table}:`, error.message);
+                        }
                     }
                 } catch (err) {
                     console.warn(`⚠️ Error processing table ${table}:`, err);
