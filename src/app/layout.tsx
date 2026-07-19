@@ -31,6 +31,7 @@ export default function RootLayout({
     <html lang="en" data-theme="light" data-scroll-behavior="smooth">
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

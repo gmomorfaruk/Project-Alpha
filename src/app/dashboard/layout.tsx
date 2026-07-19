@@ -13,6 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { user, loading, logout } = useAuth();
     const { lang, tText, tNum, toggleLang } = useTranslation();
     const { theme, toggleTheme } = useTheme();
+    const { showToast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,9 +22,52 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [notifications, setNotifications] = useState<any[]>([]);
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [settings, setSettings] = useState<any>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+                .catch(err => console.warn('PWA Service Worker registration failed:', err));
+        }
+
+        const handleBeforeInstallPrompt = (e: Event) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+    }, []);
+
+    const handleInstallClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult: any) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the PWA install prompt');
+                } else {
+                    console.log('User dismissed the PWA install prompt');
+                }
+                setDeferredPrompt(null);
+            });
+        } else {
+            showToast(
+                tText(
+                    "To install: Open in Chrome/Edge, click the browser menu (⋮) -> 'Add to Home screen' or 'Install app'. On iPhone, use Safari -> Share button -> 'Add to Home Screen'.",
+                    "ইনস্টল করতে: Chrome/Edge ব্রাউজারে খুলুন, ব্রাউজার মেনু (⋮) -> 'Add to Home screen' বা 'Install app' এ চাপুন। আইফোনে Safari ব্রাউজার -> Share বাটন -> 'Add to Home Screen' এ চাপুন।"
+                ),
+                "info"
+            );
+        }
+    };
 
     useEffect(() => {
         if (!loading && !user) {
@@ -154,6 +198,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <div className="drawer-footer">
                         <a 
                             href="#" 
+                            onClick={handleInstallClick}
                             className="sidebar-item" 
                             style={{ 
                                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
@@ -224,6 +269,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </Link>
                         <a 
                             href="#" 
+                            onClick={handleInstallClick}
                             className="sidebar-item" 
                             style={{ 
                                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
