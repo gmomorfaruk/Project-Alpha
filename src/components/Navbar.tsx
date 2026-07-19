@@ -507,6 +507,20 @@ export default function Navbar() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Download APK Button */}
+                        <a 
+                            href="#" 
+                            className="nav-link-pill-inactive flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-sm transition-all"
+                            style={{ 
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
+                                color: 'white',
+                                marginLeft: '8px'
+                            }}
+                        >
+                            <i className="fab fa-android text-lg"></i>
+                            <span>{tText('Download App', 'অ্যাপ ডাউনলোড')}</span>
+                        </a>
                     </div>
 
                     {/* Right Action Icons Panel */}
@@ -950,6 +964,24 @@ export default function Navbar() {
                                     </div>
                                 )}
                             </div>
+
+                            <hr className="sidebar-divider" />
+                            
+                            {/* Download App Mobile Link */}
+                            <a 
+                                href="#" 
+                                className="sidebar-item" 
+                                style={{ 
+                                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
+                                    color: '#10b981',
+                                    fontWeight: 'bold',
+                                    borderRadius: '12px',
+                                    marginTop: '8px'
+                                }}
+                            >
+                                <i className="fab fa-android text-lg"></i>
+                                <span>{tText('Download App', 'অ্যাপ ডাউনলোড')}</span>
+                            </a>
                         </div>
                     </div>
 

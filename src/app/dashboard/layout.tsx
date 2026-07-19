@@ -152,6 +152,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <hr className="sidebar-divider" />
                     
                     <div className="drawer-footer">
+                        <a 
+                            href="#" 
+                            className="sidebar-item" 
+                            style={{ 
+                                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
+                                color: '#10b981',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            <i className="fab fa-android"></i>
+                            <span>{tText('Download App', 'অ্যাপ ডাউনলোড')}</span>
+                        </a>
                         <button className="sidebar-item logout-btn" onClick={() => { logout(); setDesktopMenuOpen(false); }}>
                             <i className="fas fa-sign-out-alt"></i>
                             <span>{tText("Logout", "লগআউট")}</span>
@@ -200,6 +212,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <i className="fas fa-cog"></i>
                             <span>{tText("Settings", "সেটিংস")}</span>
                         </Link>
+                        <a 
+                            href="#" 
+                            className="sidebar-item" 
+                            style={{ 
+                                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
+                                color: '#10b981',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            <i className="fab fa-android"></i>
+                            <span>{tText('Download App', 'অ্যাপ ডাউনলোড')}</span>
+                        </a>
                         <button className="sidebar-item logout-btn" onClick={() => { logout(); setMobileMenuOpen(false); }}>
                             <i className="fas fa-sign-out-alt"></i>
                             <span>{tText("Logout", "লগআউট")}</span>

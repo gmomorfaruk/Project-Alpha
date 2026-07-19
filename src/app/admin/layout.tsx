@@ -275,7 +275,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { path: `${adminPrefix}/memberships`, name: 'Memberships', icon: 'fa-crown' },
         { path: `${adminPrefix}/products`, name: 'Products', icon: 'fa-box' },
         { path: `${adminPrefix}/tasks`, name: 'Tasks', icon: 'fa-tasks' },
-        { path: `${adminPrefix}/proofs`, name: 'Proofs', icon: 'fa-receipt' },
+        { path: `${adminPrefix}/tasks-verification`, name: 'Task Proofs', icon: 'fa-clipboard-check' },
+        { path: `${adminPrefix}/proofs`, name: 'Sell Proofs', icon: 'fa-receipt' },
         { path: `${adminPrefix}/database`, name: 'Database', icon: 'fa-database' },
         { path: `${adminPrefix}/settings`, name: 'Settings', icon: 'fa-cog' }
     ];

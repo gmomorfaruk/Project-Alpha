@@ -76,6 +76,11 @@ export default function ClientTasksPage() {
     const [activeTask, setActiveTask] = useState<Task | null>(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    
+    // Proof state
+    const [proofText, setProofText] = useState('');
+    const [proofImage, setProofImage] = useState<string | null>(null);
+    const [isSubmittingProof, setIsSubmittingProof] = useState(false);
 
     // Load settings for configurable rewards
     const settings = typeof window !== 'undefined' ? Storage.get('settings') : null;
@@ -91,6 +96,28 @@ export default function ClientTasksPage() {
         vip: settings?.socialLimitVip ?? -1,
     };
     const socialDailyLimit = socialLimitMap[membershipKey] ?? 3;
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 800;
+                let w = img.width, h = img.height;
+                if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+                else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, w, h);
+                setProofImage(canvas.toDataURL('image/jpeg', 0.5));
+            };
+            img.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    };
 
     useEffect(() => {
         let allTasks = Storage.get('workTasks');
@@ -188,18 +215,30 @@ export default function ClientTasksPage() {
         if (timerRef.current) clearTimeout(timerRef.current);
         setModalOpen(false);
         setActiveTask(null);
+        setProofText('');
+        setProofImage(null);
+        setIsSubmittingProof(false);
     };
 
     const handleCompleteTask = async () => {
         if (!user || !activeTask) return;
 
+        const isAuto = activeTask.verification === 'auto' || !activeTask.verification;
+
+        if (!isAuto && !proofImage && !proofText) {
+            showToast(tText("Please provide a screenshot or text proof", "অনুগ্রহ করে একটি স্ক্রিনশট বা টেক্সট প্রমাণ দিন"), "error");
+            return;
+        }
+
+        setIsSubmittingProof(true);
         const reward = getTaskReward(activeTask);
 
         try {
-            if (reward > 0) {
+            if (isAuto && reward > 0) {
                 const balanceUpdated = await updateUserBalance(reward, 'add');
                 if (!balanceUpdated) {
                     showToast('Failed to update wallet rewards', 'error');
+                    setIsSubmittingProof(false);
                     return;
                 }
 
@@ -214,18 +253,21 @@ export default function ClientTasksPage() {
 
             const allCompletions = Storage.get('taskCompletions') || [];
             allCompletions.push({
-                id: Date.now(),
+                id: Date.now().toString(),
                 taskId: activeTask.id,
+                taskTitle: activeTask.title,
                 userId: user.email,
                 pointsAwarded: reward,
                 taskType: activeTask.taskType || 'bonus',
                 socialAction: activeTask.socialAction,
-                status: 'approved',
+                status: isAuto ? 'approved' : 'pending',
+                proofText: proofText,
+                proofImage: proofImage,
                 timestamp: new Date().toISOString()
             });
             Storage.set('taskCompletions', allCompletions);
 
-            if (reward > 0) {
+            if (isAuto && reward > 0) {
                 const allTx = Storage.get('transactions') || [];
                 allTx.unshift({
                     id: db.generateId(),
@@ -239,15 +281,22 @@ export default function ClientTasksPage() {
                 Storage.set('transactions', allTx);
             }
 
-            if (reward > 0) {
-                showToast(tText(`Task completed! Earned ৳${reward}`, `কাজ সম্পন্ন হয়েছে! ৳${reward} অর্জিত হয়েছে`), 'success');
+            if (isAuto) {
+                if (reward > 0) {
+                    showToast(tText(`Task completed! Earned ৳${reward}`, `কাজ সম্পন্ন হয়েছে! ৳${reward} অর্জিত হয়েছে`), 'success');
+                } else {
+                    showToast(tText('Mandatory task marked as completed!', 'বাধ্যতামূলক কাজ সম্পন্ন হয়েছে!'), 'success');
+                }
             } else {
-                showToast(tText('Mandatory task marked as completed!', 'বাধ্যতামূলক কাজ সম্পন্ন হয়েছে!'), 'success');
+                showToast(tText('Proof submitted! Waiting for admin approval.', 'প্রমাণ জমা দেওয়া হয়েছে! অ্যাডমিন অনুমোদনের অপেক্ষায়।'), 'success');
             }
+            
             handleCloseModal();
             loadTodayCompletions();
         } catch (err) {
-            showToast('Failed to claim task reward', 'error');
+            showToast('Failed to process task', 'error');
+        } finally {
+            setIsSubmittingProof(false);
         }
     };
 
@@ -562,6 +611,11 @@ export default function ClientTasksPage() {
                     <span>{tText("Bonus", "বোনাস")}</span>
                     <span className="tab-count">{bonusCount}</span>
                 </button>
+                <button className={`task-type-tab ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
+                    <i className="fas fa-history"></i>
+                    <span>{tText("History", "হিস্টোরি")}</span>
+                    <span className="tab-count">{completions.length}</span>
+                </button>
             </div>
 
             {/* Tab-specific info banners */}
@@ -612,7 +666,37 @@ export default function ClientTasksPage() {
 
             {/* Tasks list */}
             <div className="duo-tasks-container">
-                {filteredTasks.length === 0 ? (
+                {activeTab === 'history' ? (
+                    completions.length === 0 ? (
+                        <div className="tab-content-card" style={{ textAlign: 'center', padding: '48px' }}>
+                            <i className="fas fa-history" style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }}></i>
+                            <h3>{tText("No history yet", "এখনও কোন ইতিহাস নেই")}</h3>
+                            <p>{tText("Complete some tasks to see them here", "এখানে দেখতে কিছু কাজ সম্পন্ন করুন")}</p>
+                        </div>
+                    ) : (
+                        completions.map((comp: any) => (
+                            <div key={comp.id} className="duo-task-card">
+                                <div className="duo-icon-box" style={{ background: comp.status === 'approved' ? '#10B981' : comp.status === 'rejected' ? '#EF4444' : '#F59E0B' }}>
+                                    <i className={comp.status === 'approved' ? "fas fa-check" : comp.status === 'rejected' ? "fas fa-times" : "fas fa-clock"}></i>
+                                </div>
+                                <div className="duo-info-box">
+                                    <h4>{comp.taskTitle || 'Task'}</h4>
+                                    <p>{new Date(comp.timestamp).toLocaleString()}</p>
+                                    <div className="duo-meta-row">
+                                        <span className="task-type-badge" style={{ background: 'var(--bg-body)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}>
+                                            {comp.status.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="duo-reward-box">
+                                    <span className="duo-reward-badge" style={{ opacity: comp.status === 'rejected' ? 0.5 : 1 }}>
+                                        ৳{tNum(comp.pointsAwarded || 0)}
+                                    </span>
+                                </div>
+                            </div>
+                        ))
+                    )
+                ) : filteredTasks.length === 0 ? (
                     <div className="tab-content-card" style={{ textAlign: 'center', padding: '48px' }}>
                         <i className="fas fa-clipboard-check" style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }}></i>
                         <h3>{tText("No tasks available", "কোন কাজ উপলব্ধ নেই")}</h3>
@@ -717,21 +801,44 @@ export default function ClientTasksPage() {
                                 </div>
                             </div>
 
+                            {timeLeft <= 0 && activeTask.verification !== 'auto' && (
+                                <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '16px', marginBottom: '24px', border: '1px solid var(--border-color)', textAlign: 'left' }}>
+                                    <h4 style={{ margin: '0 0 12px', fontSize: '15px', fontWeight: 700 }}>Submit Proof</h4>
+                                    <p style={{ margin: '0 0 16px', fontSize: '13px', color: 'var(--text-secondary)' }}>Please provide proof that you completed the task.</p>
+                                    
+                                    <div style={{ marginBottom: '16px' }}>
+                                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>Screenshot (Required)</label>
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} style={{ width: '100%', padding: '10px', background: 'var(--bg-body)', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '13px' }} />
+                                        {proofImage && <div style={{ marginTop: '10px', textAlign: 'center' }}><img src={proofImage} style={{ maxHeight: '100px', borderRadius: '8px', border: '1px solid var(--border-color)' }} alt="Proof preview" /></div>}
+                                    </div>
+
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>Username / Details (Optional)</label>
+                                        <input type="text" value={proofText} onChange={(e) => setProofText(e.target.value)} placeholder="e.g. Your YouTube username" style={{ width: '100%', padding: '12px', background: 'var(--bg-body)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '14px' }} />
+                                    </div>
+                                </div>
+                            )}
+
                             <button
                                 className="complete-task-btn"
-                                disabled={timeLeft > 0}
+                                disabled={timeLeft > 0 || isSubmittingProof}
                                 onClick={handleCompleteTask}
                                 style={{ height: '48px', borderRadius: '14px' }}
                             >
-                                {timeLeft > 0 ? (
+                                {isSubmittingProof ? (
+                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                        <span>Submitting...</span>
+                                    </span>
+                                ) : timeLeft > 0 ? (
                                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                         <i className="fas fa-hourglass-half"></i>
                                         <span>Wait for timer...</span>
                                     </span>
                                 ) : (
                                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                        <i className="fas fa-check-circle"></i>
-                                        <span>{getTaskReward(activeTask) > 0 ? `Complete Task — Earn ৳${getTaskReward(activeTask)}` : 'Mark as Complete'}</span>
+                                        <i className={activeTask.verification === 'auto' ? "fas fa-check-circle" : "fas fa-paper-plane"}></i>
+                                        <span>{activeTask.verification === 'auto' ? (getTaskReward(activeTask) > 0 ? `Complete Task — Earn ৳${getTaskReward(activeTask)}` : 'Mark as Complete') : 'Submit Proof'}</span>
                                     </span>
                                 )}
                             </button>

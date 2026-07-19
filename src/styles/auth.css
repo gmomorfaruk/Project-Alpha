@@ -283,6 +283,10 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+    .auth-section {
+        padding: 80px 15px 40px;
+    }
+
     .auth-wrapper {
         grid-template-columns: 1fr;
         max-width: 500px;

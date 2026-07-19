@@ -733,6 +733,11 @@ body {
 }
 
 @media (max-width: 576px) {
+    .dashboard-content {
+        padding: 16px;
+        padding-bottom: 90px;
+    }
+    
     .top-navbar {
         padding: 0 15px;
     }

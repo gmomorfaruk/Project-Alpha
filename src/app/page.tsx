@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +13,7 @@ import { useToast } from '@/context/ToastContext';
 
 export default function Home() {
     const { lang, t, tText, tNum } = useTranslation();
+    const router = useRouter();
     const { user } = useAuth();
     const ecommerceCart = useCart();
     const { showToast } = useToast();
@@ -20,6 +22,18 @@ export default function Home() {
 
     useEffect(() => {
         setMounted(true);
+
+        if (user) {
+            if (user.role === 'admin') {
+                router.push('/dashboard'); // Admin could also go to /admin depending on requirements, but /dashboard is standard
+            } else if (user.role === 'buyer') {
+                router.push('/buyer/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
+            return;
+        }
+
         // Force reset products list to load updated discounts
         const hasReset = Storage.get('products_reset_v8');
         let list = Storage.get('products');
