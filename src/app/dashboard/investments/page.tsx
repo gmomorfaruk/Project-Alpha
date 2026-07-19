@@ -255,29 +255,29 @@ export default function ClientInvestmentsPage() {
                     {tText("How It Works", "কীভাবে কাজ করে")}
                 </h3>
                 
-                <div style={{ display: 'flex', flexDirection: 'row', gap: '15px', alignItems: 'stretch', overflowX: 'auto', paddingBottom: '20px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                <div className="how-it-works-steps">
                     
                     {/* Step 1 */}
-                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
-                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>💰</div>
-                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                    <div className="step-card">
+                        <div className="step-icon">💰</div>
+                        <h4 className="step-title">
                             {tText("Step 1: Start with a Small Investment", "ধাপ ১: অল্প টাকা দিয়ে শুরু করুন")}
                         </h4>
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                        <p className="step-desc">
                             {tText("Invest any amount you can afford.", "আপনার সামর্থ্য অনুযায়ী বিনিয়োগ করুন।")}
                         </p>
                     </div>
 
                     {/* Arrow */}
-                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
 
                     {/* Step 2 */}
-                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
-                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>📦</div>
-                        <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                    <div className="step-card">
+                        <div className="step-icon">📦</div>
+                        <h4 className="step-title">
                             {tText("Step 2: Choose How to Earn", "ধাপ ২: যেভাবে আয় করতে চান, বেছে নিন")}
                         </h4>
-                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'left', display: 'inline-block', lineHeight: '1.5' }}>
+                        <div className="step-desc" style={{ textAlign: 'left', display: 'inline-block' }}>
                             <div>• {tText("Sell yourself & earn profit", "নিজে বিক্রি করে লাভ করুন")}</div>
                             <div style={{ margin: '8px 0', textAlign: 'center', fontWeight: 'bold', color: 'var(--primary-color)' }}>{tText("OR", "অথবা")}</div>
                             <div>• {tText("Let us sell & receive a share of the profit", "আমরা বিক্রি করব, আপনি লাভের অংশ পাবেন")}</div>
@@ -285,29 +285,29 @@ export default function ClientInvestmentsPage() {
                     </div>
 
                     {/* Arrow */}
-                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
 
                     {/* Step 3 */}
-                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--border-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
-                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>📈</div>
-                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                    <div className="step-card">
+                        <div className="step-icon">📈</div>
+                        <h4 className="step-title">
                             {tText("Step 3: Receive Your Profit", "ধাপ ৩: লাভ গ্রহণ করুন")}
                         </h4>
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                        <p className="step-desc">
                             {tText("Your profit is added to your investment and returned at the end of the investment period.", "নির্ধারিত সময় শেষে মূল টাকা ও লাভ একসাথে ফেরত পাবেন।")}
                         </p>
                     </div>
 
                     {/* Arrow */}
-                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-color)', fontSize: '24px', flexShrink: 0 }}>→</div>
+                    <div className="step-arrow"><i className="fas fa-arrow-right desktop-arrow"></i><i className="fas fa-arrow-down mobile-arrow"></i></div>
 
                     {/* Step 4 */}
-                    <div style={{ flex: '1', minWidth: '240px', background: 'var(--bg-primary)', padding: '20px', borderRadius: '12px', border: '2px solid var(--primary-light)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', transition: 'transform 0.3s' }}>
-                        <div style={{ fontSize: '28px', marginBottom: '10px' }}>🚀</div>
-                        <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: 'var(--text-primary)' }}>
+                    <div className="step-card">
+                        <div className="step-icon">🚀</div>
+                        <h4 className="step-title">
                             {tText("Step 4: Grow Your Investment", "ধাপ ৪: ধীরে ধীরে এগিয়ে যান")}
                         </h4>
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                        <p className="step-desc">
                             {tText("Start small today and increase your earnings over time.", "আজ অল্প দিয়ে শুরু করুন, ভবিষ্যতে আরও বড় করুন।")}
                         </p>
                     </div>
@@ -317,7 +317,7 @@ export default function ClientInvestmentsPage() {
 
 
             {/* Redesigned 3 Stats Columns */}
-            <div className="fintech-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+            <div className="fintech-stats-grid">
                 <div className="stat-card">
                     <div className="stat-card-header">
                         <div className="stat-icon-wrapper investments">

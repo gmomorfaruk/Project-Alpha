@@ -2280,17 +2280,11 @@ body {
     padding: 0 4px;
 }
 
-/* 4 Statistics Cards */
+/* Statistics Cards Grid */
 .fintech-stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 24px;
-}
-
-@media (max-width: 1200px) {
-    .fintech-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 @media (max-width: 576px) {
@@ -2746,4 +2740,80 @@ body {
 .status-badge.rejected {
     background: rgba(239, 68, 68, 0.08);
     color: #EF4444;
+}
+
+/* How It Works Steps Component */
+.how-it-works-steps {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: stretch;
+    padding-bottom: 20px;
+}
+
+.step-card {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-primary);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid var(--border-light);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+}
+
+.step-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.step-title {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.step-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.step-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.step-arrow .mobile-arrow {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .how-it-works-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step-card {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .step-arrow .desktop-arrow {
+        display: none;
+    }
+    
+    .step-arrow .mobile-arrow {
+        display: block;
+        margin: 10px 0;
+    }
 }

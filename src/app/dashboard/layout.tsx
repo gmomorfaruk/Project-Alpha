@@ -204,6 +204,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <hr className="sidebar-divider" />
                     
                     <div className="drawer-footer">
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button className="sidebar-item" onClick={toggleTheme} style={{ flex: 1, justifyContent: 'center' }}>
+                                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+                                <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+                            </button>
+                            <button className="sidebar-item" onClick={toggleLang} style={{ flex: 1, justifyContent: 'center' }}>
+                                <i className="fas fa-language"></i>
+                                <span>{lang.toUpperCase()}</span>
+                            </button>
+                        </div>
                         <Link
                             href="/dashboard/profile"
                             className={`sidebar-item ${pathname === '/dashboard/profile' ? 'active' : ''}`}
@@ -340,14 +350,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div className="header-right mobile-only-utilities">
                             <button className="header-icon-btn mobile-search-btn" title="Search">
                                 <i className="fas fa-search"></i>
-                            </button>
-
-                            <button className="header-icon-btn" onClick={toggleTheme} title="Toggle Theme">
-                                <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
-                            </button>
-
-                            <button className="header-icon-btn" onClick={toggleLang} title="Toggle Language">
-                                <span style={{ fontSize: '12px', fontWeight: 600 }}>{lang.toUpperCase()}</span>
                             </button>
 
                             <div style={{ position: 'relative' }}>
