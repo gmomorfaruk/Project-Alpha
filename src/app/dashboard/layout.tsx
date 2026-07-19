@@ -222,7 +222,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="drawer-content" onClick={(e) => e.stopPropagation()}>
                     <div className="drawer-header">
                         <Link href="/dashboard" className="drawer-logo" onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
+                            <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
                         </Link>
                         <button className="drawer-close-btn" onClick={() => setMobileMenuOpen(false)}>
                             <i className="fas fa-times"></i>
@@ -301,7 +301,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             </button>
 
                             <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
+                                <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
                             </Link>
 
                             {/* Core navigation links - desktop only */}

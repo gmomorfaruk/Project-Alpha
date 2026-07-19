@@ -2890,7 +2890,7 @@ html, body, .dashboard-container, .dashboard-main, .dashboard-content {
     }
     
     .header-left img {
-        height: 18px !important; /* Slightly smaller logo to fit small viewports */
+        height: 26px !important;
     }
     
     .mobile-only-utilities {
