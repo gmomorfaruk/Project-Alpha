@@ -316,6 +316,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return { success: false, message: 'An account with this email already exists' };
             }
 
+            const settings = Storage.get('settings') || {};
+            const signupBonus = Number(settings.signupBonus) || 0;
+
             const newUser: any = {
                 id: db.generateId(),
                 fullName,
@@ -325,7 +328,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 password,
                 role: role || 'user',
                 isLoggedIn: true,
-                balance: 0,
+                balance: signupBonus,
                 points: 0,
                 totalInvested: 0,
                 totalProfit: 0,

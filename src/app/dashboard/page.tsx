@@ -12,6 +12,22 @@ export default function DashboardPage() {
     const { tText, tNum } = useTranslation();
     const { showToast } = useToast();
 
+    const getTodayIncome = () => {
+        if (user?.totalProfit && user.totalProfit > 0) {
+            return user.totalProfit / 30;
+        }
+        
+        const isSignedUpToday = user?.createdAt && 
+            new Date(user.createdAt).toDateString() === new Date().toDateString();
+            
+        if (isSignedUpToday) {
+            const settings = Storage.get('settings') || {};
+            return Number(settings.signupBonus) || 0;
+        }
+        
+        return 0;
+    };
+
     // Data states
     const [recentActivity, setRecentActivity] = useState<any[]>([]);
     const [activeInvestments, setActiveInvestments] = useState<any[]>([]);
@@ -317,7 +333,7 @@ export default function DashboardPage() {
                         </div>
                         <span className="stat-card-title">{tText("Today's Income", "আজকের আয়")}</span>
                     </div>
-                    <h3 className="stat-card-value">{formatMoney(user?.totalProfit ? user.totalProfit / 30 : 150)}</h3>
+                    <h3 className="stat-card-value">{formatMoney(getTodayIncome())}</h3>
                     <div className="stat-card-footer positive">
                         <i className="fas fa-arrow-trend-up"></i>
                         <span>{trends.todayIncome}</span>

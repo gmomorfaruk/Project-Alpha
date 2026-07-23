@@ -223,7 +223,7 @@ body {
 .header-top {
     display: flex;
     flex-direction: column;
-    padding: 16px 40px;
+    padding: 12px 24px;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
@@ -236,21 +236,21 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 24px;
+    gap: 16px;
 }
 
 .header-menu {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-left: 32px;
+    gap: 4px;
+    margin-left: 16px;
 }
 
 .header-menu-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 6px;
+    padding: 8px 12px;
     border-radius: var(--radius-md);
     color: var(--text-secondary) !important;
     font-weight: 500;
@@ -299,7 +299,7 @@ body {
 .header-utilities {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 /* Desktop / Mobile view toggle utility classes */
@@ -310,7 +310,12 @@ body {
 .desktop-only-utilities {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
 }
 
 /* Desktop Drawer (Slide-out from Right) */

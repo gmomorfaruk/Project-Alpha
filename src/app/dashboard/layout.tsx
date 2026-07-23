@@ -16,16 +16,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { showToast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [searchExpanded, setSearchExpanded] = useState(false);
+    const [dashboardSearchQuery, setDashboardSearchQuery] = useState('');
     const [settings, setSettings] = useState<any>(null);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    const handleSearchSubmit = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (dashboardSearchQuery.trim()) {
+            router.push(`/dashboard/products?search=${encodeURIComponent(dashboardSearchQuery.trim())}`);
+            setSearchExpanded(false);
+            setDashboardSearchQuery('');
+        }
+    };
 
     useEffect(() => {
         if ('serviceWorker' in navigator) {
@@ -308,7 +318,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             </button>
 
                             <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+                                <img src={theme === 'dark' ? "/name_white.png" : "/name_transparent.png"} alt="SmartEarnBD" style={{ height: '22px', width: 'auto', objectFit: 'contain' }} />
                             </Link>
 
                             {/* Core navigation links - desktop only */}
@@ -333,22 +343,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 ref={searchRef}
                                 className={`header-search ${searchExpanded ? 'expanded' : ''}`}
                             >
-                                <button 
-                                    className="search-toggle-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSearchExpanded(!searchExpanded);
-                                    }}
-                                    title={tText("Search", "অনুসন্ধান")}
-                                >
-                                    <i className="fas fa-search"></i>
-                                </button>
-                                <input 
-                                    ref={searchInputRef}
-                                    type="text" 
-                                    placeholder={tText("Search...", "অনুসন্ধান...")} 
-                                    className="search-input" 
-                                />
+                                <form onSubmit={handleSearchSubmit} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}>
+                                    <input 
+                                        ref={searchInputRef}
+                                        type="text" 
+                                        placeholder={tText("Search...", "অনুসন্ধান...")} 
+                                        className="search-input"
+                                        value={dashboardSearchQuery}
+                                        onChange={(e) => setDashboardSearchQuery(e.target.value)}
+                                    />
+                                    <button 
+                                        type="submit"
+                                        className="search-toggle-btn"
+                                        onClick={(e) => {
+                                            if (!searchExpanded) {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setSearchExpanded(true);
+                                            }
+                                        }}
+                                        title={tText("Search", "অনুসন্ধান")}
+                                    >
+                                        <i className="fas fa-search"></i>
+                                    </button>
+                                </form>
                             </div>
 
                             <button className="header-icon-btn" onClick={toggleTheme} title="Toggle Theme">
@@ -397,11 +415,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <button className="header-icon-btn hamburger-menu-btn" onClick={toggleDesktopMenu} title="Menu">
                                 <i className="fas fa-bars"></i>
                             </button>
+
+                            <button className="header-icon-btn logout-btn" onClick={() => logout()} title={tText("Logout", "লগআউট")}>
+                                <i className="fas fa-sign-out-alt"></i>
+                            </button>
                         </div>
 
                         {/* Mobile-only utilities (Theme, Lang, Notifications, Avatar) */}
                         <div className="header-right mobile-only-utilities">
-                            <button className="header-icon-btn mobile-search-btn" title="Search">
+                            <button className="header-icon-btn mobile-search-btn" title="Search" onClick={() => router.push('/dashboard/products')}>
                                 <i className="fas fa-search"></i>
                             </button>
 
@@ -439,6 +461,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     <i className="fas fa-user"></i>
                                 )}
                             </Link>
+
+                            <button className="header-icon-btn logout-btn" onClick={() => logout()} title={tText("Logout", "লগআউট")} style={{ minWidth: '32px', height: '32px', marginLeft: '6px' }}>
+                                <i className="fas fa-sign-out-alt" style={{ fontSize: '16px' }}></i>
+                            </button>
                         </div>
                     </div>
                 </header>

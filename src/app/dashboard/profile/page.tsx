@@ -18,7 +18,7 @@ interface WithdrawalRecord {
 }
 
 export default function ClientProfilePage() {
-    const { user, updateUserBalance } = useAuth();
+    const { user, logout, updateUserBalance } = useAuth();
     const { tText } = useTranslation();
     const { showToast } = useToast();
 
@@ -292,9 +292,14 @@ export default function ClientProfilePage() {
                         </span>
                     </div>
                 </div>
-                <button className="btn btn-primary" onClick={() => setEditProfileOpen(true)}>
-                    <i className="fas fa-edit" style={{ marginRight: '6px' }}></i> {tText("Edit Profile", "প্রোফাইল সম্পাদন")}
-                </button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button className="btn btn-primary" onClick={() => setEditProfileOpen(true)}>
+                        <i className="fas fa-edit" style={{ marginRight: '6px' }}></i> {tText("Edit Profile", "প্রোফাইল সম্পাদন")}
+                    </button>
+                    <button className="btn btn-outline" onClick={() => logout()} style={{ borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}>
+                        <i className="fas fa-sign-out-alt" style={{ marginRight: '6px' }}></i> {tText("Logout", "লগআউট")}
+                    </button>
+                </div>
             </div>
 
             {/* Account Information Section */}

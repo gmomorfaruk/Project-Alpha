@@ -17,6 +17,7 @@ interface AppSettings {
     withdrawalFee: number;
     referralRate: number;
     referralBonus: number;
+    signupBonus: number;
     referralEnabled: boolean;
     bkashNumber: string;
     nagadNumber: string;
@@ -53,6 +54,7 @@ const defaultSettings: AppSettings = {
     withdrawalFee: 0,
     referralRate: 5,
     referralBonus: 50,
+    signupBonus: 0,
     referralEnabled: true,
     bkashNumber: '01700000000',
     nagadNumber: '01800000000',
@@ -100,6 +102,7 @@ export default function AdminSettingsPage() {
     // Referral
     const [referralRate, setReferralRate] = useState('5');
     const [referralBonus, setReferralBonus] = useState('50');
+    const [signupBonus, setSignupBonus] = useState('0');
     const [referralEnabled, setReferralEnabled] = useState(true);
 
     // Payment Gateways
@@ -154,6 +157,7 @@ export default function AdminSettingsPage() {
 
         setReferralRate((settings.referralRate ?? defaultSettings.referralRate).toString());
         setReferralBonus((settings.referralBonus ?? defaultSettings.referralBonus).toString());
+        setSignupBonus((settings.signupBonus ?? defaultSettings.signupBonus).toString());
         setReferralEnabled(settings.referralEnabled !== false);
 
         setBkashNumber(settings.bkashNumber || defaultSettings.bkashNumber);
@@ -199,6 +203,7 @@ export default function AdminSettingsPage() {
                 withdrawalFee: Number(withdrawalFee) || 0,
                 referralRate: Number(referralRate) || 5,
                 referralBonus: Number(referralBonus) || 50,
+                signupBonus: Number(signupBonus) || 0,
                 referralEnabled,
                 bkashNumber: bkashNumber.trim(),
                 nagadNumber: nagadNumber.trim(),
@@ -318,9 +323,13 @@ export default function AdminSettingsPage() {
                             <label htmlFor="maxWithdrawInput">Daily Maximum Withdrawal (৳)</label>
                             <input type="number" id="maxWithdrawInput" value={maxWithdrawal} onChange={e => setMaxWithdrawal(e.target.value)} style={inputStyle} />
                         </div>
-                        <div className="form-group">
+                        <div className="form-group" style={{ marginBottom: '12px' }}>
                             <label htmlFor="withdrawFeeInput">Withdrawal Commission Surcharge (%)</label>
                             <input type="number" id="withdrawFeeInput" value={withdrawalFee} onChange={e => setWithdrawalFee(e.target.value)} style={inputStyle} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="signupBonusInput">Account Opening Bonus (৳)</label>
+                            <input type="number" id="signupBonusInput" value={signupBonus} onChange={e => setSignupBonus(e.target.value)} style={inputStyle} />
                         </div>
                     </div>
 
