@@ -24,6 +24,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "static-backup/**",
+    "test-supabase.js",
   ]),
 ]);
 

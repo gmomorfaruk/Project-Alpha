@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" data-scroll-behavior="smooth">
+    <html lang="en" data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="manifest" href="/manifest.json" />

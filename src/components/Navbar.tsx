@@ -511,12 +511,7 @@ export default function Navbar() {
                         {/* Download APK Button */}
                         <a 
                             href="#" 
-                            className="nav-link-pill-inactive flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-sm transition-all"
-                            style={{ 
-                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
-                                color: 'white',
-                                marginLeft: '8px'
-                            }}
+                            className="nav-download-btn"
                         >
                             <i className="fab fa-android text-lg"></i>
                             <span>{tText('Download App', 'অ্যাপ ডাউনলোড')}</span>

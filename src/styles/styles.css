@@ -1948,6 +1948,34 @@ textarea::placeholder {
     background: rgba(16, 185, 129, 0.05);
 }
 
+.nav-download-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 999px;
+    margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    color: #ffffff !important;
+    filter: brightness(1.05);
+}
+
+.nav-download-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
 /* Right control actions */
 .navbar-action-btn {
     width: 40px;
